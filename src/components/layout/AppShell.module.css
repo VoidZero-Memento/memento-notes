@@ -1,0 +1,117 @@
+@keyframes app-shell-blob-warm {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  45% {
+    transform: translate(2.5%, -2%) scale(1.04);
+    opacity: 0.88;
+  }
+}
+
+@keyframes app-shell-blob-cool {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-2%, 2.5%) scale(1.05);
+    opacity: 0.86;
+  }
+}
+
+.root {
+  position: relative;
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  isolation: isolate;
+  overflow: hidden;
+  /* mesh：暖顶左 + 紫右下 + 中部粉紫衔接 + 深底 */
+  background:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(245, 168, 112, 0.38), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(124, 86, 210, 0.36), transparent 54%),
+    radial-gradient(ellipse 55% 50% at 68% 18%, rgba(196, 181, 253, 0.12), transparent 48%),
+    radial-gradient(ellipse 45% 40% at 48% 62%, rgba(255, 209, 232, 0.07), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(244, 90, 163, 0.1), transparent 50%),
+    linear-gradient(165deg, #0e0a10 0%, #141018 38%, #100c14 72%, #0b090e 100%);
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.35);
+  padding: 0;
+}
+
+.root::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 1;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.07) 0.6px, transparent 0.6px),
+    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size:
+    24px 24px,
+    64px 64px,
+    64px 64px,
+    180px 180px;
+  background-blend-mode: normal, normal, normal, soft-light;
+  mask-image: radial-gradient(ellipse 88% 78% at 50% 44%, black 22%, transparent 76%);
+}
+
+.root::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  left: -8%;
+  top: -6%;
+  width: 48vmin;
+  height: 48vmin;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 45% 42%, rgba(220, 160, 108, 0.32), transparent 58%);
+  filter: blur(52px);
+  animation: app-shell-blob-warm 22s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root::after,
+  .rootBlob {
+    animation: none !important;
+  }
+}
+
+/* 额外一层右下漫反射，模拟参考站大体积模糊光斑 */
+.rootBlob {
+  pointer-events: none;
+  position: absolute;
+  right: -6%;
+  bottom: -5%;
+  width: 50vmin;
+  height: 50vmin;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 58% 48%, rgba(152, 96, 220, 0.26), transparent 62%);
+  filter: blur(48px);
+  animation: app-shell-blob-cool 26s ease-in-out infinite;
+  animation-delay: -4s;
+  will-change: transform, opacity;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 0;
+}

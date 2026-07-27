@@ -1,0 +1,53 @@
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  padding: 6px 8px;
+  color: rgba(255, 248, 252, 0.78);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.row:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 248, 252, 0.95);
+}
+
+.name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  margin: 8px 4px;
+  color: rgba(255, 248, 252, 0.45);
+  font-size: 13px;
+  line-height: 1.5;
+}
