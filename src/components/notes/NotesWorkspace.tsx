@@ -30,6 +30,7 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>("files");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const outlineItems = content ? parseOutline(content) : [];
   const outlineEmptyLabel = selectedPath ? "暂无大纲" : "请先选择文件";
@@ -41,8 +42,25 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
     };
   }, [selectedPath]);
 
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileNavOpen(false);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileNavOpen]);
+
+  const openMobileNav = (mode: SidebarMode) => {
+    setSidebarMode(mode);
+    setMobileNavOpen(true);
+  };
+
   const handleSelect = async (path: string) => {
     setSelectedPath(path);
+    setMobileNavOpen(false);
     setLoading(true);
     setError(null);
 
@@ -67,13 +85,40 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
       top: container.scrollTop + offset,
       behavior: "smooth",
     });
+    setMobileNavOpen(false);
   };
+
+  const sidebarClassName = mobileNavOpen
+    ? `${styles.sidebar} ${styles.sidebarOpen}`
+    : styles.sidebar;
+
+  const backdropClassName = mobileNavOpen
+    ? `${styles.backdrop} ${styles.backdropVisible}`
+    : styles.backdrop;
 
   return (
     <div className={styles.root}>
-      <aside className={styles.sidebar}>
+      <button
+        type="button"
+        className={backdropClassName}
+        aria-label="关闭导航"
+        aria-hidden={!mobileNavOpen}
+        tabIndex={mobileNavOpen ? 0 : -1}
+        onClick={() => setMobileNavOpen(false)}
+      />
+      <aside className={sidebarClassName}>
         <div className={styles.sidebarHeader}>
-          <h2 className={styles.sidebarTitle}>笔记仓库</h2>
+          <div className={styles.sidebarTitleRow}>
+            <h2 className={styles.sidebarTitle}>笔记仓库</h2>
+            <button
+              type="button"
+              className={styles.mobileClose}
+              aria-label="关闭"
+              onClick={() => setMobileNavOpen(false)}
+            >
+              ×
+            </button>
+          </div>
           <RepoSelect repos={repos} activeId={config.id} />
           <div className={styles.sidebarTabs} role="tablist" aria-label="侧栏面板">
             <button
@@ -118,9 +163,20 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
         </div>
       </aside>
       <main className={styles.viewer}>
+        <div className={styles.mobileBar}>
+          <h2 className={styles.mobileBarTitle}>笔记仓库</h2>
+          <div className={styles.mobileBarActions}>
+            <button type="button" className={styles.mobileBarBtn} onClick={() => openMobileNav("files")}>
+              文件
+            </button>
+            <button type="button" className={styles.mobileBarBtn} onClick={() => openMobileNav("outline")}>
+              大纲
+            </button>
+          </div>
+        </div>
         {selectedPath ? <p className={styles.viewerPath}>{selectedPath}</p> : null}
         <div className={styles.viewerBody} ref={viewerBodyRef}>
-          {!selectedPath ? <p className={styles.status}>请从左侧选择一个 Markdown 文件</p> : null}
+          {!selectedPath ? <p className={styles.status}>请选择一个 Markdown 文件</p> : null}
           {selectedPath && loading ? <LoadingState label="加载中" /> : null}
           {selectedPath && error ? <p className={styles.error}>{error}</p> : null}
           {selectedPath && content && !loading ? (

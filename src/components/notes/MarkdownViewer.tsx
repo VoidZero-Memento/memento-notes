@@ -38,6 +38,11 @@ const extractText = (node: unknown): string => {
 };
 
 const markdownComponents: Components = {
+  table: ({ children }) => (
+    <div className={styles.tableScroll}>
+      <table>{children}</table>
+    </div>
+  ),
   pre: ({ children, className }) => {
     const childList = Children.toArray(children);
     const codeChild = childList.find((child) => isValidElement(child));
