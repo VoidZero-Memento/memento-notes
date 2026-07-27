@@ -137,6 +137,10 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
           </div>
           <RepoSelect repos={repos} activeId={config.id} />
           <div className={styles.sidebarTabs} role="tablist" aria-label="侧栏面板">
+            <span
+              className={`${styles.sidebarTabsThumb}${sidebarMode === "outline" ? ` ${styles.sidebarTabsThumbOutline}` : ""}`}
+              aria-hidden="true"
+            />
             <button
               type="button"
               role="tab"

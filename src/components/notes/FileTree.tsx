@@ -38,6 +38,12 @@ const FileIcon = () => (
   </svg>
 );
 
+const ChevronIcon = () => (
+  <svg className={styles.chevronIcon} viewBox="0 0 16 16" aria-hidden>
+    <path fill="currentColor" d="M6.2 3.2a.75.75 0 0 1 1.06 0l4 4a.75.75 0 0 1 0 1.06l-4 4A.75.75 0 0 1 6.2 11.2L9.64 7.75 6.2 4.3a.75.75 0 0 1 0-1.1Z" />
+  </svg>
+);
+
 const TreeNode = ({ node, depth, selectedPath, expanded, onToggle, onSelect }: TreeNodeProps) => {
   const isTree = node.type === "tree";
   const isExpanded = isTree && expanded.has(node.path);
@@ -58,7 +64,9 @@ const TreeNode = ({ node, depth, selectedPath, expanded, onToggle, onSelect }: T
           onClick={() => onToggle(node.path)}
           title={node.path}
         >
-          <span className={`${styles.chevron}${isExpanded ? ` ${styles.chevronExpanded}` : ""}`}>▶</span>
+          <span className={`${styles.chevron}${isExpanded ? ` ${styles.chevronExpanded}` : ""}`}>
+            <ChevronIcon />
+          </span>
           <FolderIcon />
           <span className={styles.name}>{node.name}</span>
         </button>

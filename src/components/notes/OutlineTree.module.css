@@ -18,11 +18,12 @@
   width: 100%;
   box-sizing: border-box;
   align-items: center;
+  gap: 7px;
   border: none;
   border-radius: 8px;
   background: transparent;
   padding: 6px 8px;
-  color: rgba(255, 248, 252, 0.78);
+  color: rgba(230, 248, 255, 0.78);
   font: inherit;
   font-size: 13px;
   line-height: 1.35;
@@ -30,12 +31,52 @@
   cursor: pointer;
   transition:
     background 0.15s ease,
-    color 0.15s ease;
+    color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .row:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 248, 252, 0.95);
+  background: rgba(0, 240, 255, 0.06);
+  color: rgba(230, 248, 255, 0.95);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+}
+
+.icon {
+  display: inline-flex;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.iconL1 {
+  color: rgba(0, 240, 255, 0.95);
+  filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.55));
+}
+
+.iconL2 {
+  color: rgba(255, 45, 149, 0.9);
+  filter: drop-shadow(0 0 4px rgba(255, 45, 149, 0.45));
+}
+
+.iconL3 {
+  width: 10px;
+  height: 10px;
+  color: rgba(0, 240, 255, 0.55);
+  filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.3));
+}
+
+.iconLn {
+  width: 10px;
+  height: 10px;
+  color: rgba(230, 248, 255, 0.35);
+}
+
+.row:hover .iconL1 {
+  filter: drop-shadow(0 0 7px rgba(0, 240, 255, 0.75));
+}
+
+.row:hover .iconL2 {
+  filter: drop-shadow(0 0 6px rgba(255, 45, 149, 0.65));
 }
 
 .name {
@@ -47,7 +88,7 @@
 
 .empty {
   margin: 8px 4px;
-  color: rgba(255, 248, 252, 0.45);
+  color: rgba(230, 248, 255, 0.42);
   font-size: 13px;
   line-height: 1.5;
 }
