@@ -37,7 +37,26 @@ const extractText = (node: unknown): string => {
   return "";
 };
 
+const isExternalHref = (href?: string): boolean => {
+  if (!href) return false;
+  return /^(https?:|mailto:|tel:)/i.test(href);
+};
+
 const markdownComponents: Components = {
+  a: ({ href, children, ...props }) => {
+    if (isExternalHref(href)) {
+      return (
+        <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+          {children}
+        </a>
+      );
+    }
+    return (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    );
+  },
   table: ({ children }) => (
     <div className={styles.tableScroll}>
       <table>{children}</table>

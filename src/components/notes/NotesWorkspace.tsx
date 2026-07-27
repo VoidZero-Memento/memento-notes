@@ -8,6 +8,7 @@ import { FileTree } from "./FileTree";
 import { LoadingState } from "./LoadingState";
 import { MarkdownViewer } from "./MarkdownViewer";
 import { OutlineTree } from "./OutlineTree";
+import { OwnerFooter } from "./OwnerFooter";
 import { RepoSelect } from "./RepoSelect";
 import styles from "./NotesShell.module.css";
 
@@ -30,6 +31,7 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>("files");
+  const [sidebarHidden, setSidebarHidden] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const outlineItems = content ? parseOutline(content) : [];
@@ -88,16 +90,20 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
     setMobileNavOpen(false);
   };
 
-  const sidebarClassName = mobileNavOpen
-    ? `${styles.sidebar} ${styles.sidebarOpen}`
-    : styles.sidebar;
+  const sidebarClassName = [
+    styles.sidebar,
+    mobileNavOpen ? styles.sidebarOpen : "",
+    sidebarHidden ? styles.sidebarHidden : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const backdropClassName = mobileNavOpen
     ? `${styles.backdrop} ${styles.backdropVisible}`
     : styles.backdrop;
 
   return (
-    <div className={styles.root}>
+    <div className={`${styles.root}${sidebarHidden ? ` ${styles.rootSidebarHidden}` : ""}`}>
       <button
         type="button"
         className={backdropClassName}
@@ -106,18 +112,28 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
         tabIndex={mobileNavOpen ? 0 : -1}
         onClick={() => setMobileNavOpen(false)}
       />
-      <aside className={sidebarClassName}>
+      <aside className={sidebarClassName} aria-hidden={sidebarHidden}>
         <div className={styles.sidebarHeader}>
           <div className={styles.sidebarTitleRow}>
             <h2 className={styles.sidebarTitle}>笔记仓库</h2>
-            <button
-              type="button"
-              className={styles.mobileClose}
-              aria-label="关闭"
-              onClick={() => setMobileNavOpen(false)}
-            >
-              ×
-            </button>
+            <div className={styles.sidebarTitleActions}>
+              <button
+                type="button"
+                className={styles.sidebarCollapse}
+                aria-label="隐藏目录"
+                onClick={() => setSidebarHidden(true)}
+              >
+                «
+              </button>
+              <button
+                type="button"
+                className={styles.mobileClose}
+                aria-label="关闭"
+                onClick={() => setMobileNavOpen(false)}
+              >
+                ×
+              </button>
+            </div>
           </div>
           <RepoSelect repos={repos} activeId={config.id} />
           <div className={styles.sidebarTabs} role="tablist" aria-label="侧栏面板">
@@ -161,6 +177,7 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
             />
           </div>
         </div>
+        <OwnerFooter login={config.owner} avatarUrl={config.ownerAvatarUrl} />
       </aside>
       <main className={styles.viewer}>
         <div className={styles.mobileBar}>
@@ -174,6 +191,16 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
             </button>
           </div>
         </div>
+        {sidebarHidden ? (
+          <button
+            type="button"
+            className={styles.sidebarExpand}
+            aria-label="显示目录"
+            onClick={() => setSidebarHidden(false)}
+          >
+            <span className={styles.sidebarExpandMark} aria-hidden />
+          </button>
+        ) : null}
         {selectedPath ? <p className={styles.viewerPath}>{selectedPath}</p> : null}
         <div className={styles.viewerBody} ref={viewerBodyRef}>
           {!selectedPath ? <p className={styles.status}>请选择一个 Markdown 文件</p> : null}

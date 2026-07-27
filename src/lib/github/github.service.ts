@@ -20,11 +20,17 @@ type GithubApiTreeResponse = {
   message?: string;
 };
 
+type GithubApiRepoOwner = {
+  login?: string;
+  avatar_url?: string;
+};
+
 type GithubApiRepo = {
   name?: string;
   default_branch?: string;
   archived?: boolean;
   disabled?: boolean;
+  owner?: GithubApiRepoOwner;
 };
 
 type GithubApiRepoListResponse = GithubApiRepo[] | { message?: string };
@@ -118,7 +124,8 @@ export const listOrgRepos = async (owner: string): Promise<GithubRepoConfig[]> =
     .map((repo) => ({
       id: repo.name.toLowerCase(),
       label: repo.name,
-      owner,
+      owner: repo.owner?.login || owner,
+      ...(repo.owner?.avatar_url ? { ownerAvatarUrl: repo.owner.avatar_url } : {}),
       repo: repo.name,
       branch: repo.default_branch || "main",
     }));

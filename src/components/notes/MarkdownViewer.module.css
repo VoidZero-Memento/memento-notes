@@ -98,9 +98,13 @@
 }
 
 .viewer :global(img) {
+  display: block;
   max-width: 100%;
   height: auto;
+  margin: 1em auto;
   border-radius: 10px;
+  float: none;
+  clear: both;
 }
 
 .viewer :global(:not(pre) > code) {
