@@ -23,7 +23,7 @@
   border-radius: 8px;
   background: transparent;
   padding: 6px 8px;
-  color: rgba(230, 248, 255, 0.78);
+  color: rgba(var(--fg-rgb), 0.78);
   font: inherit;
   font-size: 13px;
   line-height: 1.35;
@@ -36,9 +36,9 @@
 }
 
 .row:hover {
-  background: rgba(0, 240, 255, 0.06);
-  color: rgba(230, 248, 255, 0.95);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+  background: rgba(var(--accent-rgb), 0.06);
+  color: rgba(var(--fg-rgb), 0.95);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.1);
 }
 
 .icon {
@@ -49,34 +49,34 @@
 }
 
 .iconL1 {
-  color: rgba(0, 240, 255, 0.95);
-  filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.55));
+  color: rgba(var(--accent-rgb), 0.95);
+  filter: drop-shadow(0 0 5px rgba(var(--accent-rgb), 0.55));
 }
 
 .iconL2 {
-  color: rgba(255, 45, 149, 0.9);
-  filter: drop-shadow(0 0 4px rgba(255, 45, 149, 0.45));
+  color: rgba(var(--accent-2-rgb), 0.9);
+  filter: drop-shadow(0 0 4px rgba(var(--accent-2-rgb), 0.45));
 }
 
 .iconL3 {
   width: 10px;
   height: 10px;
-  color: rgba(0, 240, 255, 0.55);
-  filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.3));
+  color: rgba(var(--accent-rgb), 0.55);
+  filter: drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.3));
 }
 
 .iconLn {
   width: 10px;
   height: 10px;
-  color: rgba(230, 248, 255, 0.35);
+  color: rgba(var(--fg-rgb), 0.35);
 }
 
 .row:hover .iconL1 {
-  filter: drop-shadow(0 0 7px rgba(0, 240, 255, 0.75));
+  filter: drop-shadow(0 0 7px rgba(var(--accent-rgb), 0.75));
 }
 
 .row:hover .iconL2 {
-  filter: drop-shadow(0 0 6px rgba(255, 45, 149, 0.65));
+  filter: drop-shadow(0 0 6px rgba(var(--accent-2-rgb), 0.65));
 }
 
 .name {
@@ -88,7 +88,7 @@
 
 .empty {
   margin: 8px 4px;
-  color: rgba(230, 248, 255, 0.42);
+  color: rgba(var(--fg-rgb), 0.42);
   font-size: 13px;
   line-height: 1.5;
 }

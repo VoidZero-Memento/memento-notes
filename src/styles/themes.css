@@ -1,0 +1,170 @@
+/* 主题通过 html[data-theme="1"…"5"] 切换；?theme=N */
+
+:root,
+[data-theme="2"] {
+  --accent-rgb: 0, 240, 255;
+  --accent-2-rgb: 255, 45, 149;
+  --accent-3-rgb: 0, 240, 255;
+  --fg-rgb: 230, 248, 255;
+  --accent: #00f0ff;
+  --accent-2: #ff2d95;
+  --accent-3: #00f0ff;
+  --accent-magenta: var(--accent-2);
+  --accent-dim: rgba(var(--accent-rgb), 0.18);
+  --accent-magenta-dim: rgba(var(--accent-2-rgb), 0.18);
+  --accent-gold: var(--accent-3);
+  --accent-gold-dim: rgba(var(--accent-3-rgb), 0.18);
+  --link: #00e5ff;
+  --link-hover: #ff2d95;
+  --background: #060a12;
+  --background-deep: #04070e;
+  --background-mid: #080e1a;
+  --foreground: rgba(var(--fg-rgb), 0.95);
+  --panel-bg: rgba(8, 14, 28, 0.55);
+  --panel-border: rgba(var(--accent-rgb), 0.18);
+  --glow-cyan: 0 0 12px rgba(var(--accent-rgb), 0.55), 0 0 28px rgba(var(--accent-rgb), 0.25);
+  --glow-magenta: 0 0 12px rgba(var(--accent-2-rgb), 0.55), 0 0 28px rgba(var(--accent-2-rgb), 0.25);
+  --glow-gold: 0 0 12px rgba(var(--accent-3-rgb), 0.55), 0 0 28px rgba(var(--accent-3-rgb), 0.28);
+  --glow-mixed: 0 0 10px rgba(var(--accent-rgb), 0.4), 0 0 22px rgba(var(--accent-2-rgb), 0.3);
+  --hologram: linear-gradient(135deg, #00f0ff 0%, #7c5cff 48%, #ff2d95 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.42), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.4), transparent 54%),
+    radial-gradient(ellipse 55% 50% at 68% 18%, rgba(120, 80, 255, 0.16), transparent 48%),
+    radial-gradient(ellipse 45% 40% at 48% 62%, rgba(var(--accent-rgb), 0.1), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.12), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool: radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.4), transparent 62%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.45);
+  --title-color: var(--foreground);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-2-rgb), 0.12);
+}
+
+/* 1 极光紫金 */
+[data-theme="1"] {
+  --accent-rgb: 167, 139, 250;
+  --accent-2-rgb: 240, 171, 252;
+  --accent-3-rgb: 251, 191, 36;
+  --fg-rgb: 248, 244, 255;
+  --accent: #a78bfa;
+  --accent-2: #f0abfc;
+  --accent-3: #fbbf24;
+  --link: #c4b5fd;
+  --link-hover: #f0abfc;
+  --background: #05030a;
+  --background-deep: #030208;
+  --background-mid: #0c0816;
+  --panel-bg: rgba(12, 8, 22, 0.55);
+  --hologram: linear-gradient(135deg, #a78bfa 0%, #f0abfc 50%, #fbbf24 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.44), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.38), transparent 54%),
+    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.14), transparent 50%),
+    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.12), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.1), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.38), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.22), transparent 55%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.5);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-3-rgb), 0.12);
+}
+
+/* 3 冰焰蓝橙 */
+[data-theme="3"] {
+  --accent-rgb: 56, 189, 248;
+  --accent-2-rgb: 129, 140, 248;
+  --accent-3-rgb: 251, 146, 60;
+  --fg-rgb: 230, 242, 255;
+  --accent: #38bdf8;
+  --accent-2: #818cf8;
+  --accent-3: #fb923c;
+  --link: #7dd3fc;
+  --link-hover: #818cf8;
+  --background: #020617;
+  --background-deep: #01040f;
+  --background-mid: #0a1228;
+  --panel-bg: rgba(6, 12, 28, 0.55);
+  --hologram: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #fb923c 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.44), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.38), transparent 54%),
+    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.16), transparent 50%),
+    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.12), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.1), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.38), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.22), transparent 55%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.55);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-3-rgb), 0.12);
+}
+
+/* 4 全息虹彩 */
+[data-theme="4"] {
+  --accent-rgb: 34, 211, 238;
+  --accent-2-rgb: 168, 85, 247;
+  --accent-3-rgb: 244, 114, 182;
+  --fg-rgb: 248, 246, 255;
+  --accent: #22d3ee;
+  --accent-2: #a855f7;
+  --accent-3: #f472b6;
+  --link: #67e8f9;
+  --link-hover: #a855f7;
+  --background: #0a0a0f;
+  --background-deep: #050508;
+  --background-mid: #121018;
+  --panel-bg: rgba(12, 10, 22, 0.55);
+  --hologram: linear-gradient(135deg, #22d3ee 0%, #a855f7 48%, #f472b6 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 8% 10%, rgba(var(--accent-rgb), 0.48), transparent 56%),
+    radial-gradient(ellipse 70% 60% at 50% 8%, rgba(var(--accent-2-rgb), 0.28), transparent 52%),
+    radial-gradient(ellipse 78% 68% at 94% 88%, rgba(var(--accent-3-rgb), 0.36), transparent 54%),
+    radial-gradient(ellipse 50% 46% at 78% 28%, rgba(var(--accent-2-rgb), 0.2), transparent 50%),
+    radial-gradient(ellipse 55% 50% at 42% 62%, rgba(var(--accent-rgb), 0.12), transparent 52%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.38), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.22), transparent 55%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.55);
+  --title-color: transparent;
+  --title-shadow: none;
+}
+
+/* 5 激光红黑 */
+[data-theme="5"] {
+  --accent-rgb: 255, 0, 60;
+  --accent-2-rgb: 255, 107, 0;
+  --accent-3-rgb: 255, 255, 255;
+  --fg-rgb: 255, 248, 248;
+  --accent: #ff003c;
+  --accent-2: #ff6b00;
+  --accent-3: #ffffff;
+  --link: #ff4d6d;
+  --link-hover: #ff6b00;
+  --background: #0a0000;
+  --background-deep: #050000;
+  --background-mid: #1a0508;
+  --panel-bg: rgba(18, 2, 4, 0.6);
+  --hologram: linear-gradient(135deg, #ff003c 0%, #ff6b00 55%, #ffffff 100%);
+  --shell-bg:
+    radial-gradient(ellipse 88% 70% at 8% 8%, rgba(var(--accent-rgb), 0.42), transparent 58%),
+    radial-gradient(ellipse 70% 58% at 88% 18%, rgba(var(--accent-2-rgb), 0.22), transparent 52%),
+    radial-gradient(ellipse 80% 70% at 92% 92%, rgba(var(--accent-rgb), 0.28), transparent 54%),
+    radial-gradient(ellipse 40% 36% at 48% 48%, rgba(var(--accent-3-rgb), 0.04), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 40%, var(--background-mid) 75%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.4), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-rgb), 0.28), transparent 55%);
+  --shell-inset: inset 0 0 120px rgba(0, 0, 0, 0.65);
+  --title-color: #ff4d6d;
+  --title-shadow:
+    0 0 6px rgba(var(--accent-rgb), 0.85),
+    0 0 18px rgba(var(--accent-rgb), 0.45),
+    0 0 32px rgba(var(--accent-2-rgb), 0.25);
+}

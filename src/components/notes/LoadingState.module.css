@@ -57,7 +57,7 @@
   position: relative;
   width: 72px;
   height: 72px;
-  filter: drop-shadow(0 0 16px rgba(0, 240, 255, 0.35)) drop-shadow(0 0 28px rgba(255, 45, 149, 0.25));
+  filter: drop-shadow(0 0 16px rgba(var(--accent-rgb), 0.35)) drop-shadow(0 0 28px rgba(var(--accent-2-rgb), 0.25));
 }
 
 .ring {
@@ -65,13 +65,13 @@
   inset: 0;
   border-radius: 50%;
   border: 2.5px solid transparent;
-  border-top-color: rgba(0, 240, 255, 0.95);
-  border-right-color: rgba(255, 45, 149, 0.75);
-  border-bottom-color: rgba(0, 240, 255, 0.25);
-  border-left-color: rgba(255, 45, 149, 0.3);
+  border-top-color: rgba(var(--accent-rgb), 0.95);
+  border-right-color: rgba(var(--accent-2-rgb), 0.75);
+  border-bottom-color: rgba(var(--accent-rgb), 0.25);
+  border-left-color: rgba(var(--accent-2-rgb), 0.3);
   box-shadow:
-    0 0 14px rgba(0, 240, 255, 0.35),
-    0 0 22px rgba(255, 45, 149, 0.2);
+    0 0 14px rgba(var(--accent-rgb), 0.35),
+    0 0 22px rgba(var(--accent-2-rgb), 0.2);
   animation: loading-spin 0.9s linear infinite;
 }
 
@@ -81,14 +81,14 @@
   border-radius: 50%;
   background: radial-gradient(
     circle at 40% 35%,
-    rgba(0, 240, 255, 0.55),
-    rgba(255, 45, 149, 0.35) 45%,
-    rgba(0, 240, 255, 0.12) 65%,
+    rgba(var(--accent-rgb), 0.55),
+    rgba(var(--accent-2-rgb), 0.35) 45%,
+    rgba(var(--accent-rgb), 0.12) 65%,
     transparent 75%
   );
   box-shadow:
-    0 0 18px rgba(0, 240, 255, 0.4),
-    0 0 28px rgba(255, 45, 149, 0.25);
+    0 0 18px rgba(var(--accent-rgb), 0.4),
+    0 0 28px rgba(var(--accent-2-rgb), 0.25);
   animation: loading-breathe 1.8s ease-in-out infinite;
 }
 
@@ -97,11 +97,11 @@
   align-items: baseline;
   gap: 2px;
   margin: 0;
-  color: rgba(230, 248, 255, 0.62);
+  color: rgba(var(--fg-rgb), 0.62);
   font-size: 16px;
   letter-spacing: 0.08em;
   line-height: 1;
-  text-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+  text-shadow: 0 0 12px rgba(var(--accent-rgb), 0.35);
 }
 
 .dots {
@@ -115,20 +115,20 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: rgba(0, 240, 255, 0.9);
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.7);
+  background: rgba(var(--accent-rgb), 0.9);
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.7);
   animation: loading-dot 1.2s ease-in-out infinite;
 }
 
 .dots i:nth-child(2) {
-  background: rgba(255, 45, 149, 0.9);
-  box-shadow: 0 0 8px rgba(255, 45, 149, 0.7);
+  background: rgba(var(--accent-2-rgb), 0.9);
+  box-shadow: 0 0 8px rgba(var(--accent-2-rgb), 0.7);
   animation-delay: 0.16s;
 }
 
 .dots i:nth-child(3) {
-  background: rgba(0, 240, 255, 0.9);
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.7);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.75);
   animation-delay: 0.32s;
 }
 
@@ -141,9 +141,9 @@
   }
 
   .ring {
-    border-color: rgba(255, 45, 149, 0.35);
-    border-top-color: rgba(0, 240, 255, 0.95);
-    border-right-color: rgba(255, 45, 149, 0.75);
+    border-color: rgba(var(--accent-2-rgb), 0.35);
+    border-top-color: rgba(var(--accent-rgb), 0.95);
+    border-right-color: rgba(var(--accent-2-rgb), 0.75);
   }
 
   .core {

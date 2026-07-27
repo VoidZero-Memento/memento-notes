@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import { isMarkdownPath } from "@/lib/github/repo-path";
 import styles from "./FileTree.module.css";
@@ -18,6 +18,12 @@ type TreeNodeProps = {
   expanded: Set<string>;
   onToggle: (path: string) => void;
   onSelect: (path: string) => void;
+};
+
+type HighlightRect = {
+  top: number;
+  height: number;
+  ready: boolean;
 };
 
 const FolderIcon = () => (
@@ -96,6 +102,7 @@ const TreeNode = ({ node, depth, selectedPath, expanded, onToggle, onSelect }: T
           type="button"
           className={rowClassName}
           style={{ paddingLeft }}
+          data-tree-path={node.path}
           onClick={() => onSelect(node.path)}
           title={node.path}
         >
@@ -118,8 +125,28 @@ const TreeNode = ({ node, depth, selectedPath, expanded, onToggle, onSelect }: T
   );
 };
 
+const measureHighlight = (tree: HTMLElement, selectedPath: string): HighlightRect | null => {
+  const selected = tree.querySelector<HTMLElement>(`[data-tree-path="${CSS.escape(selectedPath)}"]`);
+  if (!selected) return null;
+
+  const wrap = tree.parentElement;
+  if (!wrap) return null;
+
+  const wrapRect = wrap.getBoundingClientRect();
+  const rowRect = selected.getBoundingClientRect();
+
+  return {
+    top: rowRect.top - wrapRect.top + wrap.scrollTop,
+    height: rowRect.height,
+    ready: true,
+  };
+};
+
 export const FileTree = ({ nodes, selectedPath, onSelect }: FileTreeProps) => {
   const [expanded, setExpanded] = useState(() => new Set<string>());
+  const treeRef = useRef<HTMLUListElement>(null);
+  const [highlight, setHighlight] = useState<HighlightRect>({ top: 0, height: 0, ready: false });
+  const [animate, setAnimate] = useState(false);
 
   const handleToggle = (path: string) => {
     setExpanded((prev) => {
@@ -130,23 +157,63 @@ export const FileTree = ({ nodes, selectedPath, onSelect }: FileTreeProps) => {
     });
   };
 
+  useLayoutEffect(() => {
+    const tree = treeRef.current;
+    if (!tree || !selectedPath) {
+      setAnimate(false);
+      setHighlight((prev) => (prev.ready ? { ...prev, ready: false } : prev));
+      return;
+    }
+
+    const next = measureHighlight(tree, selectedPath);
+    if (!next) {
+      setHighlight((prev) => (prev.ready ? { ...prev, ready: false } : prev));
+      return;
+    }
+
+    setAnimate(highlight.ready);
+    setHighlight(next);
+
+    const observer = new ResizeObserver(() => {
+      const updated = measureHighlight(tree, selectedPath);
+      if (updated) {
+        setAnimate(false);
+        setHighlight(updated);
+      }
+    });
+    observer.observe(tree);
+
+    return () => observer.disconnect();
+  }, [selectedPath, expanded, nodes]);
+
   if (nodes.length === 0) {
     return <p className={styles.name}>暂无文件</p>;
   }
 
+  const highlightClassName = `${styles.highlight}${highlight.ready ? ` ${styles.highlightVisible}` : ""}${
+    animate ? ` ${styles.highlightAnimate}` : ""
+  }`;
+
   return (
-    <ul className={styles.tree}>
-      {nodes.map((node) => (
-        <TreeNode
-          key={node.path}
-          node={node}
-          depth={0}
-          selectedPath={selectedPath}
-          expanded={expanded}
-          onToggle={handleToggle}
-          onSelect={onSelect}
-        />
-      ))}
-    </ul>
+    <div className={styles.treeWrap}>
+      <div
+        className={highlightClassName}
+        aria-hidden
+        style={{ top: highlight.top, height: highlight.height }}
+      />
+      <ul className={styles.tree} ref={treeRef}>
+        {nodes.map((node) => (
+          <TreeNode
+            key={node.path}
+            node={node}
+            depth={0}
+            selectedPath={selectedPath}
+            expanded={expanded}
+            onToggle={handleToggle}
+            onSelect={onSelect}
+          />
+        ))}
+      </ul>
+    </div>
   );
 };

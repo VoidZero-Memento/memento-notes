@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import styles from "./RepoSelect.module.css";
 
@@ -12,6 +12,7 @@ type RepoSelectProps = {
 
 export const RepoSelect = ({ repos, activeId }: RepoSelectProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -41,7 +42,7 @@ export const RepoSelect = ({ repos, activeId }: RepoSelectProps) => {
 
   const handleSelect = (id: string) => {
     setOpen(false);
-    if (id !== activeId) navigate(`/${id}`);
+    if (id !== activeId) navigate({ pathname: `/${id}`, search: location.search });
   };
 
   return (

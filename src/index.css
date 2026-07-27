@@ -1,15 +1,6 @@
+@import "./styles/themes.css";
+
 :root {
-  --background: #060a12;
-  --foreground: rgba(230, 248, 255, 0.95);
-  --accent: #00f0ff;
-  --accent-magenta: #ff2d95;
-  --accent-dim: rgba(0, 240, 255, 0.18);
-  --accent-magenta-dim: rgba(255, 45, 149, 0.18);
-  --glow-cyan: 0 0 12px rgba(0, 240, 255, 0.55), 0 0 28px rgba(0, 240, 255, 0.25);
-  --glow-magenta: 0 0 12px rgba(255, 45, 149, 0.55), 0 0 28px rgba(255, 45, 149, 0.25);
-  --glow-mixed: 0 0 10px rgba(0, 240, 255, 0.4), 0 0 22px rgba(255, 45, 149, 0.3);
-  --panel-bg: rgba(8, 14, 28, 0.55);
-  --panel-border: rgba(0, 240, 255, 0.18);
   --font-geist-sans: "Geist", Arial, Helvetica, sans-serif;
   --font-geist-mono: "Geist Mono", ui-monospace, monospace;
 }
@@ -18,7 +9,7 @@ html {
   height: 100%;
   height: 100dvh;
   color-scheme: dark;
-  background: #04070e;
+  background: var(--background-deep);
 }
 
 html,
@@ -34,7 +25,7 @@ body {
   display: flex;
   flex-direction: column;
   color: var(--foreground);
-  background: #04070e;
+  background: var(--background-deep);
   font-family: var(--font-geist-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -50,7 +41,7 @@ body {
   padding: 0;
   margin: 0;
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 240, 255, 0.28) transparent;
+  scrollbar-color: rgba(var(--accent-rgb), 0.3) transparent;
 }
 
 a {
@@ -59,9 +50,9 @@ a {
 }
 
 ::selection {
-  background: rgba(0, 240, 255, 0.35);
+  background: rgba(var(--accent-3-rgb), 0.35);
   color: var(--foreground);
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.45);
+  text-shadow: 0 0 8px rgba(var(--accent-3-rgb), 0.45);
 }
 
 *::-webkit-scrollbar {
@@ -72,8 +63,8 @@ a {
 *::-webkit-scrollbar-thumb {
   border: 3px solid transparent;
   border-radius: 999px;
-  background: rgba(0, 240, 255, 0.22) border-box;
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+  background: rgba(var(--accent-rgb), 0.24) border-box;
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.22);
 }
 
 *::-webkit-scrollbar-track {

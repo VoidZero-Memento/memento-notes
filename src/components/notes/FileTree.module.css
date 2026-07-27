@@ -1,10 +1,42 @@
+.treeWrap {
+  position: relative;
+}
+
 .tree {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 1px;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.highlight {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(135deg, rgba(var(--accent-3-rgb), 0.16), rgba(var(--accent-rgb), 0.12));
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--accent-3-rgb), 0.45),
+    0 0 10px rgba(var(--accent-3-rgb), 0.28),
+    0 0 18px rgba(var(--accent-rgb), 0.2);
+}
+
+.highlightVisible {
+  opacity: 1;
+}
+
+.highlightAnimate {
+  transition:
+    top 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease;
 }
 
 .item {
@@ -23,7 +55,7 @@
   border-radius: 8px;
   background: transparent;
   padding: 6px 8px;
-  color: rgba(230, 248, 255, 0.78);
+  color: rgba(var(--fg-rgb), 0.78);
   font: inherit;
   font-size: 13px;
   line-height: 1.35;
@@ -32,8 +64,7 @@
   cursor: pointer;
   transition:
     background 0.15s ease,
-    color 0.15s ease,
-    box-shadow 0.15s ease;
+    color 0.15s ease;
 }
 
 .rowDisabled {
@@ -43,26 +74,21 @@
 
 .rowDisabled:hover {
   background: transparent;
-  color: rgba(230, 248, 255, 0.78);
-  box-shadow: none;
+  color: rgba(var(--fg-rgb), 0.78);
 }
 
 .row:hover {
-  background: rgba(0, 240, 255, 0.06);
-  color: rgba(230, 248, 255, 0.95);
+  background: rgba(var(--accent-rgb), 0.06);
+  color: rgba(var(--fg-rgb), 0.95);
 }
 
 .rowSelected {
-  background: linear-gradient(135deg, rgba(255, 45, 149, 0.18), rgba(0, 240, 255, 0.12));
+  background: transparent;
   color: var(--foreground);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 45, 149, 0.35),
-    0 0 14px rgba(255, 45, 149, 0.2),
-    0 0 10px rgba(0, 240, 255, 0.12);
 }
 
 .rowSelected:hover {
-  background: linear-gradient(135deg, rgba(255, 45, 149, 0.24), rgba(0, 240, 255, 0.16));
+  background: transparent;
 }
 
 .chevron {
@@ -72,7 +98,7 @@
   width: 12px;
   height: 12px;
   flex-shrink: 0;
-  color: rgba(230, 248, 255, 0.45);
+  color: rgba(var(--fg-rgb), 0.45);
   transition: transform 0.15s ease;
 }
 
@@ -97,17 +123,17 @@
   width: 14px;
   height: 14px;
   flex-shrink: 0;
-  color: rgba(230, 248, 255, 0.5);
+  color: rgba(var(--fg-rgb), 0.5);
 }
 
 .iconFolder {
-  color: rgba(255, 45, 149, 0.85);
-  filter: drop-shadow(0 0 4px rgba(255, 45, 149, 0.45));
+  color: rgba(var(--accent-2-rgb), 0.85);
+  filter: drop-shadow(0 0 4px rgba(var(--accent-2-rgb), 0.45));
 }
 
 .iconFile {
-  color: rgba(0, 240, 255, 0.8);
-  filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.4));
+  color: rgba(var(--accent-rgb), 0.8);
+  filter: drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.4));
 }
 
 .name {
@@ -124,4 +150,10 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .highlightAnimate {
+    transition: opacity 0.15s ease;
+  }
 }
