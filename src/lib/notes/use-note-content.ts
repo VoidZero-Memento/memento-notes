@@ -14,14 +14,17 @@ type UseNoteContentResult = {
   retry: () => Promise<void>;
 };
 
+/** 延后挂 pending UI，让侧栏选中高亮先完成提交/绘制，避免同帧抢主线程 */
+const PENDING_UI_DELAY_MS = 100;
+
 const toErrorMessage = (err: unknown) => (err instanceof Error ? err.message : "加载笔记内容失败");
 
 /**
  * 管理选中笔记的内容加载。
  *
  * - `selectNote`：由用户点击触发，立刻更新 URL（侧栏选中态跟上），再后台拉内容；
- *   拉取期间保留旧正文并显示 `pending`，拉完后用 `runWithViewTransition` 替换内容，
- *   这样过渡动画截到的仍是新旧两篇真实内容。
+ *   `pending` 延后一小段再挂上，避免与高亮切换同帧竞争；短请求可不闪 Loading。
+ *   拉完后用 `runWithViewTransition` 替换内容，过渡动画截到的仍是新旧两篇真实内容。
  * - 内部的 `useEffect`：处理非点击触发的加载（首次进入、刷新、浏览器前进后退），
  *   这类场景没有"旧内容"可过渡，走普通 loading 态；用 `requestedPathRef` /
  *   `loadedPathRef` 避免与 `selectNote` 重复请求或互相抢写。
@@ -33,19 +36,37 @@ export const useNoteContent = (
 ): UseNoteContentResult => {
   const loadedPathRef = useRef<string | null>(null);
   const requestedPathRef = useRef<string | null>(null);
+  const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const clearPendingTimer = () => {
+    if (pendingTimerRef.current === null) return;
+    clearTimeout(pendingTimerRef.current);
+    pendingTimerRef.current = null;
+  };
+
+  const schedulePending = (path: string) => {
+    clearPendingTimer();
+    pendingTimerRef.current = setTimeout(() => {
+      pendingTimerRef.current = null;
+      if (requestedPathRef.current === path) setPending(true);
+    }, PENDING_UI_DELAY_MS);
+  };
+
   useEffect(() => {
     requestedPathRef.current = null;
   }, [config]);
+
+  useEffect(() => () => clearPendingTimer(), []);
 
   // URL 被外部改走（前进/后退）时，取消点击触发的 in-flight 请求
   useEffect(() => {
     if (requestedPathRef.current && requestedPathRef.current !== selectedPath) {
       requestedPathRef.current = null;
+      clearPendingTimer();
       setPending(false);
     }
   }, [selectedPath]);
@@ -55,11 +76,13 @@ export const useNoteContent = (
 
     requestedPathRef.current = path;
     onSelectPath(path);
-    setPending(true);
     setError(null);
+    // 先让选中态进同一轮更新，pending/Loading 延后，避免拖慢高亮
+    schedulePending(path);
 
     try {
       const raw = await getNoteRawContent(config, path);
+      clearPendingTimer();
       if (requestedPathRef.current !== path) return;
       loadedPathRef.current = path;
       runWithViewTransition(() => {
@@ -67,6 +90,7 @@ export const useNoteContent = (
         setPending(false);
       });
     } catch (err) {
+      clearPendingTimer();
       if (requestedPathRef.current !== path) return;
       loadedPathRef.current = path;
       const message = toErrorMessage(err);
@@ -84,6 +108,7 @@ export const useNoteContent = (
     const path = selectedPath;
     requestedPathRef.current = path;
     loadedPathRef.current = null;
+    clearPendingTimer();
     setLoading(true);
     setPending(false);
     setError(null);
@@ -105,6 +130,7 @@ export const useNoteContent = (
 
   useEffect(() => {
     if (!selectedPath) {
+      clearPendingTimer();
       setContent(null);
       setError(null);
       setLoading(false);
