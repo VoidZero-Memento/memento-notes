@@ -1,4 +1,5 @@
-export const THEME_IDS = ["1", "2", "3", "4", "5"] as const;
+/** 按主题名拼音排序：冰 → 翠 → 琥 → 激 → 极 → 全 → 赛 → 樱 */
+export const THEME_IDS = ["3", "7", "8", "5", "1", "4", "2", "6"] as const;
 
 export type ThemeId = (typeof THEME_IDS)[number];
 
@@ -6,19 +7,25 @@ export type ThemeId = (typeof THEME_IDS)[number];
 export const DEFAULT_THEME_ID: ThemeId = "2";
 
 export const THEME_LABELS: Record<ThemeId, string> = {
-  "1": "极光紫金",
-  "2": "赛博霓虹",
   "3": "冰焰蓝橙",
-  "4": "全息虹彩",
+  "7": "翠雾森岚",
+  "8": "琥珀暖金",
   "5": "激光红黑",
+  "1": "极光紫金",
+  "4": "全息虹彩",
+  "2": "赛博霓虹",
+  "6": "樱花粉黛",
 };
 
 export const THEME_PREVIEWS: Record<ThemeId, string> = {
-  "1": "linear-gradient(135deg, #a78bfa 0%, #f0abfc 50%, #fbbf24 100%)",
-  "2": "linear-gradient(135deg, #00f0ff 0%, #7c5cff 48%, #ff2d95 100%)",
   "3": "linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #fb923c 100%)",
-  "4": "linear-gradient(135deg, #22d3ee 0%, #a855f7 48%, #f472b6 100%)",
+  "7": "linear-gradient(135deg, #34d399 0%, #2dd4bf 48%, #a3e635 100%)",
+  "8": "linear-gradient(135deg, #fbbf24 0%, #f59e0b 48%, #ea580c 100%)",
   "5": "linear-gradient(135deg, #ff003c 0%, #ff6b00 55%, #ffffff 100%)",
+  "1": "linear-gradient(135deg, #a78bfa 0%, #f0abfc 50%, #fbbf24 100%)",
+  "4": "linear-gradient(135deg, #22d3ee 0%, #a855f7 48%, #f472b6 100%)",
+  "2": "linear-gradient(135deg, #00f0ff 0%, #7c5cff 48%, #ff2d95 100%)",
+  "6": "linear-gradient(135deg, #ff9ebb 0%, #ffb7d5 48%, #ffd6e4 100%)",
 };
 
 export const THEME_STORAGE_KEY = "memento-notes:theme";

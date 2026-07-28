@@ -12,7 +12,7 @@ import { CodeBlock } from "./CodeBlock";
 import { MermaidBlock } from "./MermaidBlock";
 import { markdownSanitizeSchema } from "./markdownSanitizeSchema";
 import styles from "./MarkdownViewer.module.css";
-import "highlight.js/styles/github-dark.css";
+import "@/styles/hljs-theme.css";
 import "katex/dist/katex.min.css";
 
 import type { Components } from "react-markdown";

@@ -1,4 +1,4 @@
-/* 主题通过 html[data-theme="1"…"5"] 切换，选中值持久化在 localStorage */
+/* 主题通过 html[data-theme="1"…"8"] 切换，选中值持久化在 localStorage */
 
 :root,
 [data-theme="2"] {
@@ -39,6 +39,17 @@
   --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.45);
   --title-color: var(--foreground);
   --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-2-rgb), 0.12);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(8, 16, 32, 0.98) 0%, #050a14 55%, #060810 100%);
+  --inline-code: #ff6bb5;
+  --hljs-fg: #c9d1d9;
+  --hljs-keyword: #ff6bb5;
+  --hljs-title: #c4b5fd;
+  --hljs-literal: #00f0ff;
+  --hljs-string: #7dd3fc;
+  --hljs-built-in: #ffb86c;
+  --hljs-comment: #6b7c8f;
+  --hljs-name: #5dffb0;
 }
 
 /* 1 极光紫金 */
@@ -70,6 +81,17 @@
     radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.22), transparent 55%);
   --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.5);
   --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-3-rgb), 0.12);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(14, 8, 28, 0.98) 0%, #080412 55%, #06030c 100%);
+  --inline-code: #f0abfc;
+  --hljs-fg: #e8e0f5;
+  --hljs-keyword: #f0abfc;
+  --hljs-title: #c4b5fd;
+  --hljs-literal: #a78bfa;
+  --hljs-string: #fcd34d;
+  --hljs-built-in: #fbbf24;
+  --hljs-comment: #8b7fa3;
+  --hljs-name: #e9d5ff;
 }
 
 /* 3 冰焰蓝橙 */
@@ -101,6 +123,17 @@
     radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.22), transparent 55%);
   --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.55);
   --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-3-rgb), 0.12);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(6, 14, 36, 0.98) 0%, #030816 55%, #020612 100%);
+  --inline-code: #818cf8;
+  --hljs-fg: #d6e4ff;
+  --hljs-keyword: #a5b4fc;
+  --hljs-title: #7dd3fc;
+  --hljs-literal: #38bdf8;
+  --hljs-string: #fdba74;
+  --hljs-built-in: #fb923c;
+  --hljs-comment: #64748b;
+  --hljs-name: #86efac;
 }
 
 /* 4 全息虹彩 */
@@ -133,6 +166,17 @@
   --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.55);
   --title-color: transparent;
   --title-shadow: none;
+  --code-block-bg:
+    linear-gradient(165deg, rgba(12, 10, 24, 0.98) 0%, #08060e 55%, #060508 100%);
+  --inline-code: #f472b6;
+  --hljs-fg: #e8e4f5;
+  --hljs-keyword: #f472b6;
+  --hljs-title: #c084fc;
+  --hljs-literal: #22d3ee;
+  --hljs-string: #a5f3fc;
+  --hljs-built-in: #e879f9;
+  --hljs-comment: #7c7494;
+  --hljs-name: #67e8f9;
 }
 
 /* 5 激光红黑 */
@@ -167,4 +211,141 @@
     0 0 6px rgba(var(--accent-rgb), 0.85),
     0 0 18px rgba(var(--accent-rgb), 0.45),
     0 0 32px rgba(var(--accent-2-rgb), 0.25);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(28, 4, 8, 0.98) 0%, #0e0204 55%, #080102 100%);
+  --inline-code: #ff4d6d;
+  --hljs-fg: #f5e8e8;
+  --hljs-keyword: #ff4d6d;
+  --hljs-title: #ff8a65;
+  --hljs-literal: #ff6b00;
+  --hljs-string: #ffd4a8;
+  --hljs-built-in: #ffb347;
+  --hljs-comment: #8a6a6a;
+  --hljs-name: #ff8fa3;
+}
+
+/* 6 樱花粉黛 —— 偏粉嫩樱色 */
+[data-theme="6"] {
+  --accent-rgb: 255, 158, 187;
+  --accent-2-rgb: 255, 183, 213;
+  --accent-3-rgb: 255, 214, 228;
+  --fg-rgb: 255, 245, 249;
+  --accent: #ff9ebb;
+  --accent-2: #ffb7d5;
+  --accent-3: #ffd6e4;
+  --link: #ff9ebb;
+  --link-hover: #ffb7d5;
+  --background: #160a10;
+  --background-deep: #0e060a;
+  --background-mid: #221018;
+  --panel-bg: rgba(28, 12, 20, 0.55);
+  --hologram: linear-gradient(135deg, #ff9ebb 0%, #ffb7d5 48%, #ffd6e4 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.46), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.4), transparent 54%),
+    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.22), transparent 50%),
+    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.14), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.12), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.48), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.4), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.24), transparent 55%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.4);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.36), 0 0 32px rgba(var(--accent-2-rgb), 0.18);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(32, 12, 22, 0.98) 0%, #14080e 55%, #10060a 100%);
+  --inline-code: #ffb7d5;
+  --hljs-fg: #ffe8f0;
+  --hljs-keyword: #ff9ebb;
+  --hljs-title: #ffb7d5;
+  --hljs-literal: #ffc2d8;
+  --hljs-string: #ffd6e4;
+  --hljs-built-in: #ffc4a8;
+  --hljs-comment: #b08a98;
+  --hljs-name: #f0c0d8;
+}
+
+/* 7 翠雾森岚 */
+[data-theme="7"] {
+  --accent-rgb: 52, 211, 153;
+  --accent-2-rgb: 45, 212, 191;
+  --accent-3-rgb: 163, 230, 53;
+  --fg-rgb: 232, 255, 245;
+  --accent: #34d399;
+  --accent-2: #2dd4bf;
+  --accent-3: #a3e635;
+  --link: #6ee7b7;
+  --link-hover: #a3e635;
+  --background: #030a08;
+  --background-deep: #010605;
+  --background-mid: #071612;
+  --panel-bg: rgba(4, 18, 14, 0.55);
+  --hologram: linear-gradient(135deg, #34d399 0%, #2dd4bf 48%, #a3e635 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.42), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.36), transparent 54%),
+    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.14), transparent 50%),
+    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.12), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.1), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.38), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.2), transparent 55%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.5);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-3-rgb), 0.12);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(4, 22, 16, 0.98) 0%, #020e0a 55%, #010806 100%);
+  --inline-code: #6ee7b7;
+  --hljs-fg: #d8f5e8;
+  --hljs-keyword: #2dd4bf;
+  --hljs-title: #86efac;
+  --hljs-literal: #34d399;
+  --hljs-string: #bef264;
+  --hljs-built-in: #a3e635;
+  --hljs-comment: #5a7a6c;
+  --hljs-name: #5eead4;
+}
+
+/* 8 琥珀暖金 */
+[data-theme="8"] {
+  --accent-rgb: 251, 191, 36;
+  --accent-2-rgb: 245, 158, 11;
+  --accent-3-rgb: 234, 88, 12;
+  --fg-rgb: 255, 248, 235;
+  --accent: #fbbf24;
+  --accent-2: #f59e0b;
+  --accent-3: #ea580c;
+  --link: #fcd34d;
+  --link-hover: #f59e0b;
+  --background: #0c0804;
+  --background-deep: #070502;
+  --background-mid: #161008;
+  --panel-bg: rgba(18, 12, 4, 0.58);
+  --hologram: linear-gradient(135deg, #fbbf24 0%, #f59e0b 48%, #ea580c 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.4), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.34), transparent 54%),
+    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.16), transparent 50%),
+    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.1), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.1), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.38), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.22), transparent 55%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.55);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.3), 0 0 32px rgba(var(--accent-3-rgb), 0.14);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(28, 18, 6, 0.98) 0%, #120c04 55%, #0a0702 100%);
+  --inline-code: #fcd34d;
+  --hljs-fg: #f5ead8;
+  --hljs-keyword: #f59e0b;
+  --hljs-title: #fbbf24;
+  --hljs-literal: #fdba74;
+  --hljs-string: #fde68a;
+  --hljs-built-in: #fb923c;
+  --hljs-comment: #8a7460;
+  --hljs-name: #fcd34d;
 }
