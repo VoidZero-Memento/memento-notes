@@ -70,6 +70,10 @@ export const NotesWorkspace = ({
   }, [selectedPath, config.label, workspaceTitle]);
 
   useEffect(() => {
+    viewerBodyRef.current?.scrollTo({ top: 0 });
+  }, [selectedPath]);
+
+  useEffect(() => {
     if (!mobileNavOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {

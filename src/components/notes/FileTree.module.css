@@ -15,8 +15,8 @@
 
 .highlight {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 4px;
+  right: 4px;
   z-index: 0;
   border-radius: 8px;
   pointer-events: none;
@@ -155,5 +155,11 @@
 @media (prefers-reduced-motion: reduce) {
   .highlightAnimate {
     transition: opacity 0.15s ease;
+  }
+}
+
+@media (max-width: 860px) {
+  .row {
+    font-size: 14px;
   }
 }

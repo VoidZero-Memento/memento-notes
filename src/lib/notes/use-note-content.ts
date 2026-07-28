@@ -19,13 +19,12 @@ const toErrorMessage = (err: unknown) => (err instanceof Error ? err.message : "
 /**
  * 管理选中笔记的内容加载。
  *
- * - `selectNote`：由用户点击触发，先把新内容拉取完成，再用 `runWithViewTransition`
- *   把"内容替换 + 通知外部更新 URL"合并成一次同步更新，这样浏览器截图到的
- *   才是新旧两篇笔记的真实内容，过渡动画才有意义；拉取期间保留旧内容显示（`pending`），
- *   不会被 loading 占位打断。
+ * - `selectNote`：由用户点击触发，立刻更新 URL（侧栏选中态跟上），再后台拉内容；
+ *   拉取期间保留旧正文并显示 `pending`，拉完后用 `runWithViewTransition` 替换内容，
+ *   这样过渡动画截到的仍是新旧两篇真实内容。
  * - 内部的 `useEffect`：处理非点击触发的加载（首次进入、刷新、浏览器前进后退），
- *   这类场景没有"旧内容"可过渡，走普通 loading 态即可；用 `loadedPathRef` 避免
- *   跟 `selectNote` 已经加载好的内容重复请求。
+ *   这类场景没有"旧内容"可过渡，走普通 loading 态；用 `requestedPathRef` /
+ *   `loadedPathRef` 避免与 `selectNote` 重复请求或互相抢写。
  */
 export const useNoteContent = (
   config: GithubRepoConfig,
@@ -43,10 +42,19 @@ export const useNoteContent = (
     requestedPathRef.current = null;
   }, [config]);
 
+  // URL 被外部改走（前进/后退）时，取消点击触发的 in-flight 请求
+  useEffect(() => {
+    if (requestedPathRef.current && requestedPathRef.current !== selectedPath) {
+      requestedPathRef.current = null;
+      setPending(false);
+    }
+  }, [selectedPath]);
+
   const selectNote = async (path: string) => {
     if (path === selectedPath) return;
 
     requestedPathRef.current = path;
+    onSelectPath(path);
     setPending(true);
     setError(null);
 
@@ -57,7 +65,6 @@ export const useNoteContent = (
       runWithViewTransition(() => {
         setContent(raw);
         setPending(false);
-        onSelectPath(path);
       });
     } catch (err) {
       if (requestedPathRef.current !== path) return;
@@ -67,7 +74,6 @@ export const useNoteContent = (
         setContent(null);
         setError(message);
         setPending(false);
-        onSelectPath(path);
       });
     }
   };
@@ -108,6 +114,8 @@ export const useNoteContent = (
     }
 
     if (loadedPathRef.current === selectedPath) return;
+    // 点击选中已立刻改 URL，内容由 selectNote 负责拉取，避免再走 loading 占位
+    if (requestedPathRef.current === selectedPath) return;
 
     let cancelled = false;
     setLoading(true);

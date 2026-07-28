@@ -3,7 +3,12 @@
   margin: 1.1em 0;
   border: 1px solid rgba(var(--accent-rgb), 0.32);
   border-radius: 12px;
-  background: linear-gradient(165deg, rgba(8, 16, 32, 0.98) 0%, #050a14 55%, #060810 100%);
+  background: linear-gradient(
+    165deg,
+    rgba(8, 16, 32, 0.98) 0%,
+    #050a14 55%,
+    #060810 100%
+  );
   box-shadow:
     0 0 0 1px rgba(var(--accent-2-rgb), 0.1),
     0 0 18px rgba(var(--accent-rgb), 0.28),
@@ -19,7 +24,11 @@
   justify-content: space-between;
   min-height: 40px;
   border-bottom: 1px solid rgba(var(--accent-rgb), 0.16);
-  background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.08), rgba(var(--accent-2-rgb), 0.06));
+  background: linear-gradient(
+    90deg,
+    rgba(var(--accent-rgb), 0.08),
+    rgba(var(--accent-2-rgb), 0.06)
+  );
   box-shadow: inset 0 -1px 0 rgba(var(--accent-2-rgb), 0.08);
   padding: 0 14px;
 }
@@ -66,19 +75,23 @@
   line-height: 1.2;
   cursor: pointer;
   text-shadow: 0 0 6px rgba(var(--accent-rgb), 0.35);
-  transition: color 0.15s ease, text-shadow 0.15s ease;
+  transition:
+    color 0.15s ease,
+    text-shadow 0.15s ease;
 }
 
 .copyBtn:hover {
   color: rgba(var(--accent-rgb), 1);
-  text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.7), 0 0 18px rgba(var(--accent-2-rgb), 0.35);
+  text-shadow:
+    0 0 10px rgba(var(--accent-rgb), 0.7),
+    0 0 18px rgba(var(--accent-2-rgb), 0.35);
 }
 
 .pre {
   overflow: auto;
   margin: 0;
   background: transparent;
-  padding: 12px 14px;
+  padding: 6px 12px;
 }
 
 .pre :global(code) {
