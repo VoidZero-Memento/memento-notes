@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
-import { getNoteRawContent } from "@/lib/github/github.service";
 import { useRepos } from "@/lib/github/ReposContext";
 import { parseOutline } from "@/lib/markdown/parse-outline";
-import { DEFAULT_NOTE_TITLE, getNoteTitleFromPath } from "@/lib/note-title";
+import { getNoteTitleFromPath, getRepoWorkspaceTitle } from "@/lib/note-title";
+import { useNoteContent } from "@/lib/notes/use-note-content";
 import { EmptyState } from "@/components/common/EmptyState";
 import { FileTree } from "./FileTree";
 import { LoadingState } from "./LoadingState";
@@ -23,15 +23,27 @@ type NotesWorkspaceProps = {
   config: GithubRepoConfig;
   tree: GithubFileTreeNode[];
   treeError: string | null;
+  selectedPath: string | null;
+  onSelectPath: (path: string) => void;
 };
 
-export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps) => {
+const describeNoteLoadError = (message: string) => {
+  if (/failed to fetch|networkerror|network request failed|load failed/i.test(message)) {
+    return "网络请求失败，请检查网络连接后重试";
+  }
+  return message;
+};
+
+export const NotesWorkspace = ({
+  config,
+  tree,
+  treeError,
+  selectedPath,
+  onSelectPath,
+}: NotesWorkspaceProps) => {
   const { repos } = useRepos();
   const viewerBodyRef = useRef<HTMLDivElement>(null);
-  const [selectedPath, setSelectedPath] = useState<string | null>(null);
-  const [content, setContent] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { content, loading, pending, error, selectNote, retry } = useNoteContent(config, selectedPath, onSelectPath);
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>("files");
   const [sidebarHidden, setSidebarHidden] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -48,12 +60,14 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
     ? undefined
     : { label: "浏览文件", onClick: handleBrowseFiles };
 
+  const workspaceTitle = getRepoWorkspaceTitle(config.label);
+
   useEffect(() => {
-    document.title = getNoteTitleFromPath(selectedPath);
+    document.title = getNoteTitleFromPath(selectedPath, config.label);
     return () => {
-      document.title = DEFAULT_NOTE_TITLE;
+      document.title = workspaceTitle;
     };
-  }, [selectedPath]);
+  }, [selectedPath, config.label, workspaceTitle]);
 
   useEffect(() => {
     if (!mobileNavOpen) return;
@@ -71,21 +85,9 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
     setMobileNavOpen(true);
   };
 
-  const handleSelect = async (path: string) => {
-    setSelectedPath(path);
+  const handleSelect = (path: string) => {
     setMobileNavOpen(false);
-    setLoading(true);
-    setError(null);
-
-    try {
-      const raw = await getNoteRawContent(config, path);
-      setContent(raw);
-    } catch (err) {
-      setContent(null);
-      setError(err instanceof Error ? err.message : "加载笔记内容失败");
-    } finally {
-      setLoading(false);
-    }
+    void selectNote(path);
   };
 
   const handleOutlineNavigate = (id: string) => {
@@ -126,7 +128,7 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
       <aside className={sidebarClassName} aria-hidden={sidebarHidden}>
         <div className={styles.sidebarHeader}>
           <div className={styles.sidebarTitleRow}>
-            <h2 className={styles.sidebarTitle}>笔记仓库</h2>
+            <h2 className={styles.sidebarTitle}>{workspaceTitle}</h2>
             <button
               type="button"
               className={styles.mobileClose}
@@ -198,7 +200,7 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
       </aside>
       <main className={styles.viewer}>
         <div className={styles.mobileBar}>
-          <h2 className={styles.mobileBarTitle}>笔记仓库</h2>
+          <h2 className={styles.mobileBarTitle}>{workspaceTitle}</h2>
           <div className={styles.mobileBarActions}>
             <button type="button" className={styles.mobileBarBtn} onClick={() => openMobileNav("files")}>
               文件
@@ -219,7 +221,10 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
           </button>
         ) : null}
         {selectedPath ? <p className={styles.viewerPath}>{selectedPath}</p> : null}
-        <div className={styles.viewerBody} ref={viewerBodyRef}>
+        <div
+          className={`${styles.viewerBody}${pending ? ` ${styles.viewerBodyPending}` : ""}`}
+          ref={viewerBodyRef}
+        >
           {!selectedPath ? (
             <EmptyState
               title="请选择一个 Markdown 文件"
@@ -228,11 +233,23 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
             />
           ) : null}
           {selectedPath && loading ? <LoadingState label="加载中" /> : null}
-          {selectedPath && error ? <p className={styles.error}>{error}</p> : null}
+          {selectedPath && error && !loading ? (
+            <EmptyState
+              variant="error"
+              title="无法加载笔记"
+              description={describeNoteLoadError(error)}
+              action={{ label: "重试", onClick: () => void retry() }}
+            />
+          ) : null}
           {selectedPath && content && !loading ? (
             <MarkdownViewer content={content} headingIds={outlineItems.map((item) => item.id)} />
           ) : null}
         </div>
+        {pending ? (
+          <div className={styles.pendingOverlay}>
+            <LoadingState label="加载中" />
+          </div>
+        ) : null}
       </main>
     </div>
   );

@@ -7,5 +7,5 @@ export type EmptyStateProps = {
   title: string;
   description?: string;
   action?: EmptyStateAction;
-  variant?: "compact" | "default";
+  variant?: "compact" | "default" | "error";
 };

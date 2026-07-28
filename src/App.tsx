@@ -24,7 +24,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to={defaultTo} replace />} />
-      <Route path="/:repoId" element={<RepoPage />} />
+      <Route path="/:repoId/*" element={<RepoPage />} />
     </Routes>
   );
 };

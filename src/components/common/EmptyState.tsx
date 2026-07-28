@@ -79,11 +79,44 @@ const OutlineIllustration = () => (
   </svg>
 );
 
+const ErrorIllustration = () => (
+  <svg className={styles.illustration} viewBox="0 0 96 96" aria-hidden>
+    <circle
+      className={styles.errorOrbit}
+      cx="48"
+      cy="48"
+      r="38"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeDasharray="3 6"
+    />
+    <g transform="translate(48 48)" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+      <path
+        className={styles.errorCloud}
+        strokeWidth="2.4"
+        d="M-12 8h24a11 11 0 0 0 2-22 14 14 0 0 0-27-2 10 10 0 0 0 1 24Z"
+      />
+      <path className={styles.errorSlash} strokeWidth="2.6" d="M-20 20 20 -20" />
+      <circle className={styles.errorDot} cx="-22" cy="-14" r="2" fill="currentColor" stroke="none" />
+      <circle className={styles.errorDotSoft} cx="22" cy="14" r="1.6" fill="currentColor" stroke="none" />
+    </g>
+  </svg>
+);
+
+const pickIllustration = (variant: NonNullable<EmptyStateProps["variant"]>) => {
+  if (variant === "compact") return <OutlineIllustration />;
+  if (variant === "error") return <ErrorIllustration />;
+  return <NotebookIllustration />;
+};
+
 export const EmptyState = ({ title, description, action, variant = "default" }: EmptyStateProps) => {
   const isCompact = variant === "compact";
+  const isError = variant === "error";
+
   return (
-    <div className={`${styles.root} ${isCompact ? styles.compact : ""}`}>
-      {isCompact ? <OutlineIllustration /> : <NotebookIllustration />}
+    <div className={`${styles.root} ${isCompact ? styles.compact : ""} ${isError ? styles.error : ""}`}>
+      {pickIllustration(variant)}
       <p className={styles.title}>{title}</p>
       {description ? <p className={styles.description}>{description}</p> : null}
       {action && !isCompact ? (

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import { getRepoFileTree } from "@/lib/github/github.service";
+import { encodeNotePathForUrl } from "@/lib/github/repo-path";
 import { useRepos } from "@/lib/github/ReposContext";
 import { LoadingState } from "@/components/notes/LoadingState";
 import { NotesWorkspace } from "@/components/notes/NotesWorkspace";
@@ -10,9 +11,15 @@ import styles from "@/components/notes/NotesShell.module.css";
 import type { GithubFileTreeNode } from "@/lib/github/github.types";
 
 export const RepoPage = () => {
-  const { repoId = "" } = useParams<{ repoId: string }>();
+  const { repoId = "", "*": splatPath } = useParams<{ repoId: string; "*": string }>();
+  const navigate = useNavigate();
   const { getById } = useRepos();
   const config = getById(repoId);
+  const selectedPath = splatPath ? splatPath : null;
+
+  const handleSelectPath = (path: string) => {
+    navigate(`/${repoId}/${encodeNotePathForUrl(path)}`);
+  };
 
   const [tree, setTree] = useState<GithubFileTreeNode[]>([]);
   const [treeError, setTreeError] = useState<string | null>(null);
@@ -61,5 +68,13 @@ export const RepoPage = () => {
     );
   }
 
-  return <NotesWorkspace config={config} tree={tree} treeError={treeError} />;
+  return (
+    <NotesWorkspace
+      config={config}
+      tree={tree}
+      treeError={treeError}
+      selectedPath={selectedPath}
+      onSelectPath={handleSelectPath}
+    />
+  );
 };

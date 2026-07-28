@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { isMarkdownPath } from "@/lib/github/repo-path";
 import styles from "./FileTree.module.css";
@@ -156,6 +156,25 @@ export const FileTree = ({ nodes, selectedPath, onSelect }: FileTreeProps) => {
       return next;
     });
   };
+
+  useEffect(() => {
+    if (!selectedPath) return;
+
+    const segments = selectedPath.split("/");
+    const ancestors: string[] = [];
+    for (let i = 0; i < segments.length - 1; i += 1) {
+      ancestors.push(segments.slice(0, i + 1).join("/"));
+    }
+
+    setExpanded((prev) => {
+      const missing = ancestors.filter((path) => !prev.has(path));
+      if (missing.length === 0) return prev;
+
+      const next = new Set(prev);
+      missing.forEach((path) => next.add(path));
+      return next;
+    });
+  }, [selectedPath]);
 
   useLayoutEffect(() => {
     const tree = treeRef.current;

@@ -14,6 +14,10 @@
   padding: 44px 16px;
 }
 
+.error {
+  animation: errorFadeIn 0.4s ease-out both;
+}
+
 .illustration {
   width: 76px;
   height: 76px;
@@ -78,6 +82,58 @@
 
 .outlineBarShort {
   color: rgba(var(--fg-rgb), 0.28);
+}
+
+.errorOrbit {
+  color: rgba(var(--accent-2-rgb), 0.28);
+  transform-origin: 48px 48px;
+  animation: orbitSpin 18s linear infinite;
+}
+
+.errorCloud {
+  color: rgba(var(--fg-rgb), 0.5);
+  filter: drop-shadow(0 0 8px rgba(var(--accent-2-rgb), 0.22));
+}
+
+.errorSlash {
+  color: rgba(var(--accent-2-rgb), 0.85);
+  filter: drop-shadow(0 0 6px rgba(var(--accent-2-rgb), 0.4));
+}
+
+.errorDot {
+  color: rgba(var(--accent-2-rgb), 0.8);
+}
+
+.errorDotSoft {
+  color: rgba(var(--fg-rgb), 0.28);
+}
+
+.error .title {
+  color: rgba(var(--fg-rgb), 0.88);
+}
+
+.error .description {
+  max-width: 320px;
+  color: rgba(var(--fg-rgb), 0.42);
+}
+
+.error .action {
+  border-color: rgba(var(--accent-2-rgb), 0.5);
+  background: linear-gradient(135deg, rgba(var(--accent-2-rgb), 0.16), rgba(var(--accent-rgb), 0.1));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(var(--accent-2-rgb), 0.12),
+    0 0 14px rgba(var(--accent-2-rgb), 0.28),
+    0 0 28px rgba(var(--accent-rgb), 0.14);
+}
+
+.error .action:hover {
+  border-color: rgba(var(--accent-2-rgb), 0.75);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 0 1px rgba(var(--accent-2-rgb), 0.2),
+    0 0 18px rgba(var(--accent-2-rgb), 0.4),
+    0 0 32px rgba(var(--accent-rgb), 0.22);
 }
 
 .title {
@@ -149,8 +205,25 @@
   }
 }
 
+@keyframes errorFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .orbit {
+  .orbit,
+  .errorOrbit {
+    animation: none;
+  }
+
+  .error {
     animation: none;
   }
 }

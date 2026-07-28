@@ -1,4 +1,5 @@
 import { buildFileTree } from "./build-file-tree";
+import { isExcludedFromNoteTree } from "./repo-path";
 
 import type { GithubRepoConfig } from "@/config/github.types";
 import type { GithubFileTreeNode, GithubNoteListItem, GithubTreeItem } from "./github.types";
@@ -96,7 +97,8 @@ export const getRepoFileTree = async (config: GithubRepoConfig): Promise<GithubF
     throw new Error(`获取仓库文件树失败 (${config.owner}/${config.repo}): 文件树被截断，请缩小仓库规模或改用分页方案`);
   }
 
-  return buildFileTree(toTreeItems(body.tree));
+  const items = toTreeItems(body.tree).filter((item) => !isExcludedFromNoteTree(item.path));
+  return buildFileTree(items);
 };
 
 export const listOrgRepos = async (owner: string): Promise<GithubRepoConfig[]> => {

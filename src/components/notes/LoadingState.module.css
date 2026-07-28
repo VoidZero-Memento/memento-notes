@@ -81,9 +81,9 @@
   border-radius: 50%;
   background: radial-gradient(
     circle at 40% 35%,
-    rgba(var(--accent-rgb), 0.55),
-    rgba(var(--accent-2-rgb), 0.35) 45%,
-    rgba(var(--accent-rgb), 0.12) 65%,
+    rgba(var(--accent-rgb), 0.95),
+    rgba(var(--accent-2-rgb), 0.75) 45%,
+    rgba(var(--accent-rgb), 0.35) 65%,
     transparent 75%
   );
   box-shadow:
@@ -97,11 +97,11 @@
   align-items: baseline;
   gap: 2px;
   margin: 0;
-  color: rgba(var(--fg-rgb), 0.62);
+  color: rgba(var(--fg-rgb), 0.95);
   font-size: 16px;
   letter-spacing: 0.08em;
   line-height: 1;
-  text-shadow: 0 0 12px rgba(var(--accent-rgb), 0.35);
+  text-shadow: 0 0 12px rgba(var(--accent-rgb), 0.5);
 }
 
 .dots {
