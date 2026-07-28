@@ -1,4 +1,4 @@
-/* 主题通过 html[data-theme="1"…"5"] 切换；?theme=N */
+/* 主题通过 html[data-theme="1"…"5"] 切换，选中值持久化在 localStorage */
 
 :root,
 [data-theme="2"] {

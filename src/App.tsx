@@ -1,7 +1,6 @@
 import { Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 
 import { useRepos, ReposProvider } from "@/lib/github/ReposContext";
-import { useThemeFromUrl } from "@/lib/theme/useThemeFromUrl";
 import { AppShell } from "@/components/layout/AppShell";
 import { LoadingState } from "@/components/notes/LoadingState";
 import { RepoPage } from "@/pages/RepoPage";
@@ -10,7 +9,6 @@ import styles from "@/components/notes/NotesShell.module.css";
 const AppRoutes = () => {
   const { defaultRepoId, error, loading } = useRepos();
   const [searchParams] = useSearchParams();
-  useThemeFromUrl();
 
   if (loading) {
     return <LoadingState label="加载仓库列表" />;

@@ -85,10 +85,3 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-.empty {
-  margin: 8px 4px;
-  color: rgba(var(--fg-rgb), 0.42);
-  font-size: 13px;
-  line-height: 1.5;
-}

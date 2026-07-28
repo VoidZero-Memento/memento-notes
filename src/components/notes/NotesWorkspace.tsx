@@ -4,12 +4,14 @@ import { getNoteRawContent } from "@/lib/github/github.service";
 import { useRepos } from "@/lib/github/ReposContext";
 import { parseOutline } from "@/lib/markdown/parse-outline";
 import { DEFAULT_NOTE_TITLE, getNoteTitleFromPath } from "@/lib/note-title";
+import { EmptyState } from "@/components/common/EmptyState";
 import { FileTree } from "./FileTree";
 import { LoadingState } from "./LoadingState";
 import { MarkdownViewer } from "./MarkdownViewer";
 import { OutlineTree } from "./OutlineTree";
 import { OwnerFooter } from "./OwnerFooter";
 import { RepoSelect } from "./RepoSelect";
+import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import styles from "./NotesShell.module.css";
 
 import type { GithubRepoConfig } from "@/config/github.types";
@@ -34,8 +36,17 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
   const [sidebarHidden, setSidebarHidden] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
+  const handleBrowseFiles = () => {
+    setSidebarMode("files");
+    setSidebarHidden(false);
+    setMobileNavOpen(true);
+  };
+
   const outlineItems = content ? parseOutline(content) : [];
   const outlineEmptyLabel = selectedPath ? "暂无大纲" : "请先选择文件";
+  const outlineEmptyAction = selectedPath
+    ? undefined
+    : { label: "浏览文件", onClick: handleBrowseFiles };
 
   useEffect(() => {
     document.title = getNoteTitleFromPath(selectedPath);
@@ -116,24 +127,14 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
         <div className={styles.sidebarHeader}>
           <div className={styles.sidebarTitleRow}>
             <h2 className={styles.sidebarTitle}>笔记仓库</h2>
-            <div className={styles.sidebarTitleActions}>
-              <button
-                type="button"
-                className={styles.sidebarCollapse}
-                aria-label="隐藏目录"
-                onClick={() => setSidebarHidden(true)}
-              >
-                «
-              </button>
-              <button
-                type="button"
-                className={styles.mobileClose}
-                aria-label="关闭"
-                onClick={() => setMobileNavOpen(false)}
-              >
-                ×
-              </button>
-            </div>
+            <button
+              type="button"
+              className={styles.mobileClose}
+              aria-label="关闭"
+              onClick={() => setMobileNavOpen(false)}
+            >
+              <span className={styles.sidebarCollapseMark} aria-hidden />
+            </button>
           </div>
           <RepoSelect repos={repos} activeId={config.id} />
           <div className={styles.sidebarTabs} role="tablist" aria-label="侧栏面板">
@@ -177,11 +178,23 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
             <OutlineTree
               items={outlineItems}
               emptyLabel={outlineEmptyLabel}
+              emptyAction={outlineEmptyAction}
               onNavigate={handleOutlineNavigate}
             />
           </div>
         </div>
-        <OwnerFooter login={config.owner} avatarUrl={config.ownerAvatarUrl} />
+        <button
+          type="button"
+          className={styles.sidebarCollapse}
+          aria-label="隐藏目录"
+          onClick={() => setSidebarHidden(true)}
+        >
+          <span className={styles.sidebarCollapseMark} aria-hidden />
+        </button>
+        <div className={styles.ownerFooter}>
+          <OwnerFooter login={config.owner} avatarUrl={config.ownerAvatarUrl} />
+          <ThemeSwitcher />
+        </div>
       </aside>
       <main className={styles.viewer}>
         <div className={styles.mobileBar}>
@@ -207,7 +220,13 @@ export const NotesWorkspace = ({ config, tree, treeError }: NotesWorkspaceProps)
         ) : null}
         {selectedPath ? <p className={styles.viewerPath}>{selectedPath}</p> : null}
         <div className={styles.viewerBody} ref={viewerBodyRef}>
-          {!selectedPath ? <p className={styles.status}>请选择一个 Markdown 文件</p> : null}
+          {!selectedPath ? (
+            <EmptyState
+              title="请选择一个 Markdown 文件"
+              description="从左侧文件列表中选一篇笔记开始阅读"
+              action={{ label: "浏览文件", onClick: handleBrowseFiles }}
+            />
+          ) : null}
           {selectedPath && loading ? <LoadingState label="加载中" /> : null}
           {selectedPath && error ? <p className={styles.error}>{error}</p> : null}
           {selectedPath && content && !loading ? (

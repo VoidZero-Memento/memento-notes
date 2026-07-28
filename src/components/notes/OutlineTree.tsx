@@ -1,10 +1,13 @@
+import { EmptyState } from "@/components/common/EmptyState";
 import styles from "./OutlineTree.module.css";
 
+import type { EmptyStateAction } from "@/components/common/EmptyState.types";
 import type { OutlineItem } from "@/lib/markdown/outline.types";
 
 type OutlineTreeProps = {
   items: OutlineItem[];
   emptyLabel?: string;
+  emptyAction?: EmptyStateAction;
   onNavigate: (id: string) => void;
 };
 
@@ -45,9 +48,14 @@ const LevelIcon = ({ level }: { level: number }) => {
   );
 };
 
-export const OutlineTree = ({ items, emptyLabel = "暂无大纲", onNavigate }: OutlineTreeProps) => {
+export const OutlineTree = ({
+  items,
+  emptyLabel = "暂无大纲",
+  emptyAction,
+  onNavigate,
+}: OutlineTreeProps) => {
   if (items.length === 0) {
-    return <p className={styles.empty}>{emptyLabel}</p>;
+    return <EmptyState title={emptyLabel} action={emptyAction} variant="compact" />;
   }
 
   return (

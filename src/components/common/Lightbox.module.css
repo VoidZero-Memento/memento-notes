@@ -1,0 +1,413 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: none;
+  background: rgba(2, 4, 10, 0.28);
+  padding: 24px;
+  cursor: pointer;
+  animation: overlayFadeIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.backdropArt {
+  position: absolute;
+  inset: -8%;
+  z-index: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: blur(36px) saturate(150%) brightness(0.82);
+  transform: scale(1.12);
+  opacity: 0;
+  pointer-events: none;
+  animation: backdropArtFadeIn 0.6s ease forwards;
+  will-change: opacity;
+}
+
+.backdropScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 46%, transparent 0%, rgba(2, 4, 10, 0.18) 50%, rgba(2, 4, 10, 0.62) 100%),
+    linear-gradient(180deg, rgba(2, 4, 10, 0.16), rgba(2, 4, 10, 0.32));
+  pointer-events: none;
+}
+
+.overlayClosing {
+  animation: overlayFadeOut 0.22s ease forwards;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  cursor: default;
+  animation: contentPopIn 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.contentClosing {
+  animation: contentPopOut 0.22s ease forwards;
+}
+
+.close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.2);
+  color: rgba(var(--fg-rgb), 0.85);
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.close:hover {
+  background: var(--accent-magenta-dim);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--accent-2-rgb), 0.4),
+    0 0 14px rgba(var(--accent-2-rgb), 0.3);
+  color: var(--foreground);
+  transform: scale(1.08);
+}
+
+.close:active {
+  transform: scale(0.92);
+}
+
+/* 触屏设备点击遮罩即可关闭，不再展示关闭按钮 */
+@media (hover: none), (pointer: coarse) {
+  .close {
+    display: none;
+  }
+}
+
+.frame {
+  position: relative;
+  width: min(72vw, 54vh, 480px);
+  height: min(72vw, 54vh, 480px);
+  width: min(72vw, 54dvh, 480px);
+  height: min(72vw, 54dvh, 480px);
+}
+
+.frame::before {
+  content: "";
+  position: absolute;
+  inset: -20px;
+  z-index: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(var(--accent-rgb), 0.95),
+    rgba(var(--accent-2-rgb), 0.95),
+    rgba(var(--accent-3-rgb), 0.95),
+    rgba(var(--accent-rgb), 0.3),
+    rgba(var(--accent-2-rgb), 0.95),
+    rgba(var(--accent-rgb), 0.95)
+  );
+  filter: blur(6px) saturate(180%) hue-rotate(0deg);
+  opacity: 0;
+  pointer-events: none;
+  animation:
+    haloFadeIn 0.5s ease 0.08s forwards,
+    lightboxSpin 4.2s cubic-bezier(0.55, 0.06, 0.45, 0.94) infinite,
+    lightboxHue 7s linear infinite;
+}
+
+.frame::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  z-index: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 90deg,
+    transparent 0deg,
+    rgba(var(--accent-2-rgb), 0.95) 26deg,
+    transparent 64deg,
+    transparent 180deg,
+    rgba(var(--accent-3-rgb), 0.95) 214deg,
+    transparent 250deg
+  );
+  filter: blur(2px);
+  opacity: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation:
+    haloFadeIn 0.5s ease 0.08s forwards,
+    lightboxSpinReverse 2.6s linear infinite;
+}
+
+.orbit {
+  position: absolute;
+  inset: -50px;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+  animation:
+    haloFadeIn 0.6s ease 0.15s forwards,
+    lightboxSpin 11s linear infinite;
+}
+
+.spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px 2px currentColor;
+  animation: sparkTwinkle 2.2s ease-in-out infinite;
+  --spark-radius: calc(min(36vw, 27vh, 240px) + 36px);
+  --spark-radius: calc(min(36vw, 27dvh, 240px) + 36px);
+}
+
+.spark:nth-child(1) {
+  color: var(--accent);
+  transform: rotate(0deg) translateX(var(--spark-radius));
+  animation-delay: 0s;
+}
+
+.spark:nth-child(2) {
+  color: var(--accent-2);
+  transform: rotate(45deg) translateX(var(--spark-radius));
+  animation-delay: 0.28s;
+}
+
+.spark:nth-child(3) {
+  color: var(--accent-3);
+  transform: rotate(90deg) translateX(var(--spark-radius));
+  animation-delay: 0.56s;
+}
+
+.spark:nth-child(4) {
+  color: var(--accent);
+  transform: rotate(135deg) translateX(var(--spark-radius));
+  animation-delay: 0.84s;
+}
+
+.spark:nth-child(5) {
+  color: var(--accent-2);
+  transform: rotate(180deg) translateX(var(--spark-radius));
+  animation-delay: 1.12s;
+}
+
+.spark:nth-child(6) {
+  color: var(--accent-3);
+  transform: rotate(225deg) translateX(var(--spark-radius));
+  animation-delay: 1.4s;
+}
+
+.spark:nth-child(7) {
+  color: var(--accent);
+  transform: rotate(270deg) translateX(var(--spark-radius));
+  animation-delay: 1.68s;
+}
+
+.spark:nth-child(8) {
+  color: var(--accent-2);
+  transform: rotate(315deg) translateX(var(--spark-radius));
+  animation-delay: 1.96s;
+}
+
+.image {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  animation:
+    lightboxGlow 3s ease-in-out infinite,
+    lightboxBreathe 4.4s ease-in-out infinite;
+}
+
+@keyframes lightboxSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes lightboxSpinReverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes lightboxHue {
+  to {
+    filter: blur(6px) saturate(180%) hue-rotate(360deg);
+  }
+}
+
+@keyframes sparkTwinkle {
+  0%,
+  100% {
+    opacity: 0.12;
+    box-shadow: 0 0 4px 1px currentColor;
+  }
+
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 12px 3px currentColor;
+  }
+}
+
+@keyframes lightboxBreathe {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1) saturate(1);
+  }
+
+  50% {
+    transform: scale(1.015);
+    filter: brightness(1.06) saturate(1.15);
+  }
+}
+
+@keyframes lightboxGlow {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 0 0 1px rgba(var(--accent-rgb), 0.3),
+      0 0 32px rgba(var(--accent-rgb), 0.35),
+      0 0 64px rgba(var(--accent-2-rgb), 0.22);
+  }
+
+  50% {
+    box-shadow:
+      inset 0 0 0 1px rgba(var(--accent-2-rgb), 0.4),
+      0 0 44px rgba(var(--accent-2-rgb), 0.45),
+      0 0 80px rgba(var(--accent-3-rgb), 0.32);
+  }
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes contentPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes haloFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes backdropArtFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+
+@keyframes overlayFadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes contentPopOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    animation: overlayFadeIn 0.18s ease;
+  }
+
+  .content,
+  .frame::before,
+  .frame::after,
+  .orbit,
+  .spark,
+  .image,
+  .backdropArt {
+    animation: none;
+  }
+
+  .frame::before,
+  .frame::after,
+  .orbit,
+  .backdropArt {
+    opacity: 1;
+  }
+
+  .backdropArt {
+    transform: scale(1.12);
+  }
+}

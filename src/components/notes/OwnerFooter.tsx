@@ -1,3 +1,6 @@
+import { useState } from "react";
+
+import { Lightbox } from "@/components/common/Lightbox";
 import styles from "./NotesShell.module.css";
 
 type OwnerFooterProps = {
@@ -5,15 +8,32 @@ type OwnerFooterProps = {
   avatarUrl?: string;
 };
 
-export const OwnerFooter = ({ login, avatarUrl }: OwnerFooterProps) => (
-  <div className={styles.ownerFooter}>
-    {avatarUrl ? (
-      <img className={styles.ownerAvatar} src={avatarUrl} alt="" width={28} height={28} />
-    ) : (
-      <span className={styles.ownerAvatarFallback} aria-hidden>
-        {login.slice(0, 1).toUpperCase()}
+export const OwnerFooter = ({ login, avatarUrl }: OwnerFooterProps) => {
+  const [previewOpen, setPreviewOpen] = useState(false);
+
+  return (
+    <div className={styles.ownerIdentity}>
+      {avatarUrl ? (
+        <button
+          type="button"
+          className={styles.ownerAvatarButton}
+          aria-label={`查看 ${login} 的头像`}
+          title={login}
+          onClick={() => setPreviewOpen(true)}
+        >
+          <img className={styles.ownerAvatar} src={avatarUrl} alt="" width={28} height={28} />
+        </button>
+      ) : (
+        <span className={styles.ownerAvatarFallback} aria-hidden>
+          {login.slice(0, 1).toUpperCase()}
+        </span>
+      )}
+      <span className={styles.ownerName} title={login}>
+        {login}
       </span>
-    )}
-    <span className={styles.ownerLogin}>{login}</span>
-  </div>
-);
+      {avatarUrl && previewOpen ? (
+        <Lightbox src={avatarUrl} alt={login} onClose={() => setPreviewOpen(false)} />
+      ) : null}
+    </div>
+  );
+};
