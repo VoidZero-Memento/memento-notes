@@ -7,10 +7,11 @@
   justify-content: center;
   overflow: hidden;
   border: none;
-  background: rgba(2, 4, 10, 0.28);
+  background: rgba(2, 4, 10, 0.32);
   padding: 24px;
   cursor: pointer;
-  animation: overlayFadeIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0;
+  animation: overlayFadeIn 0.42s ease forwards;
 }
 
 .overlay::before {
@@ -19,7 +20,7 @@
   inset: 0;
   z-index: 1;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.05;
+  opacity: 0.045;
   mix-blend-mode: overlay;
   pointer-events: none;
 }
@@ -31,12 +32,11 @@
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  filter: blur(36px) saturate(150%) brightness(0.82);
-  transform: scale(1.12);
+  filter: blur(36px) saturate(155%) brightness(0.8);
+  transform: scale(1.28);
   opacity: 0;
   pointer-events: none;
-  animation: backdropArtFadeIn 0.6s ease forwards;
-  will-change: opacity;
+  animation: backdropArtFadeIn 0.55s ease forwards;
 }
 
 .backdropScrim {
@@ -44,13 +44,42 @@
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(ellipse 70% 60% at 50% 46%, transparent 0%, rgba(2, 4, 10, 0.18) 50%, rgba(2, 4, 10, 0.62) 100%),
-    linear-gradient(180deg, rgba(2, 4, 10, 0.16), rgba(2, 4, 10, 0.32));
+    radial-gradient(ellipse 70% 60% at 50% 46%, transparent 0%, rgba(2, 4, 10, 0.2) 50%, rgba(2, 4, 10, 0.66) 100%),
+    linear-gradient(180deg, rgba(var(--accent-rgb), 0.08), rgba(2, 4, 10, 0.34));
   pointer-events: none;
 }
 
 .overlayClosing {
-  animation: overlayFadeOut 0.22s ease forwards;
+  pointer-events: none;
+  animation: overlayFadeOut 0.38s ease forwards;
+}
+
+/* 关闭时停掉循环动画，保留 blur，避免去模糊白闪；背景单独淡出放大 */
+.overlayClosing .halo,
+.overlayClosing .innerOrbit,
+.overlayClosing .outerRing,
+.overlayClosing .planetTrack,
+.overlayClosing .planet,
+.overlayClosing .glowRing,
+.overlayClosing .image {
+  animation: none !important;
+}
+
+.overlayClosing .halo,
+.overlayClosing .innerOrbit,
+.overlayClosing .outerRing,
+.overlayClosing .planetTrack,
+.overlayClosing .glowRing {
+  opacity: 1;
+}
+
+.overlayClosing .halo {
+  filter: blur(18px);
+}
+
+.overlayClosing .backdropArt {
+  filter: blur(36px) saturate(155%) brightness(0.8);
+  animation: backdropArtFadeOut 0.38s ease forwards !important;
 }
 
 .content {
@@ -61,195 +90,196 @@
   align-items: center;
   gap: 14px;
   cursor: default;
-  animation: contentPopIn 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0;
+  animation: contentPopIn 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .contentClosing {
-  animation: contentPopOut 0.22s ease forwards;
+  animation: contentPopOut 0.34s ease forwards;
 }
 
 .frame {
   position: relative;
-  width: min(72vw, 54vh, 480px);
-  height: min(72vw, 54vh, 480px);
   width: min(72vw, 54dvh, 480px);
   height: min(72vw, 54dvh, 480px);
 }
 
-.frame::before {
-  content: "";
-  position: absolute;
-  inset: -20px;
-  z-index: 0;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    rgba(var(--accent-rgb), 0.95),
-    rgba(var(--accent-2-rgb), 0.95),
-    rgba(var(--accent-3-rgb), 0.95),
-    rgba(var(--accent-rgb), 0.3),
-    rgba(var(--accent-2-rgb), 0.95),
-    rgba(var(--accent-rgb), 0.95)
-  );
-  filter: blur(6px) saturate(180%) hue-rotate(0deg);
-  opacity: 0;
-  pointer-events: none;
-  animation:
-    haloFadeIn 0.5s ease 0.08s forwards,
-    lightboxSpin 4.2s cubic-bezier(0.55, 0.06, 0.45, 0.94) infinite,
-    lightboxHue 7s linear infinite;
-}
-
-.frame::after {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  z-index: 0;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 90deg,
-    transparent 0deg,
-    rgba(var(--accent-2-rgb), 0.95) 26deg,
-    transparent 64deg,
-    transparent 180deg,
-    rgba(var(--accent-3-rgb), 0.95) 214deg,
-    transparent 250deg
-  );
-  filter: blur(2px);
-  opacity: 0;
-  mix-blend-mode: screen;
-  pointer-events: none;
-  animation:
-    haloFadeIn 0.5s ease 0.08s forwards,
-    lightboxSpinReverse 2.6s linear infinite;
-}
-
-.orbit {
-  position: absolute;
-  inset: -50px;
-  z-index: 0;
-  opacity: 0;
-  pointer-events: none;
-  animation:
-    haloFadeIn 0.6s ease 0.15s forwards,
-    lightboxSpin 11s linear infinite;
-}
-
-.spark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  margin: -2.5px 0 0 -2.5px;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 8px 2px currentColor;
-  animation: sparkTwinkle 2.2s ease-in-out infinite;
-  --spark-radius: calc(min(36vw, 27vh, 240px) + 36px);
-  --spark-radius: calc(min(36vw, 27dvh, 240px) + 36px);
-}
-
-.spark:nth-child(1) {
-  color: var(--accent);
-  transform: rotate(0deg) translateX(var(--spark-radius));
-  animation-delay: 0s;
-}
-
-.spark:nth-child(2) {
-  color: var(--accent-2);
-  transform: rotate(45deg) translateX(var(--spark-radius));
-  animation-delay: 0.28s;
-}
-
-.spark:nth-child(3) {
-  color: var(--accent-3);
-  transform: rotate(90deg) translateX(var(--spark-radius));
-  animation-delay: 0.56s;
-}
-
-.spark:nth-child(4) {
-  color: var(--accent);
-  transform: rotate(135deg) translateX(var(--spark-radius));
-  animation-delay: 0.84s;
-}
-
-.spark:nth-child(5) {
-  color: var(--accent-2);
-  transform: rotate(180deg) translateX(var(--spark-radius));
-  animation-delay: 1.12s;
-}
-
-.spark:nth-child(6) {
-  color: var(--accent-3);
-  transform: rotate(225deg) translateX(var(--spark-radius));
-  animation-delay: 1.4s;
-}
-
-.spark:nth-child(7) {
-  color: var(--accent);
-  transform: rotate(270deg) translateX(var(--spark-radius));
-  animation-delay: 1.68s;
-}
-
-.spark:nth-child(8) {
-  color: var(--accent-2);
-  transform: rotate(315deg) translateX(var(--spark-radius));
-  animation-delay: 1.96s;
-}
-
-.waveRing {
+.halo {
   position: absolute;
   inset: -42px;
   z-index: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent) 55%, white) 0%, transparent 52%),
+    radial-gradient(circle at 38% 32%, rgba(var(--accent-rgb), 0.3) 0%, transparent 48%),
+    radial-gradient(circle at 68% 58%, rgba(var(--accent-2-rgb), 0.24) 0%, transparent 50%),
+    radial-gradient(circle at 52% 72%, rgba(var(--accent-3-rgb), 0.2) 0%, transparent 46%);
+  filter: blur(18px);
   opacity: 0;
   pointer-events: none;
-  animation: haloFadeIn 0.55s ease 0.12s forwards;
+  animation: haloFadeIn 0.55s ease 0.06s forwards, haloPulse 4.8s ease-in-out infinite;
 }
 
-.waveSpoke {
-  --bar-angle: 0deg;
-  --bar-base: 0.6;
-  --bar-duration: 1s;
-  --bar-delay: 0s;
+.innerOrbit {
   position: absolute;
-  inset: 0;
-  transform: rotate(var(--bar-angle));
+  inset: -16px;
+  z-index: 0;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  animation: haloFadeIn 0.5s ease 0.08s forwards, spinCw 28s linear infinite reverse;
+}
+
+.tickDot,
+.tickLong {
+  --tick-angle: 0deg;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: rotate(var(--tick-angle)) translateY(calc(-1 * (min(36vw, 27dvh, 240px) + 16px)));
+  transform-origin: center center;
   pointer-events: none;
 }
 
-.waveSpoke::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: calc(50% - 3px);
-  width: 6px;
-  height: calc(18px + 26px * var(--bar-base));
+.tickDot {
+  width: 3px;
+  height: 3px;
+  margin: -1.5px 0 0 -1.5px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 65%, white);
+  box-shadow: 0 0 4px rgba(var(--accent-rgb), 0.5);
+}
+
+.tickDot:nth-child(3n) {
+  background: color-mix(in srgb, var(--accent-2) 70%, white);
+  box-shadow: 0 0 4px rgba(var(--accent-2-rgb), 0.5);
+}
+
+.tickDot:nth-child(3n + 1) {
+  background: color-mix(in srgb, var(--accent-3) 70%, white);
+  box-shadow: 0 0 4px rgba(var(--accent-3-rgb), 0.5);
+}
+
+.tickLong {
+  width: 2px;
+  height: 8px;
+  margin: -4px 0 0 -1px;
   border-radius: 999px;
   background: linear-gradient(
-    to top,
-    rgba(var(--wave-rgb), 0.95) 0%,
-    rgba(var(--wave-rgb), 0.55) 55%,
-    transparent 100%
+    to bottom,
+    color-mix(in srgb, var(--accent) 45%, white),
+    rgba(var(--accent-rgb), 0.85),
+    rgba(var(--accent-2-rgb), 0.55)
+  );
+  box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.5);
+}
+
+.tickLong:nth-child(3n) {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--accent-2) 45%, white),
+    rgba(var(--accent-2-rgb), 0.85),
+    rgba(var(--accent-3-rgb), 0.55)
+  );
+  box-shadow: 0 0 6px rgba(var(--accent-2-rgb), 0.5);
+}
+
+.outerRing {
+  position: absolute;
+  inset: -32px;
+  z-index: 0;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--accent) 72%, white);
+  box-shadow:
+    0 0 10px rgba(var(--accent-rgb), 0.45),
+    0 0 22px rgba(var(--accent-2-rgb), 0.3),
+    0 0 34px rgba(var(--accent-3-rgb), 0.18),
+    inset 0 0 10px rgba(var(--accent-rgb), 0.16);
+  opacity: 0;
+  pointer-events: none;
+  animation: haloFadeIn 0.5s ease 0.1s forwards, outerRingGlow 3.6s ease-in-out infinite;
+}
+
+.outerRing::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--accent-3-rgb), 0.22);
+  pointer-events: none;
+}
+
+.planetTrack {
+  position: absolute;
+  inset: -32px;
+  z-index: 2;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  animation: haloFadeIn 0.55s ease 0.12s forwards, spinCw 6.5s linear infinite;
+}
+
+.planet {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    color-mix(in srgb, var(--accent-3) 28%, white) 0%,
+    color-mix(in srgb, var(--accent) 55%, white) 32%,
+    rgba(var(--accent-rgb), 0.95) 62%,
+    rgba(var(--accent-2-rgb), 0.92) 82%,
+    color-mix(in srgb, var(--accent-2) 55%, black) 100%
   );
   box-shadow:
-    0 0 10px rgba(var(--wave-rgb), 0.7),
-    0 0 22px rgba(var(--wave-rgb), 0.35);
-  transform-origin: center bottom;
-  opacity: 0.9;
-  animation: wavePulse var(--bar-duration) ease-in-out var(--bar-delay) infinite;
+    0 0 8px 2px color-mix(in srgb, var(--accent) 50%, white),
+    0 0 18px 4px rgba(var(--accent-rgb), 0.7),
+    0 0 28px 5px rgba(var(--accent-2-rgb), 0.45),
+    0 0 36px 6px rgba(var(--accent-3-rgb), 0.28);
+  animation: planetPulse 2.4s ease-in-out infinite;
 }
 
-.waveAccent0 {
-  --wave-rgb: var(--accent-rgb);
+.planet::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 40%, white) 0%,
+    rgba(var(--accent-2-rgb), 0.28) 42%,
+    transparent 72%
+  );
+  filter: blur(2px);
+  pointer-events: none;
 }
 
-.waveAccent1 {
-  --wave-rgb: var(--accent-2-rgb);
+.imageWrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 
-.waveAccent2 {
-  --wave-rgb: var(--accent-3-rgb);
+.glowRing {
+  position: absolute;
+  inset: -4px;
+  z-index: 0;
+  border-radius: 50%;
+  border: 3px solid color-mix(in srgb, var(--accent) 58%, white);
+  box-shadow:
+    0 0 10px 1px rgba(var(--accent-rgb), 0.85),
+    0 0 20px 3px rgba(var(--accent-2-rgb), 0.5),
+    0 0 32px 5px rgba(var(--accent-3-rgb), 0.32),
+    0 0 44px 8px rgba(var(--accent-rgb), 0.18);
+  opacity: 0;
+  pointer-events: none;
+  animation: haloFadeIn 0.45s ease 0.08s forwards, glowRingPulse 3s ease-in-out infinite;
 }
 
 .image {
@@ -260,187 +290,115 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  animation:
-    lightboxGlow 3s ease-in-out infinite,
-    lightboxBreathe 4.4s ease-in-out infinite;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 40%, white),
+    inset 0 0 12px rgba(var(--accent-2-rgb), 0.12);
+  animation: imageBreathe 4.4s ease-in-out infinite;
 }
 
-@keyframes wavePulse {
-  0%,
-  100% {
-    transform: scaleY(0.35);
-    opacity: 0.45;
-  }
+@keyframes spinCw { to { transform: rotate(360deg); } }
 
-  35% {
-    transform: scaleY(1.25);
-    opacity: 1;
-  }
-
-  65% {
-    transform: scaleY(0.7);
-    opacity: 0.75;
-  }
+@keyframes planetPulse {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.12); filter: brightness(1.15); }
 }
 
-@keyframes lightboxSpin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes lightboxSpinReverse {
-  to {
-    transform: rotate(-360deg);
-  }
-}
-
-@keyframes lightboxHue {
-  to {
-    filter: blur(6px) saturate(180%) hue-rotate(360deg);
-  }
-}
-
-@keyframes sparkTwinkle {
-  0%,
-  100% {
-    opacity: 0.12;
-    box-shadow: 0 0 4px 1px currentColor;
-  }
-
-  50% {
-    opacity: 1;
-    box-shadow: 0 0 12px 3px currentColor;
-  }
-}
-
-@keyframes lightboxBreathe {
-  0%,
-  100% {
-    transform: scale(1);
-    filter: brightness(1) saturate(1);
-  }
-
-  50% {
-    transform: scale(1.015);
-    filter: brightness(1.06) saturate(1.15);
-  }
-}
-
-@keyframes lightboxGlow {
-  0%,
-  100% {
+@keyframes outerRingGlow {
+  0%, 100% {
+    border-color: color-mix(in srgb, var(--accent) 70%, white);
     box-shadow:
-      inset 0 0 0 1px rgba(var(--accent-rgb), 0.3),
-      0 0 32px rgba(var(--accent-rgb), 0.35),
-      0 0 64px rgba(var(--accent-2-rgb), 0.22);
+      0 0 10px rgba(var(--accent-rgb), 0.4),
+      0 0 22px rgba(var(--accent-2-rgb), 0.26),
+      0 0 32px rgba(var(--accent-3-rgb), 0.16),
+      inset 0 0 10px rgba(var(--accent-rgb), 0.14);
   }
-
   50% {
+    border-color: color-mix(in srgb, var(--accent-3) 55%, white);
     box-shadow:
-      inset 0 0 0 1px rgba(var(--accent-2-rgb), 0.4),
-      0 0 44px rgba(var(--accent-2-rgb), 0.45),
-      0 0 80px rgba(var(--accent-3-rgb), 0.32);
+      0 0 14px rgba(var(--accent-3-rgb), 0.55),
+      0 0 26px rgba(var(--accent-rgb), 0.36),
+      0 0 36px rgba(var(--accent-2-rgb), 0.28),
+      inset 0 0 12px rgba(var(--accent-2-rgb), 0.2);
   }
 }
 
-@keyframes overlayFadeIn {
-  from {
-    opacity: 0;
-  }
+@keyframes haloPulse {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
 
-  to {
-    opacity: 1;
+@keyframes imageBreathe {
+  0%, 100% { transform: scale(1); filter: brightness(1) saturate(1); }
+  50% { transform: scale(1.012); filter: brightness(1.04) saturate(1.08); }
+}
+
+@keyframes glowRingPulse {
+  0%, 100% {
+    border-color: color-mix(in srgb, var(--accent) 62%, white);
+    box-shadow:
+      0 0 10px 1px rgba(var(--accent-rgb), 0.8),
+      0 0 20px 3px rgba(var(--accent-2-rgb), 0.42),
+      0 0 32px 5px rgba(var(--accent-3-rgb), 0.26),
+      0 0 42px 7px rgba(var(--accent-rgb), 0.16);
+  }
+  50% {
+    border-color: color-mix(in srgb, var(--accent-2) 48%, white);
+    box-shadow:
+      0 0 14px 2px rgba(var(--accent-2-rgb), 0.9),
+      0 0 26px 4px rgba(var(--accent-rgb), 0.55),
+      0 0 38px 7px rgba(var(--accent-3-rgb), 0.38),
+      0 0 50px 9px rgba(var(--accent-2-rgb), 0.2);
   }
 }
+
+@keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes overlayFadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes haloFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 @keyframes contentPopIn {
-  from {
-    opacity: 0;
-    transform: scale(0.88) translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes haloFadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes backdropArtFadeIn {
-  from {
-    opacity: 0;
-    transform: scale(1.2);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1.12);
-  }
-}
-
-@keyframes overlayFadeOut {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
-  }
+  from { opacity: 0; transform: scale(0.72) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 @keyframes contentPopOut {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to { opacity: 0; transform: scale(0.86) translateY(12px); }
+}
 
-  to {
-    opacity: 0;
-    transform: scale(0.92);
-  }
+@keyframes backdropArtFadeIn {
+  from { opacity: 0; transform: scale(1.32); }
+  to { opacity: 1; transform: scale(1.12); }
+}
+
+@keyframes backdropArtFadeOut {
+  from { opacity: 1; transform: scale(1.12); }
+  to { opacity: 0; transform: scale(1.22); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .overlay {
-    animation: overlayFadeIn 0.18s ease;
-  }
+  .overlay { animation: overlayFadeIn 0.2s ease forwards; }
+  .overlayClosing { animation: overlayFadeOut 0.16s ease forwards; }
 
   .content,
-  .frame::before,
-  .frame::after,
-  .orbit,
-  .spark,
-  .waveRing,
-  .waveSpoke::before,
+  .contentClosing,
+  .halo,
+  .innerOrbit,
+  .outerRing,
+  .planetTrack,
+  .planet,
+  .glowRing,
   .image,
-  .backdropArt {
-    animation: none;
-  }
+  .backdropArt { animation: none !important; }
 
-  .frame::before,
-  .frame::after,
-  .orbit,
-  .waveRing,
-  .backdropArt {
-    opacity: 1;
-  }
+  .overlay,
+  .content,
+  .halo,
+  .innerOrbit,
+  .outerRing,
+  .planetTrack,
+  .glowRing,
+  .backdropArt { opacity: 1; }
 
-  .waveSpoke::before {
-    transform: scaleY(var(--bar-base));
-    opacity: 0.75;
-  }
-
-  .backdropArt {
-    transform: scale(1.12);
-  }
+  .backdropArt { transform: scale(1.12); }
+  .content { transform: none; }
 }

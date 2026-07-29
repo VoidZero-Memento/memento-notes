@@ -1,5 +1,5 @@
-/** 按主题名拼音排序：冰 → 翠 → 琥 → 激 → 极 → 全 → 赛 → 樱 */
-export const THEME_IDS = ["3", "7", "8", "5", "1", "4", "2", "6"] as const;
+/** 按主题名拼音排序：冰 → 翠 → 琥 → 激 → 极 → 全 → 熔 → 赛 → 樱 */
+export const THEME_IDS = ["3", "7", "8", "5", "1", "4", "9", "2", "6"] as const;
 
 export type ThemeId = (typeof THEME_IDS)[number];
 
@@ -13,6 +13,7 @@ export const THEME_LABELS: Record<ThemeId, string> = {
   "5": "激光红黑",
   "1": "极光紫金",
   "4": "全息虹彩",
+  "9": "熔金光环",
   "2": "赛博霓虹",
   "6": "樱花粉黛",
 };
@@ -24,6 +25,7 @@ export const THEME_PREVIEWS: Record<ThemeId, string> = {
   "5": "linear-gradient(135deg, #ff003c 0%, #ff6b00 55%, #ffffff 100%)",
   "1": "linear-gradient(135deg, #a78bfa 0%, #f0abfc 50%, #fbbf24 100%)",
   "4": "linear-gradient(135deg, #22d3ee 0%, #a855f7 48%, #f472b6 100%)",
+  "9": "linear-gradient(135deg, #ffd28c 0%, #ffbe64 48%, #ff8c28 100%)",
   "2": "linear-gradient(135deg, #00f0ff 0%, #7c5cff 48%, #ff2d95 100%)",
   "6": "linear-gradient(135deg, #ff9ebb 0%, #ffb7d5 48%, #ffd6e4 100%)",
 };

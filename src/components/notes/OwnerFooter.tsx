@@ -31,7 +31,7 @@ export const OwnerFooter = ({ login, avatarUrl }: OwnerFooterProps) => {
       <span className={styles.ownerName} title={login}>
         {login}
       </span>
-      {avatarUrl && previewOpen ? (
+      {previewOpen && avatarUrl ? (
         <Lightbox src={avatarUrl} alt={login} onClose={() => setPreviewOpen(false)} />
       ) : null}
     </div>

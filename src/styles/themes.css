@@ -1,4 +1,4 @@
-/* 主题通过 html[data-theme="1"…"8"] 切换，选中值持久化在 localStorage */
+/* 主题通过 html[data-theme="1"…"9"] 切换，选中值持久化在 localStorage */
 
 :root,
 [data-theme="2"] {
@@ -348,4 +348,46 @@
   --hljs-built-in: #fb923c;
   --hljs-comment: #8a7460;
   --hljs-name: #fcd34d;
+}
+
+/* 9 熔金光环 —— 头像轨道原始橙金光晕 */
+[data-theme="9"] {
+  --accent-rgb: 255, 190, 100;
+  --accent-2-rgb: 255, 140, 40;
+  --accent-3-rgb: 255, 210, 140;
+  --fg-rgb: 255, 246, 230;
+  --accent: #ffbe64;
+  --accent-2: #ff8c28;
+  --accent-3: #ffd28c;
+  --link: #ffc878;
+  --link-hover: #ff8c28;
+  --background: #0a0704;
+  --background-deep: #050302;
+  --background-mid: #15100a;
+  --panel-bg: rgba(22, 14, 6, 0.58);
+  --hologram: linear-gradient(135deg, #ffd28c 0%, #ffbe64 48%, #ff8c28 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.44), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.36), transparent 54%),
+    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.2), transparent 50%),
+    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.12), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.12), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.48), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.4), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.26), transparent 55%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.52);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.36), 0 0 32px rgba(var(--accent-2-rgb), 0.18);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(30, 18, 8, 0.98) 0%, #120c06 55%, #0a0703 100%);
+  --inline-code: #ffc878;
+  --hljs-fg: #f7ead6;
+  --hljs-keyword: #ff8c28;
+  --hljs-title: #ffbe64;
+  --hljs-literal: #ffba48;
+  --hljs-string: #ffe0a8;
+  --hljs-built-in: #ff9a32;
+  --hljs-comment: #8c7460;
+  --hljs-name: #ffd28c;
 }
