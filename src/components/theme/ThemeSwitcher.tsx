@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 
+import { useAnimatedOpen } from "@/lib/dom/use-animated-open";
 import { THEME_IDS, THEME_LABELS, THEME_PREVIEWS } from "@/lib/theme/theme";
 import { useTheme } from "@/lib/theme/useTheme";
 import styles from "./ThemeSwitcher.module.css";
@@ -29,6 +30,7 @@ export const ThemeSwitcher = () => {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const { mounted, visible } = useAnimatedOpen(open);
 
   useEffect(() => {
     if (!open) return;
@@ -70,8 +72,14 @@ export const ThemeSwitcher = () => {
         <PaletteIcon />
       </button>
 
-      {open ? (
-        <ul id={listId} className={styles.menu} role="listbox" aria-label="主题列表">
+      {mounted ? (
+        <ul
+          id={listId}
+          className={`${styles.menu}${visible ? ` ${styles.menuVisible}` : ""}`}
+          role="listbox"
+          aria-label="主题列表"
+          aria-hidden={!visible}
+        >
           {THEME_IDS.map((id) => {
             const selected = id === theme;
             return (
@@ -80,6 +88,7 @@ export const ThemeSwitcher = () => {
                   type="button"
                   role="option"
                   aria-selected={selected}
+                  tabIndex={visible ? 0 : -1}
                   className={`${styles.option}${selected ? ` ${styles.optionSelected}` : ""}`}
                   onClick={() => handleSelect(id)}
                 >

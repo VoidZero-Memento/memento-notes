@@ -247,13 +247,20 @@
   padding: 0 4px;
 }
 
+.sidebarFooter {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}
+
 .ownerFooter {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-top: auto;
   border-top: 1px solid rgba(var(--accent-rgb), 0.1);
   padding-top: 12px;
 }
@@ -365,12 +372,23 @@
   margin: 0;
   background: transparent;
   /* 顶距与侧栏 .sidebar padding(16px) 对齐，避免标题/面包屑一高一低 */
-  padding: 16px 28px 12px;
+  padding: 0;
   color: rgba(var(--fg-rgb), 0.4);
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 12px;
   line-height: 1.4;
   word-break: break-all;
+}
+
+.viewerMeta {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  z-index: 1;
+  padding: 16px 28px 12px;
 }
 
 .viewerBody {
@@ -598,8 +616,12 @@
     color: var(--foreground);
   }
 
-  .viewerPath {
+  .viewerMeta {
     padding: 10px 16px;
+  }
+
+  .viewerPath {
+    padding: 0;
   }
 
   .viewerBody {

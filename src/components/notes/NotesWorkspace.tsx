@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 
+import { useBusuanzi } from "@/lib/busuanzi/use-busuanzi";
 import { useRepos } from "@/lib/github/ReposContext";
 import { parseOutline } from "@/lib/markdown/parse-outline";
 import { getNoteTitleFromPath, getRepoWorkspaceTitle } from "@/lib/note-title";
 import { useNoteContent } from "@/lib/notes/use-note-content";
 import { EmptyState } from "@/components/common/EmptyState";
+import { ArticleVisitStats } from "@/components/stats/ArticleVisitStats";
+import { SiteVisitStats } from "@/components/stats/SiteVisitStats";
+import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import { FileTree } from "./FileTree";
 import { LoadingState } from "./LoadingState";
 import { MarkdownViewer } from "./MarkdownViewer";
 import { OutlineTree } from "./OutlineTree";
 import { OwnerFooter } from "./OwnerFooter";
 import { RepoSelect } from "./RepoSelect";
-import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import styles from "./NotesShell.module.css";
 
 import type { GithubRepoConfig } from "@/config/github.types";
@@ -61,6 +64,8 @@ export const NotesWorkspace = ({
     : { label: "浏览文件", onClick: handleBrowseFiles };
 
   const workspaceTitle = getRepoWorkspaceTitle(config.label);
+  const articleReady = Boolean(selectedPath && content && !loading && !error);
+  useBusuanzi(articleReady, Boolean(selectedPath));
 
   useEffect(() => {
     document.title = getNoteTitleFromPath(selectedPath, config.label);
@@ -197,9 +202,12 @@ export const NotesWorkspace = ({
         >
           <span className={styles.sidebarCollapseMark} aria-hidden />
         </button>
-        <div className={styles.ownerFooter}>
-          <OwnerFooter login={config.owner} avatarUrl={config.ownerAvatarUrl} />
-          <ThemeSwitcher />
+        <div className={styles.sidebarFooter}>
+          <SiteVisitStats />
+          <div className={styles.ownerFooter}>
+            <OwnerFooter login={config.owner} avatarUrl={config.ownerAvatarUrl} />
+            <ThemeSwitcher />
+          </div>
         </div>
       </aside>
       <main className={styles.viewer}>
@@ -224,7 +232,12 @@ export const NotesWorkspace = ({
             <span className={styles.sidebarExpandMark} aria-hidden />
           </button>
         ) : null}
-        {selectedPath ? <p className={styles.viewerPath}>{selectedPath}</p> : null}
+        {selectedPath ? (
+          <div className={styles.viewerMeta}>
+            <p className={styles.viewerPath}>{selectedPath}</p>
+            {content && !loading && !error ? <ArticleVisitStats /> : null}
+          </div>
+        ) : null}
         <div
           className={`${styles.viewerBody}${pending ? ` ${styles.viewerBodyPending}` : ""}`}
           ref={viewerBodyRef}

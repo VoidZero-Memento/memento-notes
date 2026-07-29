@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { useAnimatedOpen } from "@/lib/dom/use-animated-open";
 import styles from "./RepoSelect.module.css";
 
 import type { GithubRepoConfig } from "@/config/github.types";
@@ -16,6 +17,7 @@ export const RepoSelect = ({ repos, activeId }: RepoSelectProps) => {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const { mounted, visible } = useAnimatedOpen(open);
 
   const activeRepo = repos.find((repo) => repo.id === activeId) ?? repos[0];
 
@@ -60,8 +62,14 @@ export const RepoSelect = ({ repos, activeId }: RepoSelectProps) => {
         <span className={`${styles.chevron}${open ? ` ${styles.chevronOpen}` : ""}`} aria-hidden />
       </button>
 
-      {open ? (
-        <ul id={listId} className={styles.menu} role="listbox" aria-label="笔记仓库列表">
+      {mounted ? (
+        <ul
+          id={listId}
+          className={`${styles.menu}${visible ? ` ${styles.menuVisible}` : ""}`}
+          role="listbox"
+          aria-label="笔记仓库列表"
+          aria-hidden={!visible}
+        >
           {repos.map((repo) => {
             const selected = repo.id === activeId;
             return (
@@ -70,6 +78,7 @@ export const RepoSelect = ({ repos, activeId }: RepoSelectProps) => {
                   type="button"
                   role="option"
                   aria-selected={selected}
+                  tabIndex={visible ? 0 : -1}
                   className={`${styles.option}${selected ? ` ${styles.optionSelected}` : ""}`}
                   onClick={() => handleSelect(repo.id)}
                 >

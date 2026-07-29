@@ -1,0 +1,90 @@
+.root {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 2px;
+  overflow: hidden;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  line-height: 1.2;
+}
+
+.scan {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--accent-rgb), 0.16),
+    transparent
+  );
+  animation: statsScan 6.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.item {
+  display: inline-flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 2px;
+  z-index: 1;
+}
+
+.label {
+  flex-shrink: 0;
+  color: rgba(var(--fg-rgb), 0.4);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.value {
+  overflow: hidden;
+  max-width: 6.5em;
+  color: rgba(var(--fg-rgb), 0.72);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unit {
+  flex-shrink: 0;
+  color: rgba(var(--accent-rgb), 0.75);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.divider {
+  z-index: 1;
+  color: rgba(var(--fg-rgb), 0.28);
+  font-size: 14px;
+  line-height: 1;
+}
+
+@keyframes statsScan {
+  0% {
+    transform: translateX(-40%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(300%);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan {
+    display: none;
+    animation: none;
+  }
+}
