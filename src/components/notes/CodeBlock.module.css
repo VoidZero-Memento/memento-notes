@@ -86,7 +86,7 @@
   overflow: auto;
   margin: 0;
   background: transparent;
-  padding: 6px 12px;
+  padding: 16px 20px;
 }
 
 .pre :global(code) {
@@ -104,6 +104,7 @@
   }
 
   .pre {
+    padding: 10px 14px;
     -webkit-overflow-scrolling: touch;
   }
 
