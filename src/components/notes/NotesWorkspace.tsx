@@ -43,7 +43,11 @@ export const NotesWorkspace = ({
 }: NotesWorkspaceProps) => {
   const { repos } = useRepos();
   const viewerBodyRef = useRef<HTMLDivElement>(null);
-  const { content, loading, pending, error, selectNote, retry } = useNoteContent(config, selectedPath, onSelectPath);
+  const { content, loading, pending, error, selectNote, retry } = useNoteContent(
+    config,
+    selectedPath,
+    onSelectPath,
+  );
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>("files");
   const [sidebarHidden, setSidebarHidden] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);

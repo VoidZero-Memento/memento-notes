@@ -142,9 +142,21 @@ const measureHighlight = (tree: HTMLElement, selectedPath: string): HighlightRec
   };
 };
 
+const enableAnimateAfterPaint = (enable: () => void) => {
+  let inner = 0;
+  const outer = requestAnimationFrame(() => {
+    inner = requestAnimationFrame(enable);
+  });
+  return () => {
+    cancelAnimationFrame(outer);
+    cancelAnimationFrame(inner);
+  };
+};
+
 export const FileTree = ({ nodes, selectedPath, onSelect }: FileTreeProps) => {
   const [expanded, setExpanded] = useState(() => new Set<string>());
   const treeRef = useRef<HTMLUListElement>(null);
+  const highlightReadyRef = useRef(false);
   const [highlight, setHighlight] = useState<HighlightRect>({ top: 0, height: 0, ready: false });
   const [animate, setAnimate] = useState(false);
 
@@ -179,6 +191,7 @@ export const FileTree = ({ nodes, selectedPath, onSelect }: FileTreeProps) => {
   useLayoutEffect(() => {
     const tree = treeRef.current;
     if (!tree || !selectedPath) {
+      highlightReadyRef.current = false;
       setAnimate(false);
       setHighlight((prev) => (prev.ready ? { ...prev, ready: false } : prev));
       return;
@@ -190,19 +203,31 @@ export const FileTree = ({ nodes, selectedPath, onSelect }: FileTreeProps) => {
       return;
     }
 
-    setAnimate(highlight.ready);
+    const canAnimate = highlightReadyRef.current;
+    highlightReadyRef.current = true;
+    // 过渡类需在「已有旧位置」之后再挂上，避免首帧与位移同帧导致起步发涩
+    setAnimate(canAnimate);
     setHighlight(next);
+
+    let cancelEnable: (() => void) | undefined;
+    if (!canAnimate) {
+      cancelEnable = enableAnimateAfterPaint(() => setAnimate(true));
+    }
 
     const observer = new ResizeObserver(() => {
       const updated = measureHighlight(tree, selectedPath);
-      if (updated) {
-        setAnimate(false);
-        setHighlight(updated);
-      }
+      if (!updated) return;
+      setAnimate(false);
+      setHighlight(updated);
+      cancelEnable?.();
+      cancelEnable = enableAnimateAfterPaint(() => setAnimate(true));
     });
     observer.observe(tree);
 
-    return () => observer.disconnect();
+    return () => {
+      cancelEnable?.();
+      observer.disconnect();
+    };
   }, [selectedPath, expanded, nodes]);
 
   if (nodes.length === 0) {
@@ -218,7 +243,10 @@ export const FileTree = ({ nodes, selectedPath, onSelect }: FileTreeProps) => {
       <div
         className={highlightClassName}
         aria-hidden
-        style={{ top: highlight.top, height: highlight.height }}
+        style={{
+          transform: `translate3d(0, ${highlight.top}px, 0)`,
+          height: highlight.height,
+        }}
       />
       <ul className={styles.tree} ref={treeRef}>
         {nodes.map((node) => (

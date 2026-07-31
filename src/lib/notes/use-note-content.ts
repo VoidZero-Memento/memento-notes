@@ -37,6 +37,7 @@ export const useNoteContent = (
   const loadedPathRef = useRef<string | null>(null);
   const requestedPathRef = useRef<string | null>(null);
   const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inFlightRef = useRef(false);
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [pending, setPending] = useState(false);
@@ -58,6 +59,9 @@ export const useNoteContent = (
 
   useEffect(() => {
     requestedPathRef.current = null;
+    inFlightRef.current = false;
+    clearPendingTimer();
+    setPending(false);
   }, [config]);
 
   useEffect(() => () => clearPendingTimer(), []);
@@ -66,6 +70,7 @@ export const useNoteContent = (
   useEffect(() => {
     if (requestedPathRef.current && requestedPathRef.current !== selectedPath) {
       requestedPathRef.current = null;
+      inFlightRef.current = false;
       clearPendingTimer();
       setPending(false);
     }
@@ -73,10 +78,15 @@ export const useNoteContent = (
 
   const selectNote = async (path: string) => {
     if (path === selectedPath) return;
+    // 仅在点击入口拦截，不改侧栏 UI，避免干扰高亮动画
+    if (loading || pending || inFlightRef.current) return;
 
+    inFlightRef.current = true;
     requestedPathRef.current = path;
     onSelectPath(path);
     setError(null);
+    // 点击路径改由 pending 承担，清掉可能残留的 loading，避免双 Spinner
+    setLoading(false);
     // 先让选中态进同一轮更新，pending/Loading 延后，避免拖慢高亮
     schedulePending(path);
 
@@ -99,6 +109,8 @@ export const useNoteContent = (
         setError(message);
         setPending(false);
       });
+    } finally {
+      inFlightRef.current = false;
     }
   };
 
@@ -141,7 +153,10 @@ export const useNoteContent = (
 
     if (loadedPathRef.current === selectedPath) return;
     // 点击选中已立刻改 URL，内容由 selectNote 负责拉取，避免再走 loading 占位
-    if (requestedPathRef.current === selectedPath) return;
+    if (requestedPathRef.current === selectedPath) {
+      setLoading(false);
+      return;
+    }
 
     let cancelled = false;
     setLoading(true);
