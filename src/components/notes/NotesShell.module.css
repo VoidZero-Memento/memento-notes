@@ -276,29 +276,44 @@
 .ownerName {
   overflow: hidden;
   min-width: 0;
-  background: var(--hologram);
-  background-size: 200% auto;
+  background-image: linear-gradient(
+    105deg,
+    var(--accent) 0%,
+    var(--accent-2) 16%,
+    var(--accent-3) 32%,
+    var(--accent) 48%,
+    var(--accent-2) 64%,
+    var(--accent-3) 80%,
+    var(--accent) 100%
+  );
+  background-size: 280% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-family: var(--font-geist-mono);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
   white-space: nowrap;
   text-overflow: ellipsis;
-  filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.35));
-  animation: ownerNameShimmer 6s linear infinite;
+  /* 单层 drop-shadow：仅本节点光栅化，避免多层 filter / 全局 blur */
+  filter: drop-shadow(0 0 10px rgba(var(--accent-rgb), 0.6));
+  animation: ownerNameShimmer 3.6s linear infinite;
+  will-change: background-position;
 }
 
 @keyframes ownerNameShimmer {
   to {
-    background-position: 200% center;
+    background-position: -180% center;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ownerName {
     animation: none;
+    will-change: auto;
+    background-position: 0 center;
   }
 }
 
@@ -331,8 +346,10 @@
   display: block;
   object-fit: cover;
   box-shadow:
-    inset 0 0 0 1px rgba(var(--accent-rgb), 0.25),
-    0 0 10px rgba(var(--accent-rgb), 0.2);
+    inset 0 0 0 1px rgba(var(--accent-rgb), 0.5),
+    0 0 0 1px rgba(var(--accent-2-rgb), 0.22),
+    0 0 14px rgba(var(--accent-rgb), 0.42),
+    0 0 22px rgba(var(--accent-2-rgb), 0.2);
 }
 
 .ownerAvatarButton:hover .ownerAvatar,

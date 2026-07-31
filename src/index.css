@@ -1,8 +1,9 @@
+@import "./styles/fonts.css";
 @import "./styles/themes.css";
 
 :root {
-  --font-geist-sans: "Geist", Arial, Helvetica, sans-serif;
-  --font-geist-mono: "Geist Mono", ui-monospace, monospace;
+  --font-geist-sans: "Geist", "LXGWWenKai", Arial, Helvetica, sans-serif;
+  --font-geist-mono: "GeistMono", "LXGWWenKaiMono", ui-monospace, monospace;
 }
 
 html {

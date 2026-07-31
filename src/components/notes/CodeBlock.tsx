@@ -1,8 +1,10 @@
-import { isValidElement, useState } from "react";
+import { Children, cloneElement, isValidElement, useState } from "react";
+
+import { toast } from "@/lib/toast/toast";
 
 import styles from "./CodeBlock.module.css";
 
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 type CodeBlockProps = {
   children: ReactNode;
@@ -16,17 +18,44 @@ const extractText = (node: unknown): string => {
   return "";
 };
 
+const trimTrailingNewline = (node: ReactNode): ReactNode => {
+  if (typeof node === "string") return node.replace(/\n$/, "");
+  if (!Array.isArray(node)) return node;
+
+  const next = [...node];
+  for (let i = next.length - 1; i >= 0; i -= 1) {
+    const item = next[i];
+    if (typeof item === "string") {
+      next[i] = item.replace(/\n$/, "");
+      break;
+    }
+    if (item != null && item !== false) break;
+  }
+  return next;
+};
+
+const normalizeCodeChildren = (children: ReactNode): ReactNode =>
+  Children.map(children, (child) => {
+    if (!isValidElement<{ children?: ReactNode }>(child)) return child;
+    return cloneElement(child as ReactElement<{ children?: ReactNode }>, {
+      children: trimTrailingNewline(child.props.children),
+    });
+  });
+
 export const CodeBlock = ({ children, className }: CodeBlockProps) => {
   const [copied, setCopied] = useState(false);
+  const content = normalizeCodeChildren(children);
 
   const handleCopy = async () => {
-    const text = extractText(children).replace(/\n$/, "");
+    const text = extractText(content);
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
+      toast.success("已复制到剪贴板");
       window.setTimeout(() => setCopied(false), 1600);
     } catch {
       setCopied(false);
+      toast.error("复制失败，请检查浏览器权限");
     }
   };
 
@@ -44,7 +73,7 @@ export const CodeBlock = ({ children, className }: CodeBlockProps) => {
           {copied ? "已复制" : "复制代码"}
         </button>
       </div>
-      <pre className={preClassName}>{children}</pre>
+      <pre className={preClassName}>{content}</pre>
     </div>
   );
 };

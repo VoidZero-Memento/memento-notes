@@ -3,6 +3,8 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useAnimatedOpen } from "@/lib/dom/use-animated-open";
 import { THEME_IDS, THEME_LABELS, THEME_PREVIEWS } from "@/lib/theme/theme";
 import { useTheme } from "@/lib/theme/useTheme";
+import { toast } from "@/lib/toast/toast";
+
 import styles from "./ThemeSwitcher.module.css";
 
 const PaletteIcon = () => (
@@ -54,7 +56,10 @@ export const ThemeSwitcher = () => {
   }, [open]);
 
   const handleSelect = (id: (typeof THEME_IDS)[number]) => {
-    setTheme(id);
+    if (id !== theme) {
+      setTheme(id);
+      toast.success(`已切换至「${THEME_LABELS[id]}」`);
+    }
     setOpen(false);
   };
 

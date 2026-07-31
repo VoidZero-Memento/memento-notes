@@ -86,7 +86,8 @@
   overflow: auto;
   margin: 0;
   background: transparent;
-  padding: 16px 20px;
+  padding: 16px 22px;
+  letter-spacing: 0.05em;
 }
 
 .pre :global(code) {
@@ -95,6 +96,7 @@
   color: inherit;
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 1.1em;
+  letter-spacing: 0.05em;
   line-height: 1.7;
 }
 
@@ -104,7 +106,7 @@
   }
 
   .pre {
-    padding: 10px 14px;
+    padding: 12px 18px;
     -webkit-overflow-scrolling: touch;
   }
 

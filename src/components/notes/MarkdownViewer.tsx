@@ -9,6 +9,7 @@ import remarkMath from "remark-math";
 
 import { rehypeHeadingIds } from "@/lib/markdown/rehype-heading-ids";
 import { CodeBlock } from "./CodeBlock";
+import { MarkdownImage } from "./MarkdownImage";
 import { MermaidBlock } from "./MermaidBlock";
 import { markdownSanitizeSchema } from "./markdownSanitizeSchema";
 import styles from "./MarkdownViewer.module.css";
@@ -62,6 +63,10 @@ const markdownComponents: Components = {
       <table>{children}</table>
     </div>
   ),
+  img: ({ src, alt }) => {
+    if (!src) return null;
+    return <MarkdownImage src={src} alt={alt} />;
+  },
   pre: ({ children, className }) => {
     const childList = Children.toArray(children);
     const codeChild = childList.find((child) => isValidElement(child));

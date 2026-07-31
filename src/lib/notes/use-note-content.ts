@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { runWithViewTransition } from "@/lib/dom/view-transition";
 import { getNoteRawContent } from "@/lib/github/github.service";
+import { toast } from "@/lib/toast/toast";
 
 import type { GithubRepoConfig } from "@/config/github.types";
 
@@ -79,7 +80,10 @@ export const useNoteContent = (
   const selectNote = async (path: string) => {
     if (path === selectedPath) return;
     // 仅在点击入口拦截，不改侧栏 UI，避免干扰高亮动画
-    if (loading || pending || inFlightRef.current) return;
+    if (loading || pending || inFlightRef.current) {
+      toast.info("正在加载，请稍候");
+      return;
+    }
 
     inFlightRef.current = true;
     requestedPathRef.current = path;

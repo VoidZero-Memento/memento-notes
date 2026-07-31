@@ -1,4 +1,4 @@
-const DEFAULT_DOCUMENT_TITLE = "Memento Notes";
+const DEFAULT_DOCUMENT_TITLE = "Memento · 笔记";
 const LEADING_INDEX_PREFIX = /^\d+\.\s*/;
 
 export const getRepoWorkspaceTitle = (repoLabel: string): string => `${repoLabel}笔记仓库`;
