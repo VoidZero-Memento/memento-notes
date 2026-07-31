@@ -37,9 +37,6 @@
   text-shadow:
     0 0 10px rgba(var(--accent-rgb), 0.55),
     0 0 22px rgba(var(--accent-rgb), 0.28);
-  border-bottom: 1px solid rgba(var(--accent-rgb), 0.4);
-  box-shadow: 0 8px 18px -14px rgba(var(--accent-rgb), 0.65);
-  padding-bottom: 0.32em;
 }
 
 .viewer :global(h3) {
@@ -89,7 +86,6 @@
     0 0 6px rgba(var(--accent-rgb), 0.7),
     0 0 16px rgba(var(--accent-rgb), 0.35),
     0 0 24px rgba(var(--accent-2-rgb), 0.2);
-  border-bottom-color: rgba(var(--accent-rgb), 0.45);
   animation: laser-pulse 2.8s ease-in-out infinite;
 }
 
@@ -164,10 +160,12 @@
 .viewer :global(b) {
   color: rgba(var(--fg-rgb), 1);
   font-weight: 750;
-  background: rgba(var(--accent-rgb), 0.14);
-  box-shadow: inset 0 -0.12em 0 rgba(var(--accent-rgb), 0.35);
-  border-radius: 3px;
-  padding: 0.05em 0.2em;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  border-bottom: 2px solid rgba(var(--accent-rgb), 0.55);
+  padding-bottom: 0.02em;
 }
 
 .viewer :global(em),
@@ -185,11 +183,12 @@
   color: rgba(var(--fg-rgb), 1);
   font-weight: 750;
   font-style: italic;
-  background: rgba(var(--accent-2-rgb), 0.14);
-  box-shadow: inset 0 -0.12em 0 rgba(var(--accent-2-rgb), 0.35);
-  border-bottom: none;
-  border-radius: 3px;
-  padding: 0.05em 0.2em;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  border-bottom: 2px solid rgba(var(--accent-2-rgb), 0.55);
+  padding-bottom: 0.02em;
 }
 
 .viewer :global(ul),
