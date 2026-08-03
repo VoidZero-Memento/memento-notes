@@ -4,8 +4,6 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { getRepoFileTree } from "@/lib/github/github.service";
 import { encodeNotePathForUrl } from "@/lib/github/repo-path";
 import { useRepos } from "@/lib/github/ReposContext";
-import { LoadingState } from "@/components/notes/LoadingState";
-import { NotesShellRoot } from "@/components/notes/NotesShellRoot";
 import { NotesWorkspace } from "@/components/notes/NotesWorkspace";
 
 import type { GithubFileTreeNode } from "@/lib/github/github.types";
@@ -23,13 +21,13 @@ export const RepoPage = () => {
 
   const [tree, setTree] = useState<GithubFileTreeNode[]>([]);
   const [treeError, setTreeError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [treeLoading, setTreeLoading] = useState(true);
 
   useEffect(() => {
     if (!config) return;
 
     let cancelled = false;
-    setLoading(true);
+    setTreeLoading(true);
     setTree([]);
     setTreeError(null);
 
@@ -46,7 +44,7 @@ export const RepoPage = () => {
           setTreeError(error instanceof Error ? error.message : "加载文件树失败");
         }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setTreeLoading(false);
       }
     };
 
@@ -60,19 +58,12 @@ export const RepoPage = () => {
     return <Navigate to="/" replace />;
   }
 
-  if (loading) {
-    return (
-      <NotesShellRoot>
-        <LoadingState label="加载文件树" />
-      </NotesShellRoot>
-    );
-  }
-
   return (
     <NotesWorkspace
       config={config}
       tree={tree}
       treeError={treeError}
+      treeLoading={treeLoading}
       selectedPath={selectedPath}
       onSelectPath={handleSelectPath}
     />

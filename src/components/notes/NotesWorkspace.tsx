@@ -27,6 +27,7 @@ type NotesWorkspaceProps = {
   config: GithubRepoConfig;
   tree: GithubFileTreeNode[];
   treeError: string | null;
+  treeLoading?: boolean;
   selectedPath: string | null;
   onSelectPath: (path: string) => void;
 };
@@ -37,6 +38,7 @@ export const NotesWorkspace = ({
   config,
   tree,
   treeError,
+  treeLoading = false,
   selectedPath,
   onSelectPath,
 }: NotesWorkspaceProps) => {
@@ -188,8 +190,9 @@ export const NotesWorkspace = ({
         </div>
         <div className={styles.treePanel}>
           <div hidden={sidebarMode !== "files"}>
-            {treeError ? <p className={styles.error}>{treeError}</p> : null}
-            {!treeError ? (
+            {treeLoading ? <LoadingState label="加载文件树" /> : null}
+            {!treeLoading && treeError ? <p className={styles.error}>{treeError}</p> : null}
+            {!treeLoading && !treeError ? (
               <FileTree
                 key={config.id}
                 nodes={tree}
@@ -199,12 +202,16 @@ export const NotesWorkspace = ({
             ) : null}
           </div>
           <div hidden={sidebarMode !== "outline"}>
-            <OutlineTree
-              items={outlineItems}
-              emptyLabel={outlineEmptyLabel}
-              emptyAction={outlineEmptyAction}
-              onNavigate={handleOutlineNavigate}
-            />
+            {treeLoading ? (
+              <LoadingState label="加载文件树" />
+            ) : (
+              <OutlineTree
+                items={outlineItems}
+                emptyLabel={outlineEmptyLabel}
+                emptyAction={outlineEmptyAction}
+                onNavigate={handleOutlineNavigate}
+              />
+            )}
           </div>
         </div>
         <button
@@ -231,61 +238,65 @@ export const NotesWorkspace = ({
       </aside>
       <BgTransitionOverlay open={bgOverlayOpen} />
       <main className={styles.viewer}>
-        <div className={styles.mobileBar}>
-          <h2 className={styles.mobileBarTitle}>{workspaceTitle}</h2>
-          <div className={styles.mobileBarActions}>
-            <button type="button" className={styles.mobileBarBtn} onClick={() => openMobileNav("files")}>
-              文件
-            </button>
-            <button type="button" className={styles.mobileBarBtn} onClick={() => openMobileNav("outline")}>
-              大纲
-            </button>
+        <div className={styles.viewerGlass} aria-hidden />
+        <div className={styles.viewerContent}>
+          <div className={styles.mobileBar}>
+            <h2 className={styles.mobileBarTitle}>{workspaceTitle}</h2>
+            <div className={styles.mobileBarActions}>
+              <button type="button" className={styles.mobileBarBtn} onClick={() => openMobileNav("files")}>
+                文件
+              </button>
+              <button type="button" className={styles.mobileBarBtn} onClick={() => openMobileNav("outline")}>
+                大纲
+              </button>
+            </div>
           </div>
-        </div>
-        {sidebarHidden ? (
-          <button
-            type="button"
-            className={styles.sidebarExpand}
-            aria-label="显示目录"
-            onClick={() => setSidebarHidden(false)}
+          {sidebarHidden ? (
+            <button
+              type="button"
+              className={styles.sidebarExpand}
+              aria-label="显示目录"
+              onClick={() => setSidebarHidden(false)}
+            >
+              <span className={styles.sidebarExpandMark} aria-hidden />
+            </button>
+          ) : null}
+          {selectedPath ? (
+            <div className={styles.viewerMeta}>
+              <p className={styles.viewerPath}>{selectedPath}</p>
+            </div>
+          ) : null}
+          <div
+            className={`${styles.viewerBody}${pending ? ` ${styles.viewerBodyPending}` : ""}`}
+            ref={viewerBodyRef}
           >
-            <span className={styles.sidebarExpandMark} aria-hidden />
-          </button>
-        ) : null}
-        {selectedPath ? (
-          <div className={styles.viewerMeta}>
-            <p className={styles.viewerPath}>{selectedPath}</p>
+            {treeLoading ? <LoadingState label="加载文件树" /> : null}
+            {!treeLoading && !selectedPath ? (
+              <EmptyState
+                title="请选择一个 Markdown 文件"
+                description="从左侧文件列表中选一篇笔记开始阅读"
+                action={{ label: "浏览文件", onClick: handleBrowseFiles }}
+              />
+            ) : null}
+            {!treeLoading && selectedPath && loading ? <LoadingState label="加载中" /> : null}
+            {!treeLoading && selectedPath && error && !loading ? (
+              <EmptyState
+                variant="error"
+                title="无法加载笔记"
+                description={describeNoteLoadError(error)}
+                action={{ label: "重试", onClick: () => void retry() }}
+              />
+            ) : null}
+            {!treeLoading && selectedPath && content && !loading ? (
+              <MarkdownViewer content={content} headingIds={outlineItems.map((item) => item.id)} />
+            ) : null}
           </div>
-        ) : null}
-        <div
-          className={`${styles.viewerBody}${pending ? ` ${styles.viewerBodyPending}` : ""}`}
-          ref={viewerBodyRef}
-        >
-          {!selectedPath ? (
-            <EmptyState
-              title="请选择一个 Markdown 文件"
-              description="从左侧文件列表中选一篇笔记开始阅读"
-              action={{ label: "浏览文件", onClick: handleBrowseFiles }}
-            />
-          ) : null}
-          {selectedPath && loading ? <LoadingState label="加载中" /> : null}
-          {selectedPath && error && !loading ? (
-            <EmptyState
-              variant="error"
-              title="无法加载笔记"
-              description={describeNoteLoadError(error)}
-              action={{ label: "重试", onClick: () => void retry() }}
-            />
-          ) : null}
-          {selectedPath && content && !loading ? (
-            <MarkdownViewer content={content} headingIds={outlineItems.map((item) => item.id)} />
+          {pending ? (
+            <div className={styles.pendingOverlay}>
+              <LoadingState label="加载中" />
+            </div>
           ) : null}
         </div>
-        {pending ? (
-          <div className={styles.pendingOverlay}>
-            <LoadingState label="加载中" />
-          </div>
-        ) : null}
       </main>
     </div>
   );

@@ -1,9 +1,11 @@
 import { createPortal } from "react-dom";
 
 import { useAnimatedOpen } from "@/lib/dom/use-animated-open";
-import { BG_TRANSITION_EXIT_MS } from "@/lib/prefs/sidebar-bg";
+import { BG_TRANSITION_EXIT_MS, BG_TRANSITION_HOLD_MS } from "@/lib/prefs/sidebar-bg";
 
 import styles from "./BgTransitionOverlay.module.css";
+
+import type { CSSProperties } from "react";
 
 type BgTransitionOverlayProps = {
   open: boolean;
@@ -14,9 +16,15 @@ export const BgTransitionOverlay = ({ open }: BgTransitionOverlayProps) => {
 
   if (!mounted || typeof document === "undefined") return null;
 
+  const overlayVars = {
+    "--bg-transition-hold-ms": `${BG_TRANSITION_HOLD_MS}ms`,
+    "--bg-transition-exit-ms": `${BG_TRANSITION_EXIT_MS}ms`,
+  } as CSSProperties;
+
   return createPortal(
     <div
       className={`${styles.root}${visible ? ` ${styles.rootVisible}` : ""}`}
+      style={overlayVars}
       role="dialog"
       aria-modal="true"
       aria-labelledby="bg-transition-title"

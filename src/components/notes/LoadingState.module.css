@@ -67,7 +67,8 @@
   width: 72px;
   height: 72px;
   aspect-ratio: 1;
-  filter: drop-shadow(0 0 16px rgba(var(--accent-rgb), 0.35)) drop-shadow(0 0 28px rgba(var(--accent-2-rgb), 0.25));
+  filter: drop-shadow(0 0 16px rgba(var(--accent-rgb), 0.35))
+    drop-shadow(0 0 28px rgba(var(--accent-2-rgb), 0.25));
 }
 
 .ring {
@@ -119,7 +120,12 @@
   inset: 0;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.15) 32%, transparent 55%),
+    radial-gradient(
+      circle at 32% 26%,
+      rgba(255, 255, 255, 0.95),
+      rgba(255, 255, 255, 0.15) 32%,
+      transparent 55%
+    ),
     radial-gradient(circle at 70% 78%, rgba(0, 0, 0, 0.6), transparent 60%);
   animation: loading-highlight-shift 2.6s ease-in-out infinite;
 }

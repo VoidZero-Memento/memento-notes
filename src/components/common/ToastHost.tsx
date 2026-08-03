@@ -38,8 +38,8 @@ const ToastIcon = ({ type }: { type: ToastType }) => {
   if (type === "warning") {
     return (
       <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 3.2 21.5 20.2H2.5L12 3.2Z" fill="currentColor" />
-        <path d="M12 9.2v5.2M12 16.8v.4" fill="none" stroke="var(--background)" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="12" cy="12" r="10" fill="currentColor" />
+        <path d="M12 7.5v5.5M12 16.2v.5" fill="none" stroke="var(--background)" strokeWidth="2" strokeLinecap="round" />
       </svg>
     );
   }

@@ -24,8 +24,8 @@ const toErrorMessage = (err: unknown) => (err instanceof Error ? err.message : "
  * 管理选中笔记的内容加载。
  *
  * - `selectNote`：由用户点击触发，立刻更新 URL（侧栏选中态跟上），再后台拉内容；
- *   `pending` 延后一小段再挂上，避免与高亮切换同帧竞争；短请求可不闪 Loading。
- *   拉完后用 `runWithViewTransition` 替换内容，过渡动画截到的仍是新旧两篇真实内容。
+ *   `pending` 延后一小段再挂上，避免与高亮切换同帧竞争；短请求可不闪 Loading；
+ *   内容到位后用 `runWithViewTransition` 做交叉淡入。
  * - 内部的 `useEffect`：处理非点击触发的加载（首次进入、刷新、浏览器前进后退），
  *   这类场景没有"旧内容"可过渡，走普通 loading 态；用 `requestedPathRef` /
  *   `loadedPathRef` 避免与 `selectNote` 重复请求或互相抢写。
@@ -81,7 +81,7 @@ export const useNoteContent = (
     if (path === selectedPath) return;
     // 仅在点击入口拦截，不改侧栏 UI，避免干扰高亮动画
     if (loading || pending || inFlightRef.current) {
-      toast.info("正在加载，请稍候");
+      toast.warning("正在加载，请稍候");
       return;
     }
 

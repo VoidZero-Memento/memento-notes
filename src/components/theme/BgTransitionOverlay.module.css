@@ -7,7 +7,8 @@
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.52s ease;
+  cursor: none;
+  transition: opacity var(--bg-transition-exit-ms, 520ms) ease;
 }
 
 .rootVisible {
@@ -15,21 +16,32 @@
   pointer-events: auto;
 }
 
+/*
+ * 默认态 = 与 NotesShell `.rootBgEnabled::before` 对齐的最终定格。
+ * 进入时从放大播到定格；退场去掉 rootVisible 后仍落在定格，避免弹回放大造成跳变。
+ */
 .backdrop {
   position: absolute;
-  inset: -4%;
+  inset: 0;
   z-index: 0;
-  background-image: url("/viewer-bg-desktop.png");
-  background-position: right bottom;
-  background-size: cover;
-  background-repeat: no-repeat;
-  filter: saturate(1) brightness(0.92);
-  transform: scale(1.06);
-  transition: transform 3.2s ease-out;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(4, 7, 14, 0.36) 0%,
+      rgba(4, 7, 14, 0.26) 42%,
+      rgba(4, 7, 14, 0.42) 100%
+    ),
+    url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png") 50% 72% /
+      cover no-repeat;
+  filter: saturate(0.8) brightness(0.82);
+  transform: scale(1);
+  transform-origin: 50% 72%;
+  will-change: transform, filter;
 }
 
 .rootVisible .backdrop {
-  transform: scale(1);
+  animation: bgTransitionSettle var(--bg-transition-hold-ms, 3000ms)
+    cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .veil {
@@ -37,60 +49,86 @@
   inset: 0;
   z-index: 1;
   background:
-    radial-gradient(ellipse 78% 62% at 50% 40%, rgba(4, 7, 14, 0.12), rgba(4, 7, 14, 0.42) 74%),
-    linear-gradient(180deg, rgba(4, 7, 14, 0.28) 0%, rgba(4, 7, 14, 0.48) 100%);
+    radial-gradient(
+      ellipse 72% 58% at 50% 42%,
+      rgba(4, 7, 14, 0.02),
+      rgba(4, 7, 14, 0.22) 72%
+    ),
+    linear-gradient(180deg, rgba(4, 7, 14, 0.1) 0%, rgba(4, 7, 14, 0.2) 100%);
+  opacity: 0;
+}
+
+.rootVisible .veil {
+  animation: bgTransitionVeilOut var(--bg-transition-hold-ms, 3000ms) ease forwards;
 }
 
 .panel {
   position: relative;
   z-index: 2;
   display: flex;
-  width: min(280px, calc(100vw - 48px));
+  width: min(300px, calc(100vw - 48px));
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 0;
   text-align: center;
-  opacity: 0;
-  transform: translateY(8px);
-  transition:
-    opacity 0.55s ease,
-    transform 0.55s ease;
 }
 
-.rootVisible .panel {
-  opacity: 1;
-  transform: translateY(0);
+.title,
+.desc,
+.progressTrack {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.rootVisible .title {
+  animation: bgTransitionCopyIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.08s forwards,
+    bgTransitionCopyOut 0.5s ease calc(var(--bg-transition-hold-ms, 3000ms) - 0.55s) forwards;
+}
+
+.rootVisible .desc {
+  animation: bgTransitionCopyIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards,
+    bgTransitionCopyOut 0.5s ease calc(var(--bg-transition-hold-ms, 3000ms) - 0.5s) forwards;
+}
+
+.rootVisible .progressTrack {
+  animation: bgTransitionCopyIn 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.34s forwards,
+    bgTransitionCopyOut 0.45s ease calc(var(--bg-transition-hold-ms, 3000ms) - 0.45s) forwards;
 }
 
 .title {
   margin: 0;
-  color: rgba(255, 255, 255, 0.92);
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  line-height: 1.4;
-  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.55);
+  color: rgba(255, 255, 255, 0.94);
+  font-family: "LXGWWenKai", var(--font-geist-sans);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  line-height: 1.35;
+  text-indent: 0.28em;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
 }
 
 .desc {
   margin: 0;
   max-width: 22em;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.58);
   font-size: 12px;
   font-weight: 400;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.18em;
   line-height: 1.5;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
+  text-indent: 0.18em;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.4);
 }
 
 .progressTrack {
-  width: min(120px, 48%);
-  height: 2px;
-  margin-top: 12px;
+  position: relative;
+  width: min(132px, 52%);
+  height: 3px;
+  margin-top: 14px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(var(--accent-rgb), 0.16);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .progressBar {
@@ -100,17 +138,72 @@
   border-radius: inherit;
   background: linear-gradient(
     90deg,
-    rgba(var(--accent-rgb), 0.55),
-    rgba(var(--accent-2-rgb), 0.85),
+    rgba(var(--accent-rgb), 0.65),
+    rgba(var(--accent-2-rgb), 0.9),
     rgba(var(--accent-3-rgb), 0.95)
   );
-  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.35);
+  background-size: 200% 100%;
+  box-shadow:
+    0 0 10px rgba(var(--accent-rgb), 0.45),
+    0 0 18px rgba(var(--accent-2-rgb), 0.28);
   transform: scaleX(0);
   transform-origin: left center;
 }
 
 .progressBarActive {
-  animation: bgTransitionProgress 3s linear forwards;
+  animation:
+    bgTransitionProgress var(--bg-transition-hold-ms, 3000ms) linear forwards,
+    bgTransitionShimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes bgTransitionSettle {
+  from {
+    transform: scale(1.22);
+    filter: saturate(1.12) brightness(1.05);
+  }
+
+  to {
+    transform: scale(1);
+    filter: saturate(0.8) brightness(0.82);
+  }
+}
+
+@keyframes bgTransitionVeilOut {
+  0% {
+    opacity: 1;
+  }
+
+  55% {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes bgTransitionCopyIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bgTransitionCopyOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
 }
 
 @keyframes bgTransitionProgress {
@@ -123,55 +216,74 @@
   }
 }
 
+@keyframes bgTransitionShimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 @media (max-width: 860px) {
   .backdrop {
-    background-image: url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png");
-    background-position: center;
-  }
-
-  .root {
-    place-items: start center;
-    padding: 18vh 16px 0;
-  }
-
-  .veil {
     background:
-      radial-gradient(ellipse 90% 58% at 50% 28%, rgba(4, 7, 14, 0.08), rgba(4, 7, 14, 0.36) 70%),
-      linear-gradient(180deg, rgba(4, 7, 14, 0.18) 0%, rgba(4, 7, 14, 0.52) 100%);
+      linear-gradient(
+        180deg,
+        rgba(4, 7, 14, 0.36) 0%,
+        rgba(4, 7, 14, 0.26) 42%,
+        rgba(4, 7, 14, 0.42) 100%
+      ),
+      url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner8.png") center /
+        cover no-repeat;
+    transform-origin: center;
   }
 
   .panel {
-    width: min(240px, calc(100vw - 32px));
-    transform: translateY(10px);
+    width: min(260px, calc(100vw - 32px));
   }
 
   .title {
-    font-size: 14px;
+    font-size: 18px;
+    letter-spacing: 0.22em;
+    text-indent: 0.22em;
   }
 
   .desc {
     font-size: 11px;
+    letter-spacing: 0.14em;
+    text-indent: 0.14em;
   }
 
   .progressTrack {
-    width: min(96px, 42%);
-    margin-top: 10px;
+    width: min(108px, 46%);
+    margin-top: 12px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .root,
-  .backdrop,
-  .panel {
+  .root {
     transition: none;
   }
 
-  .backdrop {
+  .rootVisible .backdrop,
+  .rootVisible .veil {
+    animation: none;
+  }
+
+  .title,
+  .desc,
+  .progressTrack {
+    opacity: 1;
     transform: none;
   }
 
-  .rootVisible .backdrop {
-    transform: none;
+  .rootVisible .title,
+  .rootVisible .desc,
+  .rootVisible .progressTrack {
+    animation: none;
   }
 
   .progressBarActive {

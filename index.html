@@ -90,8 +90,8 @@
         object-fit: cover;
         object-position: center 28%;
         transform: scale(1.06);
-        opacity: 0.62;
-        filter: saturate(1.05) brightness(0.88);
+        opacity: 0.82;
+        filter: saturate(1.08) brightness(1.02);
         animation: splashDrift 12s ease-in-out infinite alternate;
       }
 
@@ -102,14 +102,14 @@
         background:
           linear-gradient(
             180deg,
-            rgba(4, 7, 14, 0.35) 0%,
-            rgba(4, 7, 14, 0.22) 28%,
-            rgba(4, 7, 14, 0.72) 68%,
-            rgba(4, 7, 14, 0.94) 100%
+            rgba(4, 7, 14, 0.08) 0%,
+            rgba(4, 7, 14, 0.04) 36%,
+            rgba(4, 7, 14, 0.38) 62%,
+            rgba(4, 7, 14, 0.72) 100%
           ),
           radial-gradient(
             ellipse at 50% 18%,
-            rgba(255, 154, 196, 0.18),
+            rgba(255, 154, 196, 0.14),
             transparent 55%
           );
       }
@@ -254,6 +254,12 @@
         }
         to {
           transform: scale(1.12) translateY(-1.5%);
+        }
+      }
+
+      @media (min-width: 861px) {
+        #app-splash .splash-banner {
+          object-position: center 50%;
         }
       }
 
