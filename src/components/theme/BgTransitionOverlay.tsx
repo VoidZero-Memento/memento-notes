@@ -30,10 +30,10 @@ export const BgTransitionOverlay = ({ open }: BgTransitionOverlayProps) => {
       <div className={styles.veil} aria-hidden />
       <div className={styles.panel}>
         <p id="bg-transition-title" className={styles.title}>
-          正在进入氛围模式
+          氛围模式
         </p>
         <p id="bg-transition-desc" className={styles.desc}>
-          背景铺开中，当前笔记与阅读位置保持不变
+          背景铺开中
         </p>
         <div className={styles.progressTrack} aria-hidden>
           <span className={`${styles.progressBar}${visible ? ` ${styles.progressBarActive}` : ""}`} />

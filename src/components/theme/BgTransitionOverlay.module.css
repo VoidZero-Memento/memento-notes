@@ -44,61 +44,52 @@
   position: relative;
   z-index: 2;
   display: flex;
-  width: min(420px, calc(100vw - 48px));
+  width: min(280px, calc(100vw - 48px));
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  border: 1px solid rgba(var(--accent-rgb), 0.28);
-  border-radius: 18px;
-  background: rgba(8, 14, 28, 0.42);
-  box-shadow:
-    0 0 0 1px rgba(var(--accent-rgb), 0.08),
-    0 0 28px rgba(var(--accent-rgb), 0.16),
-    0 18px 48px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(18px) saturate(150%);
-  -webkit-backdrop-filter: blur(18px) saturate(150%);
-  padding: 28px 24px 22px;
+  gap: 6px;
+  padding: 0;
   text-align: center;
   opacity: 0;
-  transform: translateY(14px) scale(0.98);
+  transform: translateY(8px);
   transition:
-    opacity 0.45s ease,
-    transform 0.45s ease;
+    opacity 0.55s ease,
+    transform 0.55s ease;
 }
 
 .rootVisible .panel {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
 }
 
 .title {
   margin: 0;
-  color: var(--foreground);
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   line-height: 1.4;
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.55);
 }
 
 .desc {
   margin: 0;
-  max-width: 28em;
-  color: rgba(var(--fg-rgb), 0.72);
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  line-height: 1.55;
+  max-width: 22em;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
 }
 
 .progressTrack {
-  width: min(220px, 70%);
-  height: 3px;
-  margin-top: 10px;
+  width: min(120px, 48%);
+  height: 2px;
+  margin-top: 12px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.12);
+  background: rgba(var(--accent-rgb), 0.16);
 }
 
 .progressBar {
@@ -108,10 +99,11 @@
   border-radius: inherit;
   background: linear-gradient(
     90deg,
-    rgba(var(--accent-rgb), 0.85),
-    rgba(var(--accent-2-rgb), 0.9)
+    rgba(var(--accent-rgb), 0.55),
+    rgba(var(--accent-2-rgb), 0.85),
+    rgba(var(--accent-3-rgb), 0.95)
   );
-  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.45);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.35);
   transform: scaleX(0);
   transform-origin: left center;
 }
@@ -143,33 +135,21 @@
   }
 
   .panel {
-    width: min(320px, calc(100vw - 32px));
-    gap: 6px;
-    border-radius: 14px;
-    background: rgba(8, 14, 28, 0.34);
-    backdrop-filter: blur(12px) saturate(140%);
-    -webkit-backdrop-filter: blur(12px) saturate(140%);
-    padding: 14px 16px 12px;
-    transform: translateY(18px) scale(0.98);
-  }
-
-  .rootVisible .panel {
-    transform: translateY(0) scale(1);
+    width: min(240px, calc(100vw - 32px));
+    transform: translateY(10px);
   }
 
   .title {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .desc {
-    font-size: 12px;
-    line-height: 1.45;
+    font-size: 11px;
   }
 
   .progressTrack {
-    width: min(160px, 62%);
-    height: 2px;
-    margin-top: 6px;
+    width: min(96px, 42%);
+    margin-top: 10px;
   }
 }
 

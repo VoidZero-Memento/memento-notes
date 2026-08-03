@@ -1,4 +1,6 @@
 .root {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex: 1;
   min-height: 0;
@@ -17,7 +19,7 @@
 .sidebar,
 .viewer {
   position: relative;
-  z-index: 0;
+  z-index: 1;
   isolation: isolate;
   border-radius: 14px;
   box-shadow:
@@ -46,42 +48,30 @@
     opacity 0.18s ease;
 }
 
-/* 面板氛围底图：低透明度 + 暗色遮罩，避免抢霓虹与文字可读性 */
-.sidebarBgEnabled::before,
-.viewerBgEnabled::before {
+/* 桌面：整页共用正文底图，侧栏/正文半透明透出同一张图 */
+.rootBgEnabled::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
-  border-radius: inherit;
   pointer-events: none;
-  opacity: 0.55;
-  filter: saturate(0.55) brightness(0.55);
-}
-
-.sidebarBgEnabled::before {
   background:
     linear-gradient(
       180deg,
-      rgba(4, 7, 14, 0.82) 0%,
-      rgba(4, 7, 14, 0.72) 45%,
-      rgba(4, 7, 14, 0.88) 100%
+      rgba(4, 7, 14, 0.36) 0%,
+      rgba(4, 7, 14, 0.26) 42%,
+      rgba(4, 7, 14, 0.42) 100%
     ),
-    url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/loading-banner.png") center / cover no-repeat;
+    url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png") center /
+      cover no-repeat;
+  filter: saturate(0.8) brightness(0.82);
 }
 
-.viewerBgEnabled::before {
-  /* 正文区图偏亮，遮罩略加重以保证可读性 */
-  opacity: 0.5;
-  filter: saturate(0.45) brightness(0.42);
-  background:
-    linear-gradient(
-      180deg,
-      rgba(4, 7, 14, 0.88) 0%,
-      rgba(4, 7, 14, 0.78) 40%,
-      rgba(4, 7, 14, 0.9) 100%
-    ),
-    url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png") center / cover no-repeat;
+.rootBgEnabled .sidebar,
+.rootBgEnabled .viewer {
+  background: rgba(6, 10, 20, 0.2);
+  backdrop-filter: blur(12px) saturate(135%);
+  -webkit-backdrop-filter: blur(12px) saturate(135%);
 }
 
 .sidebarHeader {
@@ -491,6 +481,15 @@
   line-height: 1.6;
 }
 
+.bootState {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  padding: 24px;
+}
 @media (max-width: 860px) {
   .root {
     flex-direction: column;
@@ -544,6 +543,27 @@
       0 10px 36px rgba(0, 0, 0, 0.4),
       inset 0 1px 0 rgba(var(--accent-rgb), 0.08);
     transition: transform 0.22s ease;
+  }
+
+  /* 手机抽屉侧栏保留独立背景图 */
+  .sidebarBgEnabled::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0.55;
+    filter: saturate(0.55) brightness(0.55);
+    background:
+      linear-gradient(
+        180deg,
+        rgba(4, 7, 14, 0.82) 0%,
+        rgba(4, 7, 14, 0.72) 45%,
+        rgba(4, 7, 14, 0.88) 100%
+      ),
+      url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner8.png") center /
+        cover no-repeat;
   }
 
   .sidebarHidden {

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+import { describeGithubError } from "@/lib/github/describe-github-error";
 import { useRepos } from "@/lib/github/ReposContext";
 import { parseOutline } from "@/lib/markdown/parse-outline";
 import { getNoteTitleFromPath, getRepoWorkspaceTitle } from "@/lib/note-title";
@@ -30,12 +31,7 @@ type NotesWorkspaceProps = {
   onSelectPath: (path: string) => void;
 };
 
-const describeNoteLoadError = (message: string) => {
-  if (/failed to fetch|networkerror|network request failed|load failed/i.test(message)) {
-    return "网络请求失败，请检查网络连接后重试";
-  }
-  return message;
-};
+const describeNoteLoadError = (message: string) => describeGithubError(message).description;
 
 export const NotesWorkspace = ({
   config,
@@ -134,7 +130,15 @@ export const NotesWorkspace = ({
     : styles.backdrop;
 
   return (
-    <div className={`${styles.root}${sidebarHidden ? ` ${styles.rootSidebarHidden}` : ""}`}>
+    <div
+      className={[
+        styles.root,
+        sidebarHidden ? styles.rootSidebarHidden : "",
+        sidebarBgEnabled ? styles.rootBgEnabled : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <button
         type="button"
         className={backdropClassName}
@@ -226,7 +230,7 @@ export const NotesWorkspace = ({
         </div>
       </aside>
       <BgTransitionOverlay open={bgOverlayOpen} />
-      <main className={`${styles.viewer}${sidebarBgEnabled ? ` ${styles.viewerBgEnabled}` : ""}`}>
+      <main className={styles.viewer}>
         <div className={styles.mobileBar}>
           <h2 className={styles.mobileBarTitle}>{workspaceTitle}</h2>
           <div className={styles.mobileBarActions}>

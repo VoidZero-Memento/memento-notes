@@ -110,20 +110,43 @@ const pickIllustration = (variant: NonNullable<EmptyStateProps["variant"]>) => {
   return <NotebookIllustration />;
 };
 
-export const EmptyState = ({ title, description, action, variant = "default" }: EmptyStateProps) => {
+export const EmptyState = ({
+  title,
+  description,
+  action,
+  actions,
+  variant = "default",
+  children,
+  footer,
+}: EmptyStateProps) => {
   const isCompact = variant === "compact";
   const isError = variant === "error";
+  const resolvedActions = actions ?? (action ? [action] : []);
 
   return (
     <div className={`${styles.root} ${isCompact ? styles.compact : ""} ${isError ? styles.error : ""}`}>
       {pickIllustration(variant)}
       <p className={styles.title}>{title}</p>
       {description ? <p className={styles.description}>{description}</p> : null}
-      {action && !isCompact ? (
-        <button type="button" className={styles.action} onClick={action.onClick}>
-          {action.label}
-        </button>
+      {children}
+      {!isCompact && resolvedActions.length > 0 ? (
+        <div className={styles.actions}>
+          {resolvedActions.map((item, index) => {
+            const isSecondary = item.variant === "secondary" || (item.variant !== "primary" && index > 0);
+            return (
+              <button
+                key={item.label}
+                type="button"
+                className={`${styles.action}${isSecondary ? ` ${styles.actionSecondary}` : ""}`}
+                onClick={item.onClick}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
       ) : null}
+      {footer && !isCompact ? <div className={styles.footer}>{footer}</div> : null}
     </div>
   );
 };

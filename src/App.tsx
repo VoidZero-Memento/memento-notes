@@ -2,20 +2,29 @@ import { Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 
 import { useRepos, ReposProvider } from "@/lib/github/ReposContext";
 import { AppShell } from "@/components/layout/AppShell";
+import { BootErrorState } from "@/components/notes/BootErrorState";
 import { LoadingState } from "@/components/notes/LoadingState";
+import { NotesShellRoot } from "@/components/notes/NotesShellRoot";
 import { RepoPage } from "@/pages/RepoPage";
-import styles from "@/components/notes/NotesShell.module.css";
 
 const AppRoutes = () => {
-  const { defaultRepoId, error, loading } = useRepos();
+  const { defaultRepoId, error, loading, retry } = useRepos();
   const [searchParams] = useSearchParams();
 
   if (loading) {
-    return <LoadingState label="加载仓库列表" />;
+    return (
+      <NotesShellRoot>
+        <LoadingState label="加载仓库列表" />
+      </NotesShellRoot>
+    );
   }
 
   if (error || !defaultRepoId) {
-    return <p className={styles.error}>{error ?? "未找到可用仓库"}</p>;
+    return (
+      <NotesShellRoot>
+        <BootErrorState message={error ?? "未找到可用仓库"} onRetry={retry} />
+      </NotesShellRoot>
+    );
   }
 
   const search = searchParams.toString();

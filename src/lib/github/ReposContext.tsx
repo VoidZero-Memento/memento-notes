@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { githubOrgConfig } from "@/config/github.config";
 import { listOrgRepos } from "./github.service";
@@ -12,6 +12,7 @@ type ReposContextValue = {
   error: string | null;
   getById: (id: string) => GithubRepoConfig | undefined;
   defaultRepoId: string | undefined;
+  retry: () => void;
 };
 
 const ReposContext = createContext<ReposContextValue | null>(null);
@@ -20,11 +21,14 @@ export const ReposProvider = ({ children }: { children: ReactNode }) => {
   const [repos, setRepos] = useState<GithubRepoConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
 
     const load = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const nextRepos = await listOrgRepos(githubOrgConfig.owner);
         if (!cancelled) {
@@ -45,6 +49,10 @@ export const ReposProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       cancelled = true;
     };
+  }, [reloadKey]);
+
+  const retry = useCallback(() => {
+    setReloadKey((key) => key + 1);
   }, []);
 
   const value = useMemo<ReposContextValue>(() => {
@@ -55,8 +63,9 @@ export const ReposProvider = ({ children }: { children: ReactNode }) => {
       error,
       getById: (id) => repos.find((repo) => repo.id === id),
       defaultRepoId,
+      retry,
     };
-  }, [error, loading, repos]);
+  }, [error, loading, repos, retry]);
 
   return <ReposContext.Provider value={value}>{children}</ReposContext.Provider>;
 };

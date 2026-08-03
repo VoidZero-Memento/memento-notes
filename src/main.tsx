@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
+import { readStoredSidebarBg } from "@/lib/prefs/sidebar-bg";
 import { waitForSplash } from "@/lib/splash/wait-splash";
 import { applyTheme, readStoredTheme } from "@/lib/theme/theme";
 import App from "./App";
@@ -19,4 +20,8 @@ const mount = () => {
   );
 };
 
-void waitForSplash().then(mount);
+if (readStoredSidebarBg()) {
+  void waitForSplash().then(mount);
+} else {
+  mount();
+}

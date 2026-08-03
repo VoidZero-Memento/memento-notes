@@ -1,0 +1,123 @@
+.tokenForm {
+  display: flex;
+  width: min(100%, 320px);
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+  text-align: left;
+}
+
+.tokenLabel {
+  color: rgba(var(--fg-rgb), 0.62);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.tokenInput {
+  width: 100%;
+  border: 1px solid rgba(var(--fg-rgb), 0.16);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  padding: 10px 12px;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tokenInput::placeholder {
+  color: rgba(var(--fg-rgb), 0.35);
+}
+
+.tokenInput:focus {
+  border-color: rgba(var(--accent-rgb), 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 3px rgba(var(--accent-rgb), 0.14);
+}
+
+.tokenTip {
+  margin: 0;
+  color: rgba(var(--fg-rgb), 0.42);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.textLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px 0;
+}
+
+.textLink {
+  border: none;
+  background: none;
+  padding: 4px 6px;
+  color: rgba(var(--fg-rgb), 0.55);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.textLink:hover {
+  text-decoration: underline;
+}
+
+.textLink:active {
+  background: transparent;
+  opacity: 0.72;
+}
+
+.textLinkSave {
+  color: rgba(var(--accent-rgb), 0.92);
+}
+
+.textLinkSave:hover {
+  color: rgba(var(--accent-rgb), 1);
+}
+
+.textLinkClear {
+  color: rgba(var(--fg-rgb), 0.42);
+}
+
+.textLinkClear:hover {
+  color: rgba(var(--accent-2-rgb), 0.9);
+}
+
+.textLinkHelp {
+  color: rgba(var(--accent-3-rgb), 0.88);
+}
+
+.textLinkHelp:hover {
+  color: rgba(var(--accent-3-rgb), 1);
+}
+
+.textSep {
+  color: rgba(var(--fg-rgb), 0.28);
+  font-size: 12px;
+  line-height: 1.4;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.tokenHint {
+  margin: 0;
+  text-align: center;
+  color: rgba(var(--accent-3-rgb), 0.9);
+  font-size: 12px;
+  line-height: 1.4;
+}

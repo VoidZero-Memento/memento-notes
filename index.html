@@ -2,12 +2,26 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      (function () {
+        try {
+          var v = localStorage.getItem("memento-notes:sidebar-bg");
+          if (v === null || v === "1")
+            document.documentElement.dataset.splash = "1";
+        } catch (e) {
+          document.documentElement.dataset.splash = "1";
+        }
+        if (document.documentElement.dataset.splash === "1") {
+          var link = document.createElement("link");
+          link.rel = "preload";
+          link.as = "image";
+          link.href =
+            "https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner163.png";
+          document.head.appendChild(link);
+        }
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.png" />
-    <link
-      rel="preload"
-      as="image"
-      href="https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png"
-    />
     <link
       rel="preload"
       as="font"
@@ -45,65 +59,69 @@
         src: url("/fonts/LXGWWenKai-Regular.ttf") format("truetype");
       }
 
+      html:not([data-splash="1"]) #app-splash {
+        display: none !important;
+      }
+
       #app-splash {
         position: fixed;
         inset: 0;
         z-index: 9999;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-end;
+        min-height: 100svh;
+        min-height: 100dvh;
         overflow: hidden;
-        padding: 0 24px calc(10vh + env(safe-area-inset-bottom, 0px));
         background: #04070e;
         color: rgba(245, 240, 255, 0.95);
         font-family: "Geist", "LXGWWenKai", Arial, Helvetica, sans-serif;
         -webkit-font-smoothing: antialiased;
       }
 
-      #app-splash .splash-backdrop {
+      #app-splash .splash-stage {
         position: absolute;
-        inset: -4%;
-        z-index: 0;
-        background: url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png")
-          center / cover no-repeat;
-        filter: saturate(1.05) brightness(0.95);
-        transform: scale(1.08);
-        animation: splashKenBurns 8s ease-out forwards;
+        inset: 0;
+        overflow: hidden;
+        animation: splashRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+
+      #app-splash .splash-banner {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 28%;
+        transform: scale(1.06);
+        opacity: 0.62;
+        filter: saturate(1.05) brightness(0.88);
+        animation: splashDrift 12s ease-in-out infinite alternate;
       }
 
       #app-splash .splash-veil {
         position: absolute;
         inset: 0;
-        z-index: 1;
+        pointer-events: none;
         background:
-          radial-gradient(
-            ellipse 70% 55% at 50% 35%,
-            transparent 0%,
-            rgba(4, 7, 14, 0.18) 62%,
-            rgba(4, 7, 14, 0.55) 100%
-          ),
           linear-gradient(
             180deg,
-            rgba(4, 7, 14, 0.08) 0%,
-            rgba(4, 7, 14, 0.12) 42%,
-            rgba(4, 7, 14, 0.72) 78%,
-            rgba(4, 7, 14, 0.88) 100%
+            rgba(4, 7, 14, 0.35) 0%,
+            rgba(4, 7, 14, 0.22) 28%,
+            rgba(4, 7, 14, 0.72) 68%,
+            rgba(4, 7, 14, 0.94) 100%
+          ),
+          radial-gradient(
+            ellipse at 50% 18%,
+            rgba(255, 154, 196, 0.18),
+            transparent 55%
           );
       }
 
-      #app-splash .splash-copy {
-        position: relative;
-        z-index: 2;
-        display: flex;
-        width: min(360px, 100%);
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
+      #app-splash .splash-panel {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: max(40px, 8svh) 24px
+          max(36px, calc(6svh + env(safe-area-inset-bottom, 0px)));
         text-align: center;
-        opacity: 0;
-        transform: translateY(18px);
-        animation: splashCopyIn 0.7s ease 0.15s forwards;
       }
 
       #app-splash .splash-brand {
@@ -121,7 +139,7 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        margin: 0;
+        margin: 8px 0 0;
         color: rgba(245, 240, 255, 0.96);
         font-size: 20px;
         font-weight: 700;
@@ -155,9 +173,11 @@
         animation-delay: 0.36s;
       }
 
-      #app-splash .splash-desc {
-        margin: 0;
+      #app-splash .splash-label {
+        margin: 8px 0 0;
         max-width: 22em;
+        margin-left: auto;
+        margin-right: auto;
         color: rgba(245, 240, 255, 0.68);
         font-size: 13px;
         font-weight: 500;
@@ -168,43 +188,40 @@
 
       #app-splash .splash-track {
         position: relative;
-        width: min(168px, 48%);
-        height: 2px;
-        margin-top: 14px;
+        width: min(280px, 72%);
+        height: 7px;
+        margin: 18px auto 0;
         overflow: hidden;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
       }
 
-      #app-splash .splash-bar {
-        position: absolute;
-        inset: 0 auto 0 0;
-        width: 38%;
+      #app-splash .splash-fill {
+        display: block;
+        height: 100%;
+        width: 0%;
         border-radius: inherit;
         background: linear-gradient(
           90deg,
-          rgba(186, 160, 255, 0.25),
-          rgba(255, 182, 210, 0.95),
-          rgba(186, 160, 255, 0.95)
+          #00f0ff 0%,
+          #7c5cff 32%,
+          #ff2d95 64%,
+          #ffb86c 100%
         );
-        box-shadow: 0 0 14px rgba(255, 154, 196, 0.4);
-        animation: splashBar 1.8s ease-in-out infinite;
+        box-shadow:
+          0 0 10px rgba(0, 240, 255, 0.35),
+          0 0 18px rgba(255, 45, 149, 0.28);
+        transition: width 0.35s ease;
       }
 
-      @keyframes splashKenBurns {
-        from {
-          transform: scale(1.08);
-        }
-        to {
-          transform: scale(1);
-        }
-      }
-
-      @keyframes splashCopyIn {
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+      #app-splash .splash-percent {
+        margin: 10px 0 0;
+        color: rgba(245, 240, 255, 0.58);
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        font-variant-numeric: tabular-nums;
       }
 
       @keyframes splashDot {
@@ -220,55 +237,57 @@
         }
       }
 
-      @keyframes splashBar {
-        0% {
-          left: -38%;
+      @keyframes splashRise {
+        from {
+          opacity: 0;
+          transform: translateY(18px) scale(0.97);
         }
-        100% {
-          left: 100%;
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes splashDrift {
+        from {
+          transform: scale(1.06) translateY(0);
+        }
+        to {
+          transform: scale(1.12) translateY(-1.5%);
         }
       }
 
       @media (max-width: 860px) {
-        #app-splash {
-          padding: 0 20px calc(12vh + env(safe-area-inset-bottom, 0px));
+        #app-splash .splash-panel {
+          padding: max(32px, 6svh) 20px
+            max(28px, calc(5svh + env(safe-area-inset-bottom, 0px)));
         }
 
         #app-splash .splash-title {
           font-size: 17px;
         }
 
-        #app-splash .splash-desc {
+        #app-splash .splash-label {
           font-size: 12px;
           line-height: 1.45;
         }
 
         #app-splash .splash-track {
-          width: min(140px, 52%);
-          margin-top: 12px;
+          width: min(240px, 78%);
         }
       }
 
       @media (prefers-reduced-motion: reduce) {
-        #app-splash .splash-backdrop,
-        #app-splash .splash-copy,
+        #app-splash .splash-stage,
+        #app-splash .splash-banner,
         #app-splash .splash-dots span,
-        #app-splash .splash-bar {
+        #app-splash .splash-fill {
           animation: none;
+          transition: none;
         }
 
-        #app-splash .splash-backdrop {
+        #app-splash .splash-banner {
           transform: none;
-        }
-
-        #app-splash .splash-copy {
-          opacity: 1;
-          transform: none;
-        }
-
-        #app-splash .splash-bar {
-          left: 0;
-          width: 100%;
         }
       }
     </style>
@@ -276,22 +295,86 @@
   <body>
     <div id="root">
       <div id="app-splash" role="status" aria-live="polite" aria-busy="true">
-        <div class="splash-backdrop" aria-hidden="true"></div>
-        <div class="splash-veil" aria-hidden="true"></div>
-        <div class="splash-copy">
-          <p class="splash-brand">Memento</p>
-          <p class="splash-title">
-            <span>资源加载中</span>
-            <span class="splash-dots" aria-hidden="true">
-              <span></span><span></span><span></span>
-            </span>
-          </p>
-          <p class="splash-desc">正在准备笔记空间，请稍候</p>
-          <div class="splash-track" aria-hidden="true">
-            <span class="splash-bar"></span>
+        <div class="splash-stage">
+          <img
+            class="splash-banner"
+            src="https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner163.png"
+            alt=""
+            decoding="async"
+            fetchpriority="high"
+          />
+          <div class="splash-veil" aria-hidden="true"></div>
+          <div class="splash-panel">
+            <p class="splash-brand">Memento</p>
+            <p class="splash-title">
+              <span>资源加载中</span>
+              <span class="splash-dots" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </span>
+            </p>
+            <p class="splash-label" id="splash-label">
+              正在准备笔记空间，请稍候
+            </p>
+            <div class="splash-track" aria-hidden="true">
+              <span class="splash-fill" id="splash-fill"></span>
+            </div>
+            <p class="splash-percent" id="splash-percent">0%</p>
           </div>
         </div>
       </div>
+      <script>
+        (function () {
+          if (document.documentElement.dataset.splash !== "1") return;
+          var fill = document.getElementById("splash-fill");
+          var pctEl = document.getElementById("splash-percent");
+          var labelEl = document.getElementById("splash-label");
+          if (!fill || !pctEl) return;
+
+          var reduce =
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          if (reduce) {
+            fill.style.width = "90%";
+            pctEl.textContent = "90%";
+            return;
+          }
+
+          var CAP = 90;
+          var start = performance.now();
+          var lastShown = -1;
+          var labels = [
+            [0, "正在准备笔记空间，请稍候"],
+            [28, "正在加载核心资源…"],
+            [55, "正在整理笔记环境…"],
+            [78, "即将就绪…"],
+          ];
+
+          var tick = function (now) {
+            var t = (now - start) / 1000;
+            var p;
+            if (t < 0.45) p = (t / 0.45) * 18;
+            else if (t < 1.1) p = 18 + ((t - 0.45) / 0.65) * 24;
+            else if (t < 1.85) p = 42 + ((t - 1.1) / 0.75) * 22;
+            else if (t < 2.6) p = 64 + ((t - 1.85) / 0.75) * 14;
+            else p = 78 + (1 - Math.exp(-(t - 2.6) * 0.55)) * (CAP - 78);
+
+            p = Math.min(CAP, Math.round(p));
+            if (p !== lastShown) {
+              lastShown = p;
+              fill.style.width = p + "%";
+              pctEl.textContent = p + "%";
+              for (var i = labels.length - 1; i >= 0; i--) {
+                if (p >= labels[i][0]) {
+                  if (labelEl) labelEl.textContent = labels[i][1];
+                  break;
+                }
+              }
+            }
+            window.requestAnimationFrame(tick);
+          };
+          window.requestAnimationFrame(tick);
+        })();
+      </script>
     </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -5,8 +5,8 @@ import { getRepoFileTree } from "@/lib/github/github.service";
 import { encodeNotePathForUrl } from "@/lib/github/repo-path";
 import { useRepos } from "@/lib/github/ReposContext";
 import { LoadingState } from "@/components/notes/LoadingState";
+import { NotesShellRoot } from "@/components/notes/NotesShellRoot";
 import { NotesWorkspace } from "@/components/notes/NotesWorkspace";
-import styles from "@/components/notes/NotesShell.module.css";
 
 import type { GithubFileTreeNode } from "@/lib/github/github.types";
 
@@ -62,9 +62,9 @@ export const RepoPage = () => {
 
   if (loading) {
     return (
-      <div className={styles.root}>
+      <NotesShellRoot>
         <LoadingState label="加载文件树" />
-      </div>
+      </NotesShellRoot>
     );
   }
 

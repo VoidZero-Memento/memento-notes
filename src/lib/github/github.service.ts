@@ -1,4 +1,5 @@
 import { buildFileTree } from "./build-file-tree";
+import { getGithubToken } from "./github-token";
 import { isExcludedFromNoteTree } from "./repo-path";
 
 import type { GithubRepoConfig } from "@/config/github.types";
@@ -39,9 +40,14 @@ type GithubApiRepoListResponse = GithubApiRepo[] | { message?: string };
 const GITHUB_API_ACCEPT = "application/vnd.github+json";
 const GITHUB_API_VERSION = "2022-11-28";
 
-const githubApiHeaders = {
-  Accept: GITHUB_API_ACCEPT,
-  "X-GitHub-Api-Version": GITHUB_API_VERSION,
+const buildGithubApiHeaders = (): HeadersInit => {
+  const headers: Record<string, string> = {
+    Accept: GITHUB_API_ACCEPT,
+    "X-GitHub-Api-Version": GITHUB_API_VERSION,
+  };
+  const token = getGithubToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
 };
 
 const buildRawContentUrl = (config: GithubRepoConfig, path: string): string => {
@@ -74,7 +80,7 @@ const toTreeItems = (entries: GithubApiTreeEntry[]): GithubTreeItem[] =>
 export const getRepoFileTree = async (config: GithubRepoConfig): Promise<GithubFileTreeNode[]> => {
   const url = buildTreeApiUrl(config);
   const res = await fetch(url, {
-    headers: githubApiHeaders,
+    headers: buildGithubApiHeaders(),
   });
 
   let body: GithubApiTreeResponse | null = null;
@@ -103,7 +109,7 @@ export const getRepoFileTree = async (config: GithubRepoConfig): Promise<GithubF
 
 export const listOrgRepos = async (owner: string): Promise<GithubRepoConfig[]> => {
   const url = `https://api.github.com/orgs/${encodeURIComponent(owner)}/repos?per_page=100&type=public&sort=full_name`;
-  const res = await fetch(url, { headers: githubApiHeaders });
+  const res = await fetch(url, { headers: buildGithubApiHeaders() });
 
   let body: GithubApiRepoListResponse | null = null;
   try {

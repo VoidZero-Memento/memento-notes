@@ -113,11 +113,11 @@
 }
 
 .error .description {
-  max-width: 320px;
-  color: rgba(var(--fg-rgb), 0.42);
+  max-width: 360px;
+  color: rgba(var(--fg-rgb), 0.55);
 }
 
-.error .action {
+.error .action:not(.actionSecondary) {
   border-color: rgba(var(--accent-2-rgb), 0.5);
   background: linear-gradient(135deg, rgba(var(--accent-2-rgb), 0.16), rgba(var(--accent-rgb), 0.1));
   box-shadow:
@@ -125,10 +125,12 @@
     0 0 0 1px rgba(var(--accent-2-rgb), 0.12),
     0 0 14px rgba(var(--accent-2-rgb), 0.28),
     0 0 28px rgba(var(--accent-rgb), 0.14);
+  color: rgba(var(--accent-2-rgb), 0.95);
 }
 
-.error .action:hover {
+.error .action:not(.actionSecondary):hover {
   border-color: rgba(var(--accent-2-rgb), 0.75);
+  color: rgba(var(--accent-2-rgb), 1);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
     0 0 0 1px rgba(var(--accent-2-rgb), 0.2),
@@ -162,8 +164,20 @@
   line-height: 1.6;
 }
 
-.action {
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   margin-top: 6px;
+}
+
+.footer {
+  margin-top: 4px;
+}
+
+.action {
   border: 1px solid rgba(var(--accent-rgb), 0.55);
   border-radius: 10px;
   background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.16), rgba(var(--accent-2-rgb), 0.1));
@@ -179,10 +193,17 @@
   font-weight: 600;
   letter-spacing: 0.02em;
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease,
-    filter 0.15s ease;
+    filter 0.15s ease,
+    background 0.15s ease;
 }
 
 .action:hover {
@@ -193,6 +214,21 @@
     0 0 0 1px rgba(var(--accent-2-rgb), 0.2),
     0 0 18px rgba(var(--accent-rgb), 0.45),
     0 0 32px rgba(var(--accent-2-rgb), 0.28);
+}
+
+.actionSecondary {
+  border-color: rgba(var(--fg-rgb), 0.18);
+  background: rgba(var(--fg-rgb), 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  color: rgba(var(--fg-rgb), 0.78);
+  font-weight: 500;
+}
+
+.actionSecondary:hover {
+  border-color: rgba(var(--fg-rgb), 0.32);
+  background: rgba(var(--fg-rgb), 0.09);
+  filter: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 @keyframes orbitSpin {
