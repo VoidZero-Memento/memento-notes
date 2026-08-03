@@ -46,6 +46,44 @@
     opacity 0.18s ease;
 }
 
+/* 面板氛围底图：低透明度 + 暗色遮罩，避免抢霓虹与文字可读性 */
+.sidebarBgEnabled::before,
+.viewerBgEnabled::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.55;
+  filter: saturate(0.55) brightness(0.55);
+}
+
+.sidebarBgEnabled::before {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(4, 7, 14, 0.82) 0%,
+      rgba(4, 7, 14, 0.72) 45%,
+      rgba(4, 7, 14, 0.88) 100%
+    ),
+    url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/loading-banner.png") center / cover no-repeat;
+}
+
+.viewerBgEnabled::before {
+  /* 正文区图偏亮，遮罩略加重以保证可读性 */
+  opacity: 0.5;
+  filter: saturate(0.45) brightness(0.42);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(4, 7, 14, 0.88) 0%,
+      rgba(4, 7, 14, 0.78) 40%,
+      rgba(4, 7, 14, 0.9) 100%
+    ),
+    url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png") center / cover no-repeat;
+}
+
 .sidebarHeader {
   display: flex;
   flex-shrink: 0;
@@ -263,6 +301,13 @@
   gap: 10px;
   border-top: 1px solid rgba(var(--accent-rgb), 0.1);
   padding-top: 12px;
+}
+
+.ownerFooterActions {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
 }
 
 .ownerIdentity {

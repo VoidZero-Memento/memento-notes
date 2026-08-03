@@ -3,15 +3,296 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    <link
+      rel="preload"
+      as="image"
+      href="https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png"
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/Geist-Variable.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/ttf"
+      href="/fonts/LXGWWenKai-Regular.ttf"
+      crossorigin
+    />
     <meta
       name="viewport"
-      content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, viewport-fit=cover"
+      content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,viewport-fit=cover"
     />
     <meta name="description" content="浏览 GitHub 仓库中的 Markdown 笔记" />
     <title>Memento · 笔记</title>
+    <style>
+      @font-face {
+        font-family: "Geist";
+        font-style: normal;
+        font-weight: 100 900;
+        font-display: swap;
+        src: url("/fonts/Geist-Variable.woff2") format("woff2");
+      }
+
+      @font-face {
+        font-family: "LXGWWenKai";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("/fonts/LXGWWenKai-Regular.ttf") format("truetype");
+      }
+
+      #app-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        overflow: hidden;
+        padding: 0 24px calc(10vh + env(safe-area-inset-bottom, 0px));
+        background: #04070e;
+        color: rgba(245, 240, 255, 0.95);
+        font-family: "Geist", "LXGWWenKai", Arial, Helvetica, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #app-splash .splash-backdrop {
+        position: absolute;
+        inset: -4%;
+        z-index: 0;
+        background: url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png")
+          center / cover no-repeat;
+        filter: saturate(1.05) brightness(0.95);
+        transform: scale(1.08);
+        animation: splashKenBurns 8s ease-out forwards;
+      }
+
+      #app-splash .splash-veil {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background:
+          radial-gradient(
+            ellipse 70% 55% at 50% 35%,
+            transparent 0%,
+            rgba(4, 7, 14, 0.18) 62%,
+            rgba(4, 7, 14, 0.55) 100%
+          ),
+          linear-gradient(
+            180deg,
+            rgba(4, 7, 14, 0.08) 0%,
+            rgba(4, 7, 14, 0.12) 42%,
+            rgba(4, 7, 14, 0.72) 78%,
+            rgba(4, 7, 14, 0.88) 100%
+          );
+      }
+
+      #app-splash .splash-copy {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        width: min(360px, 100%);
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(18px);
+        animation: splashCopyIn 0.7s ease 0.15s forwards;
+      }
+
+      #app-splash .splash-brand {
+        margin: 0;
+        color: rgba(245, 240, 255, 0.78);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        text-shadow: 0 1px 18px rgba(0, 0, 0, 0.45);
+      }
+
+      #app-splash .splash-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin: 0;
+        color: rgba(245, 240, 255, 0.96);
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        line-height: 1.35;
+        text-shadow:
+          0 1px 2px rgba(0, 0, 0, 0.35),
+          0 8px 28px rgba(0, 0, 0, 0.4);
+      }
+
+      #app-splash .splash-dots {
+        display: inline-flex;
+        gap: 4px;
+        min-width: 1.2em;
+      }
+
+      #app-splash .splash-dots span {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: rgba(255, 182, 210, 0.95);
+        box-shadow: 0 0 10px rgba(255, 154, 196, 0.55);
+        animation: splashDot 1.2s ease-in-out infinite;
+      }
+
+      #app-splash .splash-dots span:nth-child(2) {
+        animation-delay: 0.18s;
+      }
+
+      #app-splash .splash-dots span:nth-child(3) {
+        animation-delay: 0.36s;
+      }
+
+      #app-splash .splash-desc {
+        margin: 0;
+        max-width: 22em;
+        color: rgba(245, 240, 255, 0.68);
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        line-height: 1.55;
+        text-shadow: 0 1px 14px rgba(0, 0, 0, 0.4);
+      }
+
+      #app-splash .splash-track {
+        position: relative;
+        width: min(168px, 48%);
+        height: 2px;
+        margin-top: 14px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      #app-splash .splash-bar {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 38%;
+        border-radius: inherit;
+        background: linear-gradient(
+          90deg,
+          rgba(186, 160, 255, 0.25),
+          rgba(255, 182, 210, 0.95),
+          rgba(186, 160, 255, 0.95)
+        );
+        box-shadow: 0 0 14px rgba(255, 154, 196, 0.4);
+        animation: splashBar 1.8s ease-in-out infinite;
+      }
+
+      @keyframes splashKenBurns {
+        from {
+          transform: scale(1.08);
+        }
+        to {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes splashCopyIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes splashDot {
+        0%,
+        80%,
+        100% {
+          opacity: 0.25;
+          transform: translateY(0);
+        }
+        40% {
+          opacity: 1;
+          transform: translateY(-2px);
+        }
+      }
+
+      @keyframes splashBar {
+        0% {
+          left: -38%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+
+      @media (max-width: 860px) {
+        #app-splash {
+          padding: 0 20px calc(12vh + env(safe-area-inset-bottom, 0px));
+        }
+
+        #app-splash .splash-title {
+          font-size: 17px;
+        }
+
+        #app-splash .splash-desc {
+          font-size: 12px;
+          line-height: 1.45;
+        }
+
+        #app-splash .splash-track {
+          width: min(140px, 52%);
+          margin-top: 12px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #app-splash .splash-backdrop,
+        #app-splash .splash-copy,
+        #app-splash .splash-dots span,
+        #app-splash .splash-bar {
+          animation: none;
+        }
+
+        #app-splash .splash-backdrop {
+          transform: none;
+        }
+
+        #app-splash .splash-copy {
+          opacity: 1;
+          transform: none;
+        }
+
+        #app-splash .splash-bar {
+          left: 0;
+          width: 100%;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="app-splash" role="status" aria-live="polite" aria-busy="true">
+        <div class="splash-backdrop" aria-hidden="true"></div>
+        <div class="splash-veil" aria-hidden="true"></div>
+        <div class="splash-copy">
+          <p class="splash-brand">Memento</p>
+          <p class="splash-title">
+            <span>资源加载中</span>
+            <span class="splash-dots" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </span>
+          </p>
+          <p class="splash-desc">正在准备笔记空间，请稍候</p>
+          <div class="splash-track" aria-hidden="true">
+            <span class="splash-bar"></span>
+          </div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

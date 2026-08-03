@@ -1,0 +1,195 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.52s ease;
+}
+
+.rootVisible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.backdrop {
+  position: absolute;
+  inset: -4%;
+  z-index: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: saturate(1) brightness(0.92);
+  transform: scale(1.06);
+  transition: transform 3.2s ease-out;
+}
+
+.rootVisible .backdrop {
+  transform: scale(1);
+}
+
+.veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 78% 62% at 50% 40%, rgba(4, 7, 14, 0.12), rgba(4, 7, 14, 0.42) 74%),
+    linear-gradient(180deg, rgba(4, 7, 14, 0.28) 0%, rgba(4, 7, 14, 0.48) 100%);
+}
+
+.panel {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  width: min(420px, calc(100vw - 48px));
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(var(--accent-rgb), 0.28);
+  border-radius: 18px;
+  background: rgba(8, 14, 28, 0.42);
+  box-shadow:
+    0 0 0 1px rgba(var(--accent-rgb), 0.08),
+    0 0 28px rgba(var(--accent-rgb), 0.16),
+    0 18px 48px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  padding: 28px 24px 22px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(14px) scale(0.98);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+
+.rootVisible .panel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.title {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+
+.desc {
+  margin: 0;
+  max-width: 28em;
+  color: rgba(var(--fg-rgb), 0.72);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.55;
+}
+
+.progressTrack {
+  width: min(220px, 70%);
+  height: 3px;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.12);
+}
+
+.progressBar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--accent-rgb), 0.85),
+    rgba(var(--accent-2-rgb), 0.9)
+  );
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.45);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.progressBarActive {
+  animation: bgTransitionProgress 3s linear forwards;
+}
+
+@keyframes bgTransitionProgress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 860px) {
+  .root {
+    place-items: start center;
+    padding: 18vh 16px 0;
+  }
+
+  .veil {
+    background:
+      radial-gradient(ellipse 90% 58% at 50% 28%, rgba(4, 7, 14, 0.08), rgba(4, 7, 14, 0.36) 70%),
+      linear-gradient(180deg, rgba(4, 7, 14, 0.18) 0%, rgba(4, 7, 14, 0.52) 100%);
+  }
+
+  .panel {
+    width: min(320px, calc(100vw - 32px));
+    gap: 6px;
+    border-radius: 14px;
+    background: rgba(8, 14, 28, 0.34);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    padding: 14px 16px 12px;
+    transform: translateY(18px) scale(0.98);
+  }
+
+  .rootVisible .panel {
+    transform: translateY(0) scale(1);
+  }
+
+  .title {
+    font-size: 15px;
+  }
+
+  .desc {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .progressTrack {
+    width: min(160px, 62%);
+    height: 2px;
+    margin-top: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .backdrop,
+  .panel {
+    transition: none;
+  }
+
+  .backdrop {
+    transform: none;
+  }
+
+  .rootVisible .backdrop {
+    transform: none;
+  }
+
+  .progressBarActive {
+    animation: none;
+    transform: scaleX(1);
+  }
+}

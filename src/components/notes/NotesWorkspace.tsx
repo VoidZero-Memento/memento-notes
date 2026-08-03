@@ -4,7 +4,10 @@ import { useRepos } from "@/lib/github/ReposContext";
 import { parseOutline } from "@/lib/markdown/parse-outline";
 import { getNoteTitleFromPath, getRepoWorkspaceTitle } from "@/lib/note-title";
 import { useNoteContent } from "@/lib/notes/use-note-content";
+import { useSidebarBgTransition } from "@/lib/prefs/useSidebarBgTransition";
 import { EmptyState } from "@/components/common/EmptyState";
+import { BgTransitionOverlay } from "@/components/theme/BgTransitionOverlay";
+import { SidebarBgToggle } from "@/components/theme/SidebarBgToggle";
 import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import { FileTree } from "./FileTree";
 import { LoadingState } from "./LoadingState";
@@ -42,6 +45,12 @@ export const NotesWorkspace = ({
   onSelectPath,
 }: NotesWorkspaceProps) => {
   const { repos } = useRepos();
+  const {
+    enabled: sidebarBgEnabled,
+    setBgEnabled: setSidebarBgEnabled,
+    overlayOpen: bgOverlayOpen,
+    busy: bgTransitionBusy,
+  } = useSidebarBgTransition();
   const viewerBodyRef = useRef<HTMLDivElement>(null);
   const { content, loading, pending, error, selectNote, retry } = useNoteContent(
     config,
@@ -115,6 +124,7 @@ export const NotesWorkspace = ({
     styles.sidebar,
     mobileNavOpen ? styles.sidebarOpen : "",
     sidebarHidden ? styles.sidebarHidden : "",
+    sidebarBgEnabled ? styles.sidebarBgEnabled : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -204,11 +214,19 @@ export const NotesWorkspace = ({
         <div className={styles.sidebarFooter}>
           <div className={styles.ownerFooter}>
             <OwnerFooter login={config.owner} avatarUrl={config.ownerAvatarUrl} />
-            <ThemeSwitcher />
+            <div className={styles.ownerFooterActions}>
+              <SidebarBgToggle
+                enabled={sidebarBgEnabled}
+                disabled={bgTransitionBusy}
+                onChange={setSidebarBgEnabled}
+              />
+              <ThemeSwitcher />
+            </div>
           </div>
         </div>
       </aside>
-      <main className={styles.viewer}>
+      <BgTransitionOverlay open={bgOverlayOpen} />
+      <main className={`${styles.viewer}${sidebarBgEnabled ? ` ${styles.viewerBgEnabled}` : ""}`}>
         <div className={styles.mobileBar}>
           <h2 className={styles.mobileBarTitle}>{workspaceTitle}</h2>
           <div className={styles.mobileBarActions}>
