@@ -3,10 +3,6 @@ export const SIDEBAR_BG_STORAGE_KEY = "memento-notes:sidebar-bg";
 /** 默认开启，与当前已落地的侧栏氛围底图一致 */
 export const DEFAULT_SIDEBAR_BG_ENABLED = true;
 
-/** 正文区氛围底图（开启过渡蒙层复用） */
-export const VIEWER_BG_IMAGE_URL =
-  "https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png";
-
 /** 开启背景时全屏过渡蒙层展示时长 */
 export const BG_TRANSITION_HOLD_MS = 3000;
 

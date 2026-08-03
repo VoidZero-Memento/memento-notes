@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
 
 import { useAnimatedOpen } from "@/lib/dom/use-animated-open";
-import { BG_TRANSITION_EXIT_MS, VIEWER_BG_IMAGE_URL } from "@/lib/prefs/sidebar-bg";
+import { BG_TRANSITION_EXIT_MS } from "@/lib/prefs/sidebar-bg";
 
 import styles from "./BgTransitionOverlay.module.css";
 
@@ -22,11 +22,7 @@ export const BgTransitionOverlay = ({ open }: BgTransitionOverlayProps) => {
       aria-labelledby="bg-transition-title"
       aria-describedby="bg-transition-desc"
     >
-      <div
-        className={styles.backdrop}
-        style={{ backgroundImage: `url("${VIEWER_BG_IMAGE_URL}")` }}
-        aria-hidden
-      />
+      <div className={styles.backdrop} aria-hidden />
       <div className={styles.veil} aria-hidden />
       <div className={styles.panel}>
         <p id="bg-transition-title" className={styles.title}>

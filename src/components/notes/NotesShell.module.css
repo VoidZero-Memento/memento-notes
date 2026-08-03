@@ -48,7 +48,7 @@
     opacity 0.18s ease;
 }
 
-/* 桌面：整页共用正文底图，侧栏/正文半透明透出同一张图 */
+/* 桌面：整页共用正文底图，侧栏/正文半透明透出同一张图；右下锚定人物 */
 .rootBgEnabled::before {
   content: "";
   position: absolute;
@@ -62,8 +62,7 @@
       rgba(4, 7, 14, 0.26) 42%,
       rgba(4, 7, 14, 0.42) 100%
     ),
-    url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png") center /
-      cover no-repeat;
+    url("/viewer-bg-desktop.png") right bottom / cover no-repeat;
   filter: saturate(0.8) brightness(0.82);
 }
 
@@ -491,6 +490,19 @@
   padding: 24px;
 }
 @media (max-width: 860px) {
+  /* 手机继续用原 OSS 底图 */
+  .rootBgEnabled::before {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(4, 7, 14, 0.36) 0%,
+        rgba(4, 7, 14, 0.26) 42%,
+        rgba(4, 7, 14, 0.42) 100%
+      ),
+      url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png") center /
+        cover no-repeat;
+  }
+
   .root {
     flex-direction: column;
     gap: 0;

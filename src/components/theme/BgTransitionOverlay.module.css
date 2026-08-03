@@ -19,7 +19,8 @@
   position: absolute;
   inset: -4%;
   z-index: 0;
-  background-position: center;
+  background-image: url("/viewer-bg-desktop.png");
+  background-position: right bottom;
   background-size: cover;
   background-repeat: no-repeat;
   filter: saturate(1) brightness(0.92);
@@ -123,6 +124,11 @@
 }
 
 @media (max-width: 860px) {
+  .backdrop {
+    background-image: url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png");
+    background-position: center;
+  }
+
   .root {
     place-items: start center;
     padding: 18vh 16px 0;
