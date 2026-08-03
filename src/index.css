@@ -11,6 +11,8 @@ html {
   height: 100dvh;
   color-scheme: dark;
   background: var(--background-deep);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 html,

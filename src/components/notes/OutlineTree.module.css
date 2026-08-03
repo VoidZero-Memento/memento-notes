@@ -59,16 +59,13 @@
 }
 
 .iconL3 {
-  width: 10px;
-  height: 10px;
   color: rgba(var(--accent-rgb), 0.55);
   filter: drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.3));
 }
 
 .iconLn {
-  width: 10px;
-  height: 10px;
-  color: rgba(var(--fg-rgb), 0.35);
+  color: rgba(var(--fg-rgb), 0.4);
+  filter: drop-shadow(0 0 3px rgba(var(--fg-rgb), 0.12));
 }
 
 .row:hover .iconL1 {

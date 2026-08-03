@@ -11,6 +11,14 @@ type OutlineTreeProps = {
   onNavigate: (id: string) => void;
 };
 
+/** 图标槽宽 + 与文字间距，使下级图标与上级文字起点对齐 */
+const ICON_SLOT = 12;
+const ROW_GAP = 7;
+const BASE_PAD = 8;
+/** 一级（含常见的 h2 空心菱形）沿用原缩进，避免整体右移 */
+const ROOT_STEP = 14;
+const NEST_STEP = ICON_SLOT + ROW_GAP;
+
 const LevelIcon = ({ level }: { level: number }) => {
   if (level <= 1) {
     return (
@@ -36,14 +44,14 @@ const LevelIcon = ({ level }: { level: number }) => {
   if (level === 3) {
     return (
       <svg className={`${styles.icon} ${styles.iconL3}`} viewBox="0 0 16 16" aria-hidden>
-        <rect x="3.2" y="3.2" width="9.6" height="9.6" rx="1.6" fill="currentColor" />
+        <rect x="3.5" y="3.5" width="9" height="9" rx="1.4" fill="currentColor" />
       </svg>
     );
   }
 
   return (
     <svg className={`${styles.icon} ${styles.iconLn}`} viewBox="0 0 16 16" aria-hidden>
-      <circle cx="8" cy="8" r="2.4" fill="currentColor" />
+      <rect x="3.2" y="6.8" width="9.6" height="2.4" rx="1.2" fill="currentColor" />
     </svg>
   );
 };
@@ -61,7 +69,11 @@ export const OutlineTree = ({
   return (
     <ul className={styles.tree}>
       {items.map((item) => {
-        const paddingLeft = 8 + (item.level - 1) * 14;
+        // level≤2 保持原位；更深层级按「图标对齐上级文字」递进
+        const paddingLeft =
+          item.level <= 2
+            ? BASE_PAD + (item.level - 1) * ROOT_STEP
+            : BASE_PAD + ROOT_STEP + (item.level - 2) * NEST_STEP;
         return (
           <li key={item.id} className={styles.item}>
             <button
