@@ -22,18 +22,9 @@
   src: url("/fonts/GeistMono-Variable.woff2") format("woff2");
 }
 
-@font-face {
-  font-family: "LXGWWenKai";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/LXGWWenKai-Regular.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "LXGWWenKaiMono";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/LXGWWenKaiMono-Regular.woff2") format("woff2");
-}
+/*
+ * LXGWWenKai / LXGWWenKaiMono 由 index.html 引入分段 CSS：
+ *   /fonts/lxgw/result.css
+ *   /fonts/lxgw-mono/result.css
+ * （相对路径 ./xxx.woff2 + unicode-range；勿在此写整包 @font-face）
+ */

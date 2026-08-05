@@ -29,13 +29,9 @@
       href="/fonts/Geist-Variable.woff2"
       crossorigin
     />
-    <link
-      rel="preload"
-      as="font"
-      type="font/woff2"
-      href="/fonts/LXGWWenKai-Regular.woff2"
-      crossorigin
-    />
+    <!-- LXGW 分段字体：相对路径 + unicode-range，勿 preload 整包 -->
+    <link rel="stylesheet" href="/fonts/lxgw/result.css" />
+    <link rel="stylesheet" href="/fonts/lxgw-mono/result.css" />
     <meta
       name="viewport"
       content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,viewport-fit=cover"
@@ -49,14 +45,6 @@
         font-weight: 100 900;
         font-display: swap;
         src: url("/fonts/Geist-Variable.woff2") format("woff2");
-      }
-
-      @font-face {
-        font-family: "LXGWWenKai";
-        font-style: normal;
-        font-weight: 400;
-        font-display: swap;
-        src: url("/fonts/LXGWWenKai-Regular.woff2") format("woff2");
       }
 
       html:not([data-splash="1"]) #app-splash {

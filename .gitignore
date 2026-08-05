@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 模板
+
+# 霞鹜文楷整包源文件（仅供 pnpm split-fonts，不部署）
+fonts-src/
