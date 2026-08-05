@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-import { runWithViewTransition } from "@/lib/dom/view-transition";
 import { getNoteRawContent } from "@/lib/github/github.service";
 import { toast } from "@/lib/toast/toast";
 
@@ -25,7 +24,7 @@ const toErrorMessage = (err: unknown) => (err instanceof Error ? err.message : "
  *
  * - `selectNote`：由用户点击触发，立刻更新 URL（侧栏选中态跟上），再后台拉内容；
  *   `pending` 延后一小段再挂上，避免与高亮切换同帧竞争；短请求可不闪 Loading；
- *   内容到位后用 `runWithViewTransition` 做交叉淡入。
+ *   内容到位后由正文容器 CSS 上滑进场（避免 View Transition 打断手机磨砂）。
  * - 内部的 `useEffect`：处理非点击触发的加载（首次进入、刷新、浏览器前进后退），
  *   这类场景没有"旧内容"可过渡，走普通 loading 态；用 `requestedPathRef` /
  *   `loadedPathRef` 避免与 `selectNote` 重复请求或互相抢写。
@@ -99,20 +98,15 @@ export const useNoteContent = (
       clearPendingTimer();
       if (requestedPathRef.current !== path) return;
       loadedPathRef.current = path;
-      runWithViewTransition(() => {
-        setContent(raw);
-        setPending(false);
-      });
+      setContent(raw);
+      setPending(false);
     } catch (err) {
       clearPendingTimer();
       if (requestedPathRef.current !== path) return;
       loadedPathRef.current = path;
-      const message = toErrorMessage(err);
-      runWithViewTransition(() => {
-        setContent(null);
-        setError(message);
-        setPending(false);
-      });
+      setContent(null);
+      setError(toErrorMessage(err));
+      setPending(false);
     } finally {
       inFlightRef.current = false;
     }

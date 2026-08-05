@@ -13,6 +13,7 @@ import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import { FileTree } from "./FileTree";
 import { LoadingState } from "./LoadingState";
 import { MarkdownViewer } from "./MarkdownViewer";
+import { NoteEnter } from "./NoteEnter";
 import { OutlineTree } from "./OutlineTree";
 import { OwnerFooter } from "./OwnerFooter";
 import { RepoSelect } from "./RepoSelect";
@@ -33,6 +34,23 @@ type NotesWorkspaceProps = {
 };
 
 const describeNoteLoadError = (message: string) => describeGithubError(message).description;
+
+const SidebarEdgeChevron = ({ direction }: { direction: "left" | "right" }) => (
+  <svg
+    className={direction === "left" ? styles.sidebarCollapseMark : styles.sidebarExpandMark}
+    viewBox="0 0 16 16"
+    aria-hidden
+  >
+    <path
+      d={direction === "left" ? "M10.5 3.5 5.5 8l5 4.5" : "M5.5 3.5 10.5 8l-5 4.5"}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 
 export const NotesWorkspace = ({
   config,
@@ -57,7 +75,36 @@ export const NotesWorkspace = ({
   );
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>("files");
   const [sidebarHidden, setSidebarHidden] = useState(false);
+  const [sidebarFx, setSidebarFx] = useState<"idle" | "collapse" | "expand">("idle");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const sidebarFxTimerRef = useRef<number | null>(null);
+
+  const clearSidebarFxTimer = () => {
+    if (sidebarFxTimerRef.current == null) return;
+    window.clearTimeout(sidebarFxTimerRef.current);
+    sidebarFxTimerRef.current = null;
+  };
+
+  const playSidebarFx = (fx: "collapse" | "expand", durationMs: number) => {
+    clearSidebarFxTimer();
+    setSidebarFx(fx);
+    sidebarFxTimerRef.current = window.setTimeout(() => {
+      setSidebarFx("idle");
+      sidebarFxTimerRef.current = null;
+    }, durationMs);
+  };
+
+  const collapseSidebar = () => {
+    setSidebarHidden(true);
+    playSidebarFx("collapse", 520);
+  };
+
+  const expandSidebar = () => {
+    setSidebarHidden(false);
+    playSidebarFx("expand", 580);
+  };
+
+  useEffect(() => () => clearSidebarFxTimer(), []);
 
   const handleBrowseFiles = () => {
     setSidebarMode("files");
@@ -122,6 +169,8 @@ export const NotesWorkspace = ({
     styles.sidebar,
     mobileNavOpen ? styles.sidebarOpen : "",
     sidebarHidden ? styles.sidebarHidden : "",
+    sidebarFx === "collapse" ? styles.sidebarFxCollapse : "",
+    sidebarFx === "expand" ? styles.sidebarFxExpand : "",
     sidebarBgEnabled ? styles.sidebarBgEnabled : "",
   ]
     .filter(Boolean)
@@ -136,11 +185,23 @@ export const NotesWorkspace = ({
       className={[
         styles.root,
         sidebarHidden ? styles.rootSidebarHidden : "",
+        sidebarFx === "collapse" ? styles.rootFxCollapse : "",
+        sidebarFx === "expand" ? styles.rootFxExpand : "",
         sidebarBgEnabled ? styles.rootBgEnabled : "",
       ]
         .filter(Boolean)
         .join(" ")}
     >
+      <div
+        className={[
+          styles.sidebarRailFx,
+          sidebarFx === "collapse" ? styles.sidebarRailFxCollapse : "",
+          sidebarFx === "expand" ? styles.sidebarRailFxExpand : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        aria-hidden
+      />
       <button
         type="button"
         className={backdropClassName}
@@ -159,7 +220,7 @@ export const NotesWorkspace = ({
               aria-label="关闭"
               onClick={() => setMobileNavOpen(false)}
             >
-              <span className={styles.sidebarCollapseMark} aria-hidden />
+              <SidebarEdgeChevron direction="left" />
             </button>
           </div>
           <RepoSelect repos={repos} activeId={config.id} />
@@ -218,9 +279,9 @@ export const NotesWorkspace = ({
           type="button"
           className={styles.sidebarCollapse}
           aria-label="隐藏目录"
-          onClick={() => setSidebarHidden(true)}
+          onClick={collapseSidebar}
         >
-          <span className={styles.sidebarCollapseMark} aria-hidden />
+          <SidebarEdgeChevron direction="left" />
         </button>
         <div className={styles.sidebarFooter}>
           <div className={styles.ownerFooter}>
@@ -256,9 +317,9 @@ export const NotesWorkspace = ({
               type="button"
               className={styles.sidebarExpand}
               aria-label="显示目录"
-              onClick={() => setSidebarHidden(false)}
+              onClick={expandSidebar}
             >
-              <span className={styles.sidebarExpandMark} aria-hidden />
+              <SidebarEdgeChevron direction="right" />
             </button>
           ) : null}
           {selectedPath ? (
@@ -288,7 +349,9 @@ export const NotesWorkspace = ({
               />
             ) : null}
             {!treeLoading && selectedPath && content && !loading ? (
-              <MarkdownViewer content={content} headingIds={outlineItems.map((item) => item.id)} />
+              <NoteEnter key={selectedPath}>
+                <MarkdownViewer content={content} headingIds={outlineItems.map((item) => item.id)} />
+              </NoteEnter>
             ) : null}
           </div>
           {pending ? (

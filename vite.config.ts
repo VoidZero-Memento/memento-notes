@@ -30,6 +30,14 @@ export default defineConfig(({ mode }) => ({
   ],
   /** GitHub Pages 项目页：username.github.io/repo-name/ */
   base: mode === "production" ? "/memento-notes/" : "/",
+  /**
+   * Vite 8 默认 cssMinify=lightningcss 会丢掉标准 backdrop-filter，
+   * 只保留 -webkit-，导致 Chromium 生产构建磨砂失效。
+   * @see https://github.com/vitejs/vite/issues/22649
+   */
+  build: {
+    cssMinify: "esbuild",
+  },
   server: {
     host: "0.0.0.0",
     port: 8899,

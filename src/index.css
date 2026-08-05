@@ -73,14 +73,3 @@ a {
 *::-webkit-scrollbar-track {
   background: transparent;
 }
-
-::view-transition-group(note-content) {
-  animation-duration: 220ms;
-  animation-timing-function: ease-out;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*) {
-    animation: none !important;
-  }
-}
