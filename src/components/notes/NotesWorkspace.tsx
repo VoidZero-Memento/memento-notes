@@ -77,6 +77,7 @@ export const NotesWorkspace = ({
   const [sidebarHidden, setSidebarHidden] = useState(false);
   const [sidebarFx, setSidebarFx] = useState<"idle" | "collapse" | "expand">("idle");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const sidebarFxTimerRef = useRef<number | null>(null);
 
   const clearSidebarFxTimer = () => {
@@ -129,7 +130,21 @@ export const NotesWorkspace = ({
 
   useEffect(() => {
     viewerBodyRef.current?.scrollTo({ top: 0 });
+    setShowBackToTop(false);
   }, [selectedPath]);
+
+  useEffect(() => {
+    const container = viewerBodyRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      setShowBackToTop(container.scrollTop > 320);
+    };
+
+    handleScroll();
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [selectedPath, content]);
 
   useEffect(() => {
     if (!mobileNavOpen) return;
@@ -163,6 +178,10 @@ export const NotesWorkspace = ({
       behavior: "smooth",
     });
     setMobileNavOpen(false);
+  };
+
+  const handleBackToTop = () => {
+    viewerBodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const sidebarClassName = [
@@ -358,6 +377,25 @@ export const NotesWorkspace = ({
             <div className={styles.pendingOverlay}>
               <LoadingState label="加载中" />
             </div>
+          ) : null}
+          {showBackToTop ? (
+            <button
+              type="button"
+              className={styles.backToTop}
+              aria-label="回到顶部"
+              onClick={handleBackToTop}
+            >
+              <svg className={styles.backToTopIcon} viewBox="0 0 16 16" aria-hidden>
+                <path
+                  d="M8 3.5 3.5 8M8 3.5 12.5 8M8 3.5v9"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
           ) : null}
         </div>
       </main>

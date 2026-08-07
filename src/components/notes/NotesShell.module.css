@@ -712,6 +712,71 @@
   pointer-events: none;
 }
 
+.backToTop {
+  display: inline-flex;
+  position: absolute;
+  right: max(20px, env(safe-area-inset-right, 0px));
+  bottom: max(20px, env(safe-area-inset-bottom, 0px));
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(var(--accent-rgb), 0.18), rgba(var(--accent-2-rgb), 0.12)),
+    rgba(8, 12, 22, 0.72);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--accent-rgb), 0.28),
+    0 0 16px rgba(var(--accent-rgb), 0.18),
+    0 8px 24px rgba(0, 0, 0, 0.28);
+  padding: 0;
+  color: rgba(var(--fg-rgb), 0.88);
+  cursor: pointer;
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.backToTop:hover,
+.backToTop:focus-visible {
+  background:
+    linear-gradient(180deg, rgba(var(--accent-rgb), 0.28), rgba(var(--accent-2-rgb), 0.2)),
+    rgba(10, 14, 26, 0.82);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--accent-rgb), 0.45),
+    0 0 18px rgba(var(--accent-rgb), 0.28),
+    0 10px 28px rgba(0, 0, 0, 0.32);
+  color: var(--foreground);
+  transform: translateY(-1px);
+}
+
+.backToTopIcon {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backToTop {
+    transition: none;
+  }
+
+  .backToTop:hover,
+  .backToTop:focus-visible {
+    transform: none;
+  }
+}
+
 .noteEnter {
   opacity: 0;
   transform: translate3d(0, 14px, 0);
@@ -1019,5 +1084,12 @@
 
   .viewerBody {
     padding: 4px 16px 18px;
+  }
+
+  .backToTop {
+    right: max(14px, env(safe-area-inset-right, 0px));
+    bottom: max(14px, env(safe-area-inset-bottom, 0px));
+    width: 40px;
+    height: 40px;
   }
 }
