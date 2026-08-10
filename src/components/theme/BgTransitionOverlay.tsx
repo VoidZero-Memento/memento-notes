@@ -9,9 +9,11 @@ import type { CSSProperties } from "react";
 
 type BgTransitionOverlayProps = {
   open: boolean;
+  /** 手机真实等待：进度爬到 90%，不按固定 3s 收束文案 */
+  crawlProgress?: boolean;
 };
 
-export const BgTransitionOverlay = ({ open }: BgTransitionOverlayProps) => {
+export const BgTransitionOverlay = ({ open, crawlProgress = false }: BgTransitionOverlayProps) => {
   const { mounted, visible } = useAnimatedOpen(open, BG_TRANSITION_EXIT_MS);
 
   if (!mounted || typeof document === "undefined") return null;
@@ -21,9 +23,11 @@ export const BgTransitionOverlay = ({ open }: BgTransitionOverlayProps) => {
     "--bg-transition-exit-ms": `${BG_TRANSITION_EXIT_MS}ms`,
   } as CSSProperties;
 
+  const progressClass = crawlProgress ? styles.progressBarCrawl : styles.progressBarActive;
+
   return createPortal(
     <div
-      className={`${styles.root}${visible ? ` ${styles.rootVisible}` : ""}`}
+      className={`${styles.root}${visible ? ` ${styles.rootVisible}` : ""}${crawlProgress ? ` ${styles.rootCrawl}` : ""}`}
       style={overlayVars}
       role="dialog"
       aria-modal="true"
@@ -40,7 +44,7 @@ export const BgTransitionOverlay = ({ open }: BgTransitionOverlayProps) => {
           背景铺开中
         </p>
         <div className={styles.progressTrack} aria-hidden>
-          <span className={`${styles.progressBar}${visible ? ` ${styles.progressBarActive}` : ""}`} />
+          <span className={`${styles.progressBar}${visible ? ` ${progressClass}` : ""}`} />
         </div>
       </div>
     </div>,

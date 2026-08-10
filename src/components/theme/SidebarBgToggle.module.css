@@ -1,3 +1,8 @@
+.root {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .trigger {
   display: inline-flex;
   width: 32px;
@@ -17,7 +22,8 @@
     box-shadow 0.15s ease;
 }
 
-.triggerOn {
+.triggerOn,
+.triggerOpen {
   background: var(--accent-magenta-dim);
   box-shadow:
     inset 0 0 0 1px rgba(var(--accent-2-rgb), 0.35),
@@ -45,4 +51,114 @@
   display: block;
   width: 16px;
   height: 16px;
+}
+
+.menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  min-width: 168px;
+  border: 1px solid rgba(var(--accent-rgb), 0.28);
+  border-radius: 14px;
+  background: rgba(8, 14, 28, 0.78);
+  box-shadow:
+    0 0 0 1px rgba(var(--accent-rgb), 0.08),
+    0 0 22px rgba(var(--accent-rgb), 0.14),
+    0 14px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  padding: 8px;
+  list-style: none;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transform-origin: bottom right;
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.menuVisible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu {
+    transition: none;
+  }
+}
+
+.option {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  padding: 8px 10px;
+  color: rgba(var(--fg-rgb), 0.78);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    box-shadow 0.12s ease,
+    opacity 0.12s ease;
+}
+
+.option:hover:not(:disabled) {
+  background: rgba(var(--accent-rgb), 0.1);
+  color: var(--foreground);
+}
+
+.option:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.optionSelected {
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.18), rgba(var(--accent-2-rgb), 0.12));
+  color: var(--foreground);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--accent-rgb), 0.45),
+    0 0 14px rgba(var(--accent-rgb), 0.2);
+}
+
+.optionSelected:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.24), rgba(var(--accent-2-rgb), 0.16));
+  color: var(--foreground);
+}
+
+.optionLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionState {
+  flex-shrink: 0;
+  color: rgba(var(--fg-rgb), 0.48);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.optionSelected .optionState {
+  color: rgba(var(--accent-2-rgb), 0.9);
 }

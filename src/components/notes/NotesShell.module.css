@@ -852,7 +852,7 @@
   padding: 24px;
 }
 @media (max-width: 860px) {
-  /* 手机继续用原 OSS 底图 */
+  /* 手机继续用原 OSS 底图（轮播未挂载时的回退） */
   .rootBgEnabled::before {
     background:
       linear-gradient(
@@ -863,6 +863,11 @@
       ),
       url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner8.png") center /
         cover no-repeat;
+  }
+
+  /* 轮播层接管正文底图时关掉 ::before，避免双图层与额外解码 */
+  .rootBgEnabled.rootBgCarousel::before {
+    content: none;
   }
 
   .root {

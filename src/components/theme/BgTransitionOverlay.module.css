@@ -156,6 +156,24 @@
     bgTransitionShimmer 1.6s ease-in-out infinite;
 }
 
+/* 真实资源等待：缓爬到 90%，时长未知时不提前收束 */
+.progressBarCrawl {
+  animation:
+    bgTransitionProgressCrawl 10s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    bgTransitionShimmer 1.6s ease-in-out infinite;
+}
+
+.rootCrawl.rootVisible .title,
+.rootCrawl.rootVisible .desc,
+.rootCrawl.rootVisible .progressTrack {
+  animation: bgTransitionCopyIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.08s forwards;
+}
+
+.rootCrawl.rootVisible .veil {
+  animation: none;
+  opacity: 0.55;
+}
+
 @keyframes bgTransitionSettle {
   from {
     transform: scale(1.22);
@@ -213,6 +231,16 @@
 
   to {
     transform: scaleX(1);
+  }
+}
+
+@keyframes bgTransitionProgressCrawl {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(0.9);
   }
 }
 

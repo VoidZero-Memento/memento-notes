@@ -1,11 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
+import { MOBILE_BG_MQ } from "@/lib/bg-photos/constants";
+import { useMediaQuery } from "@/lib/dom/use-media-query";
 import { describeGithubError } from "@/lib/github/describe-github-error";
 import { useRepos } from "@/lib/github/ReposContext";
 import { parseOutline } from "@/lib/markdown/parse-outline";
 import { getNoteTitleFromPath, getRepoWorkspaceTitle } from "@/lib/note-title";
 import { useNoteContent } from "@/lib/notes/use-note-content";
+import { useSidebarBgLoop } from "@/lib/prefs/useSidebarBgLoop";
 import { useSidebarBgTransition } from "@/lib/prefs/useSidebarBgTransition";
+import { toast } from "@/lib/toast/toast";
 import { EmptyState } from "@/components/common/EmptyState";
 import { BgTransitionOverlay } from "@/components/theme/BgTransitionOverlay";
 import { SidebarBgToggle } from "@/components/theme/SidebarBgToggle";
@@ -35,6 +39,11 @@ type NotesWorkspaceProps = {
 
 const describeNoteLoadError = (message: string) => describeGithubError(message).description;
 
+/** 仅手机挂载，动态分包避免 PC 加载轮播逻辑 */
+const MobileBgCarousel = lazy(() =>
+  import("@/components/theme/MobileBgCarousel").then((m) => ({ default: m.MobileBgCarousel })),
+);
+
 const SidebarEdgeChevron = ({ direction }: { direction: "left" | "right" }) => (
   <svg
     className={direction === "left" ? styles.sidebarCollapseMark : styles.sidebarExpandMark}
@@ -61,12 +70,16 @@ export const NotesWorkspace = ({
   onSelectPath,
 }: NotesWorkspaceProps) => {
   const { repos } = useRepos();
+  const isMobile = useMediaQuery(MOBILE_BG_MQ);
+  const { looping: sidebarBgLooping, setLooping: setSidebarBgLooping } = useSidebarBgLoop();
   const {
     enabled: sidebarBgEnabled,
     setBgEnabled: setSidebarBgEnabled,
     overlayOpen: bgOverlayOpen,
     busy: bgTransitionBusy,
-  } = useSidebarBgTransition();
+    overlayCrawl: bgOverlayCrawl,
+  } = useSidebarBgTransition({ isMobile });
+  const mobileBgCarousel = isMobile && sidebarBgEnabled;
   const viewerBodyRef = useRef<HTMLDivElement>(null);
   const { content, loading, pending, error, selectNote, retry } = useNoteContent(
     config,
@@ -199,6 +212,10 @@ export const NotesWorkspace = ({
     ? `${styles.backdrop} ${styles.backdropVisible}`
     : styles.backdrop;
 
+  /** 手机+背景：有正文可看时保留磨砂（含切文 pending）；首载/空态/失败不铺 */
+  const viewingMarkdown = !treeLoading && !!selectedPath && !!content && !loading;
+  const showViewerGlass = !mobileBgCarousel || viewingMarkdown;
+
   return (
     <div
       className={[
@@ -207,10 +224,16 @@ export const NotesWorkspace = ({
         sidebarFx === "collapse" ? styles.rootFxCollapse : "",
         sidebarFx === "expand" ? styles.rootFxExpand : "",
         sidebarBgEnabled ? styles.rootBgEnabled : "",
+        mobileBgCarousel ? styles.rootBgCarousel : "",
       ]
         .filter(Boolean)
         .join(" ")}
     >
+      {mobileBgCarousel ? (
+        <Suspense fallback={null}>
+          <MobileBgCarousel looping={sidebarBgLooping} />
+        </Suspense>
+      ) : null}
       <div
         className={[
           styles.sidebarRailFx,
@@ -308,17 +331,23 @@ export const NotesWorkspace = ({
             <div className={styles.ownerFooterActions}>
               <SidebarBgToggle
                 enabled={sidebarBgEnabled}
+                looping={sidebarBgLooping}
+                menuMode={isMobile}
                 disabled={bgTransitionBusy}
-                onChange={setSidebarBgEnabled}
+                onEnabledChange={setSidebarBgEnabled}
+                onLoopingChange={(next) => {
+                  setSidebarBgLooping(next);
+                  toast.success(next ? "已开启循环播放" : "已固定当前背景");
+                }}
               />
               <ThemeSwitcher />
             </div>
           </div>
         </div>
       </aside>
-      <BgTransitionOverlay open={bgOverlayOpen} />
+      <BgTransitionOverlay open={bgOverlayOpen} crawlProgress={bgOverlayCrawl} />
       <main className={styles.viewer}>
-        <div className={styles.viewerGlass} aria-hidden />
+        {showViewerGlass ? <div className={styles.viewerGlass} aria-hidden /> : null}
         <div className={styles.viewerContent}>
           <div className={styles.mobileBar}>
             <h2 className={styles.mobileBarTitle}>{workspaceTitle}</h2>
