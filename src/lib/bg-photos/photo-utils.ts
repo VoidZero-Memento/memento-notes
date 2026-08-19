@@ -1,12 +1,18 @@
 const OSS_HOST_RE = /\.aliyuncs\.com/i;
 const OSS_BG_PROCESS = "x-oss-process=image/resize,w_720/quality,q_55";
+const OSS_GALLERY_PROCESS = "x-oss-process=image/resize,w_1920/quality,q_82";
 
-/** 背景轮播用低清 OSS 参数，非 OSS 原样返回 */
-export const toBgPhotoUrl = (url: string): string => {
+const withOssProcess = (url: string, process: string): string => {
   if (!OSS_HOST_RE.test(url) || url.includes("x-oss-process")) return url;
   const sep = url.includes("?") ? "&" : "?";
-  return `${url}${sep}${OSS_BG_PROCESS}`;
+  return `${url}${sep}${process}`;
 };
+
+/** 背景轮播用低清 OSS 参数，非 OSS 原样返回 */
+export const toBgPhotoUrl = (url: string): string => withOssProcess(url, OSS_BG_PROCESS);
+
+/** 画廊主图用较高清 OSS 参数，非 OSS 原样返回 */
+export const toGalleryPhotoUrl = (url: string): string => withOssProcess(url, OSS_GALLERY_PROCESS);
 
 export const pickNextPhotoIndex = (length: number, lastIndex: number): number => {
   if (length <= 0) return -1;

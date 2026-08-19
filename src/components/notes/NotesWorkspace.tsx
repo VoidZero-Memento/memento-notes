@@ -11,6 +11,7 @@ import { useSidebarBgLoop } from "@/lib/prefs/useSidebarBgLoop";
 import { useSidebarBgTransition } from "@/lib/prefs/useSidebarBgTransition";
 import { toast } from "@/lib/toast/toast";
 import { EmptyState } from "@/components/common/EmptyState";
+import { GalleryLink } from "@/components/gallery/GalleryLink";
 import { BgTransitionOverlay } from "@/components/theme/BgTransitionOverlay";
 import { SidebarBgToggle } from "@/components/theme/SidebarBgToggle";
 import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
@@ -329,6 +330,7 @@ export const NotesWorkspace = ({
           <div className={styles.ownerFooter}>
             <OwnerFooter login={config.owner} avatarUrl={config.ownerAvatarUrl} />
             <div className={styles.ownerFooterActions}>
+              <GalleryLink />
               <SidebarBgToggle
                 enabled={sidebarBgEnabled}
                 looping={sidebarBgLooping}
@@ -352,6 +354,7 @@ export const NotesWorkspace = ({
           <div className={styles.mobileBar}>
             <h2 className={styles.mobileBarTitle}>{workspaceTitle}</h2>
             <div className={styles.mobileBarActions}>
+              <GalleryLink />
               <button type="button" className={styles.mobileBarBtn} onClick={() => openMobileNav("files")}>
                 文件
               </button>

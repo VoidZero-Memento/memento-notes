@@ -1,10 +1,12 @@
 import { Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 
+import { GALLERY_PATH } from "@/lib/gallery/constants";
 import { useRepos, ReposProvider } from "@/lib/github/ReposContext";
 import { AppShell } from "@/components/layout/AppShell";
 import { BootErrorState } from "@/components/notes/BootErrorState";
 import { LoadingState } from "@/components/notes/LoadingState";
 import { NotesShellRoot } from "@/components/notes/NotesShellRoot";
+import { GalleryPage } from "@/pages/GalleryPage";
 import { RepoPage } from "@/pages/RepoPage";
 
 const AppRoutes = () => {
@@ -41,7 +43,10 @@ const AppRoutes = () => {
 const App = () => (
   <ReposProvider>
     <AppShell>
-      <AppRoutes />
+      <Routes>
+        <Route path={GALLERY_PATH} element={<GalleryPage />} />
+        <Route path="*" element={<AppRoutes />} />
+      </Routes>
     </AppShell>
   </ReposProvider>
 );
