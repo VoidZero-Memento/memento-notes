@@ -22,3 +22,9 @@ export type GalleryPreparedShot = {
   backdrop: string;
   size: GalleryNaturalSize;
 };
+
+export type GallerySatellite = {
+  key: string;
+  idx: number;
+  url: string;
+};

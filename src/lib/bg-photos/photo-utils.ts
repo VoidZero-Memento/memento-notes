@@ -1,6 +1,8 @@
 const OSS_HOST_RE = /\.aliyuncs\.com/i;
 const OSS_BG_PROCESS = "x-oss-process=image/resize,w_720/quality,q_55";
-const OSS_GALLERY_PROCESS = "x-oss-process=image/resize,w_1920/quality,q_82";
+const OSS_GALLERY_PROCESS = "x-oss-process=image/resize,w_1440/quality,q_78/format,webp";
+const OSS_SAT_PROCESS = "x-oss-process=image/resize,w_320/quality,q_58/format,webp";
+const OSS_BACKDROP_PROCESS = "x-oss-process=image/resize,w_64/blur,r_30,s_30/quality,q_40/format,webp";
 
 const withOssProcess = (url: string, process: string): string => {
   if (!OSS_HOST_RE.test(url) || url.includes("x-oss-process")) return url;
@@ -11,8 +13,14 @@ const withOssProcess = (url: string, process: string): string => {
 /** 背景轮播用低清 OSS 参数，非 OSS 原样返回 */
 export const toBgPhotoUrl = (url: string): string => withOssProcess(url, OSS_BG_PROCESS);
 
-/** 画廊主图用较高清 OSS 参数，非 OSS 原样返回 */
+/** 画廊主图：webp + 中等边长，切图时少解码 */
 export const toGalleryPhotoUrl = (url: string): string => withOssProcess(url, OSS_GALLERY_PROCESS);
+
+/** 心形卫星小图：约 2x 显示尺寸 */
+export const toSatPhotoUrl = (url: string): string => withOssProcess(url, OSS_SAT_PROCESS);
+
+/** 全屏氛围底：极小图 + OSS 模糊，避免浏览器 filter:blur */
+export const toBackdropPhotoUrl = (url: string): string => withOssProcess(url, OSS_BACKDROP_PROCESS);
 
 export const pickNextPhotoIndex = (length: number, lastIndex: number): number => {
   if (length <= 0) return -1;

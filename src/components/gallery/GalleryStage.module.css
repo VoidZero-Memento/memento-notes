@@ -1,20 +1,10 @@
-@keyframes gallery-hint {
-  0%,
-  100% {
-    opacity: 0.35;
-  }
-  50% {
-    opacity: 0.72;
-  }
-}
-
 @keyframes gallery-bg-drift {
   0%,
   100% {
-    transform: scale(1.16) translate(0, 0);
+    transform: translate3d(0, 0, 0) scale(1.12);
   }
   50% {
-    transform: scale(1.22) translate(1.2%, -0.8%);
+    transform: translate3d(1.2%, -0.8%, 0) scale(1.18);
   }
 }
 
@@ -27,34 +17,65 @@
   overflow: hidden;
   min-height: 0;
   width: 100%;
-  background: var(--background-deep);
+  background: var(--shell-bg);
+  container-type: size;
+  --orbit-size: min(92cqw, 88cqh);
+  -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
   overscroll-behavior: none;
 }
 
+.root::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    radial-gradient(rgba(var(--accent-rgb), 0.1) 0.6px, transparent 0.6px),
+    linear-gradient(rgba(var(--accent-rgb), 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--accent-rgb), 0.035) 1px, transparent 1px);
+  background-size: 24px 24px, 64px 64px, 64px 64px;
+  mask-image: radial-gradient(ellipse 88% 78% at 50% 44%, black 22%, transparent 76%);
+}
+
 .backdrop {
   position: absolute;
-  inset: -14%;
+  inset: 0;
   z-index: 0;
-  background-position: center;
-  background-size: cover;
-  filter: blur(52px) saturate(130%) brightness(0.36);
-  transform: scale(1.16);
+  overflow: hidden;
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--gallery-backdrop-ms, 1100ms) ease;
+  contain: layout style;
 }
 
 .backdropShow {
-  opacity: 1;
+  opacity: 0.32;
+}
+
+.backdropImg {
+  position: absolute;
+  inset: -18%;
+  background-position: center;
+  background-size: cover;
+  transform: translate3d(0, 0, 0) scale(1.12);
+  pointer-events: none;
+}
+
+.backdropShow .backdropImg {
   animation: gallery-bg-drift 28s ease-in-out infinite;
+}
+
+:global([data-gallery-pause]) .backdropImg {
+  animation-play-state: paused;
 }
 
 .content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   flex: 1;
   align-items: center;
@@ -62,6 +83,19 @@
   min-height: 0;
   width: 100%;
   height: 100%;
+  pointer-events: none;
+}
+
+.panel {
+  pointer-events: auto;
+}
+
+.rootReady {
+  cursor: pointer;
+}
+
+.rootBusy {
+  cursor: wait;
 }
 
 .stage {
@@ -75,7 +109,7 @@
   border: none;
   background: transparent;
   padding: 0;
-  cursor: pointer;
+  pointer-events: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
@@ -88,23 +122,20 @@
   cursor: wait;
 }
 
-.stage:focus {
+.hit:focus,
+.hit:focus-visible {
   outline: none;
-}
-
-.stage:focus-visible .vessel {
-  outline: 2px solid var(--accent);
-  outline-offset: 6px;
 }
 
 .board {
   position: absolute;
-  top: max(44px, env(safe-area-inset-top));
-  right: 14px;
-  bottom: max(40px, env(safe-area-inset-bottom));
-  left: 14px;
+  top: max(56px, 8vh);
+  right: max(72px, 12vw);
+  bottom: max(48px, 8vh);
+  left: max(72px, 12vw);
   transform-origin: center center;
   transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
 }
 
 .boardPressed {
@@ -122,6 +153,7 @@
   height: calc(var(--frame-h, 0px) + var(--gallery-chrome-pad, 18px) * 2);
   transform: translate(-50%, -50%);
   pointer-events: none;
+  contain: layout style;
   transition:
     width var(--gallery-fade-ms, 720ms) cubic-bezier(0.22, 1, 0.36, 1),
     height var(--gallery-fade-ms, 720ms) cubic-bezier(0.22, 1, 0.36, 1);
@@ -140,7 +172,11 @@
   position: absolute;
   inset: 0;
   z-index: 5;
+  border: none;
+  padding: 0;
   background: rgba(0, 0, 0, 0);
+  pointer-events: auto;
+  cursor: zoom-in;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
@@ -185,24 +221,15 @@
   position: absolute;
   inset: 0;
   z-index: 4;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: start;
   pointer-events: none;
   padding: max(12px, env(safe-area-inset-top)) 16px
     max(14px, env(safe-area-inset-bottom));
 }
 
-.back,
-.counter,
-.hint {
-  pointer-events: auto;
-}
-
 .back {
+  pointer-events: auto;
   display: grid;
   place-items: center;
-  justify-self: start;
   width: 28px;
   height: 28px;
   border: none;
@@ -216,15 +243,6 @@
 .backIcon {
   width: 15px;
   height: 15px;
-}
-
-.counter {
-  padding-top: 6px;
-  color: rgba(var(--fg-rgb), 0.42);
-  font-family: var(--font-geist-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
 }
 
 .hint {
@@ -253,35 +271,48 @@
 }
 
 @media (max-width: 860px) {
+  .root {
+    --orbit-size: min(180cqw, 104cqh);
+  }
+
   .board {
-    top: max(40px, env(safe-area-inset-top));
+    top: max(32px, env(safe-area-inset-top));
     right: 8px;
     bottom: max(36px, env(safe-area-inset-bottom));
     left: 8px;
+    width: auto;
+    height: auto;
+    transform: none;
+  }
+
+  .boardPressed {
+    transform: scale(0.985);
+  }
+
+  .frame {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42);
   }
 
   .hud {
     padding: max(10px, env(safe-area-inset-top)) 10px
-      max(16px, env(safe-area-inset-bottom));
+      max(12px, env(safe-area-inset-bottom));
   }
 
   .hint {
     position: absolute;
-    right: 12px;
-    bottom: max(16px, env(safe-area-inset-bottom));
-  }
-
-  .counter {
-    position: absolute;
-    bottom: max(16px, env(safe-area-inset-bottom));
-    left: 12px;
+    left: 16px;
+    right: 16px;
+    bottom: max(10px, env(safe-area-inset-bottom));
     padding-top: 0;
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 0.08em;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hint,
-  .backdropShow {
+  .backdropShow .backdropImg {
     animation: none !important;
   }
 

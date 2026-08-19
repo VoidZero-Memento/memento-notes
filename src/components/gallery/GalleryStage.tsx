@@ -1,37 +1,33 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { GALLERY_BACKDROP_MS, GALLERY_CHROME_PAD, GALLERY_CHROME_PAD_MOBILE, GALLERY_COMPACT_MAX_WIDTH, GALLERY_FADE_MS } from "@/lib/gallery/constants";
-import { fitFrameSize } from "@/lib/gallery/fit-frame";
+import { GALLERY_BACKDROP_MS, GALLERY_FADE_MS } from "@/lib/gallery/constants";
+import { DESKTOP_HEART_SPOTS, MOBILE_HEART_SPOTS } from "@/lib/gallery/heart-layout";
+import { useGalleryLayout } from "@/lib/gallery/use-gallery-layout";
+import { useGallerySatellites } from "@/lib/gallery/use-gallery-satellites";
 import { useGalleryStage } from "@/lib/gallery/use-gallery-stage";
 import { EmptyState } from "@/components/common/EmptyState";
+import { Lightbox } from "@/components/common/Lightbox";
 import { GalleryChrome } from "@/components/gallery/GalleryChrome";
+import { GallerySatellites } from "@/components/gallery/GallerySatellites";
 import { LoadingState } from "@/components/notes/LoadingState";
 
 import fx from "./GalleryFx.module.css";
 import styles from "./GalleryStage.module.css";
 
-import type { CSSProperties, MouseEvent, PointerEvent, SyntheticEvent, TransitionEvent } from "react";
-import type { GalleryLocationState, GallerySlotMotion } from "@/lib/gallery/gallery.types";
+import type { CSSProperties, PointerEvent, SyntheticEvent, TransitionEvent } from "react";
+import type { GalleryLocationState, GallerySatellite, GallerySlotMotion } from "@/lib/gallery/gallery.types";
 
-const padIndex = (value: number) => String(value).padStart(3, "0");
+const slotClass = (motion: GallerySlotMotion) =>
+  `${styles.slot} ${motion === "enter" ? styles.slotEnter : motion === "show" ? styles.slotShow : styles.slotLeave}`;
 
-const slotClass = (motion: GallerySlotMotion) => {
-  if (motion === "enter") return `${styles.slot} ${styles.slotEnter}`;
-  if (motion === "show") return `${styles.slot} ${styles.slotShow}`;
-  return `${styles.slot} ${styles.slotLeave}`;
-};
-
-const preventMenu = (event: SyntheticEvent) => {
-  event.preventDefault();
-};
+const preventMenu = (event: SyntheticEvent) => event.preventDefault();
 
 export const GalleryStage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const wellRef = useRef<HTMLDivElement>(null);
   const [pressed, setPressed] = useState(false);
-  const [maxBox, setMaxBox] = useState({ width: 0, height: 0 });
+  const [previewSrc, setPreviewSrc] = useState("");
   const {
     status,
     error,
@@ -41,18 +37,20 @@ export const GalleryStage = () => {
     backdropB,
     backdropShowB,
     index,
-    total,
     naturalSize,
     busy,
     hasShuffled,
+    orbitTick,
+    heroSatUrl,
     shuffle,
+    adoptIndex,
     settleLeaving,
     retry,
   } = useGalleryStage();
+  const { wellRef, compact, chromePad, frame, fxPaused } = useGalleryLayout(status, naturalSize);
 
-  const compact =
-    typeof window !== "undefined" && window.innerWidth <= GALLERY_COMPACT_MAX_WIDTH;
-  const chromePad = compact ? GALLERY_CHROME_PAD_MOBILE : GALLERY_CHROME_PAD;
+  const satCount = compact ? MOBILE_HEART_SPOTS.length : DESKTOP_HEART_SPOTS.length;
+  const { satellites, shown, swapSatellite } = useGallerySatellites(satCount, index, status === "ready", orbitTick);
 
   const handleBack = useCallback(() => {
     const from = (location.state as GalleryLocationState | null)?.from;
@@ -64,37 +62,13 @@ export const GalleryStage = () => {
   }, [location.pathname, location.state, navigate]);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") handleBack();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || previewSrc) return;
+      handleBack();
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleBack]);
-
-  useEffect(() => {
-    const el = wellRef.current;
-    if (!el) return;
-    const measure = () => {
-      const rect = el.getBoundingClientRect();
-      const pad =
-        window.innerWidth <= GALLERY_COMPACT_MAX_WIDTH
-          ? GALLERY_CHROME_PAD_MOBILE
-          : GALLERY_CHROME_PAD;
-      setMaxBox({
-        width: Math.max(0, rect.width - pad * 2),
-        height: Math.max(0, rect.height - pad * 2),
-      });
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [status]);
-
-  const frame = useMemo(
-    () => fitFrameSize(naturalSize.width, naturalSize.height, maxBox.width, maxBox.height),
-    [maxBox.height, maxBox.width, naturalSize.height, naturalSize.width],
-  );
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [handleBack, previewSrc]);
 
   const fadeVars = {
     "--gallery-fade-ms": `${GALLERY_FADE_MS}ms`,
@@ -103,19 +77,21 @@ export const GalleryStage = () => {
     "--frame-w": `${frame.width}px`,
     "--frame-h": `${frame.height}px`,
   } as CSSProperties;
-  const counter = `${padIndex(index + 1)} / ${padIndex(total)}`;
 
-  const handleShuffle = (event: MouseEvent<HTMLButtonElement>) => {
-    event.currentTarget.blur();
-    shuffle();
-  };
+  const heroUrl = slotA.motion === "leave" ? slotB.url : slotA.url || slotB.url;
 
-  const handlePointerDown = (event: PointerEvent<HTMLButtonElement>) => {
-    if (event.button !== 0 || busy) return;
-    setPressed(true);
-  };
-
-  const releasePress = () => setPressed(false);
+  const handleSatSwap = useCallback(
+    (slotIndex: number, sat: GallerySatellite) => {
+      if (busy || previewSrc || sat.idx === index) return;
+      const outgoing: GallerySatellite = {
+        key: `from-hero-${index}-${sat.idx}`,
+        idx: index,
+        url: heroSatUrl,
+      };
+      adoptIndex(sat.idx, () => swapSatellite(slotIndex, outgoing));
+    },
+    [adoptIndex, busy, heroSatUrl, index, previewSrc, swapSatellite],
+  );
 
   const handleSlotTransitionEnd = (event: TransitionEvent<HTMLImageElement>) => {
     if (event.propertyName !== "opacity") return;
@@ -123,59 +99,67 @@ export const GalleryStage = () => {
     settleLeaving();
   };
 
+  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0 || busy || previewSrc || status !== "ready") return;
+    setPressed(true);
+  };
+
   return (
-    <div className={styles.root} style={fadeVars} onContextMenu={preventMenu}>
+    <div
+      className={`${styles.root}${status === "ready" ? ` ${styles.rootReady}` : ""}${busy ? ` ${styles.rootBusy}` : ""}`}
+      style={fadeVars}
+      data-gallery-pause={busy || fxPaused ? "" : undefined}
+      onContextMenu={preventMenu}
+      onClick={status === "ready" && !previewSrc && !busy ? shuffle : undefined}
+      onPointerDown={handlePointerDown}
+      onPointerUp={() => setPressed(false)}
+      onPointerCancel={() => setPressed(false)}
+      onPointerLeave={() => setPressed(false)}
+    >
       {backdropA ? (
-        <div
-          className={`${styles.backdrop}${backdropShowB ? "" : ` ${styles.backdropShow}`}`}
-          style={{ backgroundImage: `url("${backdropA}")` }}
-          aria-hidden
-        />
+        <div className={`${styles.backdrop}${backdropShowB ? "" : ` ${styles.backdropShow}`}`} aria-hidden>
+          <div className={styles.backdropImg} style={{ backgroundImage: `url("${backdropA}")` }} />
+        </div>
       ) : null}
       {backdropB ? (
-        <div
-          className={`${styles.backdrop}${backdropShowB ? ` ${styles.backdropShow}` : ""}`}
-          style={{ backgroundImage: `url("${backdropB}")` }}
-          aria-hidden
-        />
+        <div className={`${styles.backdrop}${backdropShowB ? ` ${styles.backdropShow}` : ""}`} aria-hidden>
+          <div className={styles.backdropImg} style={{ backgroundImage: `url("${backdropB}")` }} />
+        </div>
       ) : null}
       <div className={fx.aurora} aria-hidden />
       <div className={fx.stars} aria-hidden />
       <div className={fx.vignette} aria-hidden />
 
+      <GallerySatellites satellites={satellites} shown={shown} compact={compact} onSwap={handleSatSwap} />
+
       <div className={styles.content}>
-        {status === "loading" ? <LoadingState label="加载画廊" /> : null}
+        {status === "loading" ? (
+          <div className={styles.panel}>
+            <LoadingState label="加载画廊" />
+          </div>
+        ) : null}
 
         {status === "error" ? (
-          <EmptyState
-            variant="error"
-            title="无法打开画廊"
-            description={error ?? "图片清单加载失败"}
-            actions={[
-              { label: "重试", onClick: retry },
-              { label: "返回笔记", onClick: handleBack, variant: "secondary" },
-            ]}
-          />
+          <div className={styles.panel}>
+            <EmptyState
+              variant="error"
+              title="无法打开画廊"
+              description={error ?? "图片清单加载失败"}
+              actions={[
+                { label: "重试", onClick: retry },
+                { label: "返回笔记", onClick: handleBack, variant: "secondary" },
+              ]}
+            />
+          </div>
         ) : null}
 
         {status === "ready" ? (
-          <button
-            type="button"
-            className={`${styles.stage}${busy ? ` ${styles.stageBusy}` : ""}`}
-            aria-label="随机切换图片"
-            onClick={handleShuffle}
-            onPointerDown={handlePointerDown}
-            onPointerUp={releasePress}
-            onPointerCancel={releasePress}
-            onPointerLeave={releasePress}
-            onContextMenu={preventMenu}
-            onDragStart={preventMenu}
-          >
+          <div className={`${styles.stage}${busy ? ` ${styles.stageBusy}` : ""}`}>
             <span className={fx.floorGlow} aria-hidden />
             <div className={`${styles.board}${pressed ? ` ${styles.boardPressed}` : ""}`} ref={wellRef}>
               {frame.width > 0 ? (
                 <div className={styles.vessel}>
-                  <GalleryChrome busy={busy} />
+                  <GalleryChrome />
                   <div className={styles.frame}>
                     {slotA.url ? (
                       <img
@@ -183,6 +167,7 @@ export const GalleryStage = () => {
                         src={slotA.url}
                         alt=""
                         decoding="async"
+                        fetchPriority={slotA.motion === "leave" ? "low" : "high"}
                         draggable={false}
                         onTransitionEnd={handleSlotTransitionEnd}
                       />
@@ -193,16 +178,27 @@ export const GalleryStage = () => {
                         src={slotB.url}
                         alt=""
                         decoding="async"
+                        fetchPriority={slotB.motion === "leave" ? "low" : "high"}
                         draggable={false}
                         onTransitionEnd={handleSlotTransitionEnd}
                       />
                     ) : null}
-                    <span className={styles.hit} aria-hidden />
+                    <button
+                      type="button"
+                      className={styles.hit}
+                      aria-label="放大图片"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        if (heroUrl) setPreviewSrc(heroUrl);
+                        setPressed(false);
+                      }}
+                      onPointerDown={(event) => event.stopPropagation()}
+                    />
                   </div>
                 </div>
               ) : null}
             </div>
-          </button>
+          </div>
         ) : null}
       </div>
 
@@ -211,7 +207,10 @@ export const GalleryStage = () => {
           type="button"
           className={styles.back}
           aria-label="返回笔记"
-          onClick={handleBack}
+          onClick={(event) => {
+            event.stopPropagation();
+            handleBack();
+          }}
         >
           <svg className={styles.backIcon} viewBox="0 0 16 16" aria-hidden>
             <path
@@ -225,20 +224,15 @@ export const GalleryStage = () => {
           </svg>
         </button>
         {status === "ready" ? (
-          <span className={styles.counter}>{counter}</span>
-        ) : (
-          <span />
-        )}
-        {status === "ready" ? (
-          <p
-            className={`${styles.hint}${hasShuffled ? ` ${styles.hintGone}` : ""}`}
-          >
-            点击画面切换
+          <p className={`${styles.hint}${hasShuffled ? ` ${styles.hintGone}` : ""}`}>
+            点击中间放大 · 点击小图互换 · 点击背景切换
           </p>
         ) : (
           <span />
         )}
       </div>
+
+      {previewSrc ? <Lightbox src={previewSrc} alt="" onClose={() => setPreviewSrc("")} /> : null}
     </div>
   );
 };

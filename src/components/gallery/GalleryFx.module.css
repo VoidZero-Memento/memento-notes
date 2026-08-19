@@ -1,26 +1,3 @@
-@property --gallery-arc {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-
-@keyframes gallery-arc {
-  to {
-    --gallery-arc: 360deg;
-  }
-}
-
-@keyframes gallery-stars {
-  to {
-    background-position:
-      120% 40%,
-      -20% 70%,
-      80% 110%,
-      40% -10%,
-      10% 90%;
-  }
-}
-
 @keyframes gallery-travel {
   to {
     offset-distance: 100%;
@@ -31,11 +8,11 @@
   0%,
   100% {
     opacity: 0.7;
-    transform: translate(0, 0) scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
   50% {
     opacity: 0.95;
-    transform: translate(2.4%, -1.8%) scale(1.06);
+    transform: translate3d(2.4%, -1.8%, 0) scale(1.06);
   }
 }
 
@@ -43,11 +20,9 @@
   0%,
   100% {
     opacity: 0.45;
-    transform: translate(-50%, -50%) scale(1);
   }
   50% {
     opacity: 0.72;
-    transform: translate(-50%, -50%) scale(1.08);
   }
 }
 
@@ -69,10 +44,6 @@
   z-index: 0;
 }
 
-.chromeSwap .aura {
-  animation-duration: 4.8s;
-}
-
 .aura {
   position: absolute;
   inset: 8px;
@@ -80,7 +51,7 @@
   padding: 1px;
   border-radius: 14px;
   background: conic-gradient(
-    from var(--gallery-arc),
+    from 210deg,
     transparent 0%,
     rgba(var(--accent-rgb), 0.85) 8%,
     transparent 18%,
@@ -96,7 +67,6 @@
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: gallery-arc 8s linear infinite;
 }
 
 .track {
@@ -192,15 +162,15 @@
       rgba(var(--accent-2-rgb), 0.12),
       transparent 64%
     );
-  filter: blur(32px);
-  transform: translate(-50%, -50%);
+  transform: translate3d(-50%, -50%, 0);
   animation: gallery-floor 11s ease-in-out infinite;
 }
 
 .aurora {
   position: absolute;
-  inset: -24%;
+  inset: -8%;
   z-index: 0;
+  transform: translate3d(0, 0, 0);
   background:
     radial-gradient(
       ellipse 48% 40% at 12% 16%,
@@ -273,7 +243,6 @@
     170% 170%,
     200% 200%,
     130% 130%;
-  animation: gallery-stars 48s linear infinite;
 }
 
 .vignette {
@@ -281,10 +250,16 @@
   inset: 0;
   z-index: 0;
   background: radial-gradient(
-    ellipse 74% 66% at 50% 48%,
-    transparent 38%,
-    rgba(4, 7, 14, 0.58) 100%
+    ellipse 80% 72% at 50% 48%,
+    transparent 58%,
+    rgba(4, 7, 14, 0.22) 100%
   );
+}
+
+:global([data-gallery-pause]) .aurora,
+:global([data-gallery-pause]) .planet,
+:global([data-gallery-pause]) .floorGlow {
+  animation-play-state: paused;
 }
 
 @media (max-width: 860px) {
@@ -306,8 +281,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .aurora,
-  .stars,
-  .aura,
   .planet,
   .floorGlow {
     animation: none !important;

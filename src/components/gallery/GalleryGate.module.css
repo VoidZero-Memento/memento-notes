@@ -7,7 +7,21 @@
   overflow: hidden;
   min-height: 0;
   width: 100%;
-  background: var(--background-deep);
+  background: var(--shell-bg);
+}
+
+.root::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    radial-gradient(rgba(var(--accent-rgb), 0.1) 0.6px, transparent 0.6px),
+    linear-gradient(rgba(var(--accent-rgb), 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--accent-rgb), 0.035) 1px, transparent 1px);
+  background-size: 24px 24px, 64px 64px, 64px 64px;
+  mask-image: radial-gradient(ellipse 88% 78% at 50% 44%, black 22%, transparent 76%);
 }
 
 .panel {

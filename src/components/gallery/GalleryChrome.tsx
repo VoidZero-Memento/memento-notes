@@ -1,11 +1,7 @@
 import fx from "./GalleryFx.module.css";
 
-type GalleryChromeProps = {
-  busy: boolean;
-};
-
-export const GalleryChrome = ({ busy }: GalleryChromeProps) => (
-  <div className={`${fx.chrome}${busy ? ` ${fx.chromeSwap}` : ""}`} aria-hidden>
+export const GalleryChrome = () => (
+  <div className={fx.chrome} aria-hidden>
     <span className={fx.aura} />
     <span className={fx.track} />
     <span className={fx.planet} />

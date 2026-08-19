@@ -1,42 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { fetchAllOssImages, getCachedAllOssImages } from "@/lib/bg-photos/images";
-import { pickNextPhotoIndex, preloadPhoto, toBgPhotoUrl, toGalleryPhotoUrl } from "@/lib/bg-photos/photo-utils";
+import { pickNextPhotoIndex, toSatPhotoUrl } from "@/lib/bg-photos/photo-utils";
 import { GALLERY_FADE_MS } from "@/lib/gallery/constants";
+import { afterPaint, emptySize, emptySlot, loadShot } from "@/lib/gallery/load-shot";
 
 import type { OssImageMeta } from "@/lib/bg-photos/bg-photos.types";
 import type { GalleryNaturalSize, GalleryPreparedShot, GallerySlot, GalleryStageStatus } from "@/lib/gallery/gallery.types";
-
-const emptySlot = (): GallerySlot => ({ url: "", motion: "leave" });
-
-const emptySize = (): GalleryNaturalSize => ({ width: 0, height: 0 });
-
-const afterPaint = (fn: () => void) => {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(fn);
-  });
-};
-
-const decodePhoto = async (url: string) => {
-  const img = new Image();
-  img.src = url;
-  if (!img.decode) return;
-  try {
-    await img.decode();
-  } catch {
-    /* 缓存命中或解码失败时仍继续切图 */
-  }
-};
-
-const loadShot = async (photos: OssImageMeta[], idx: number, signal?: AbortSignal): Promise<GalleryPreparedShot | null> => {
-  const meta = photos[idx];
-  if (!meta) return null;
-  const url = toGalleryPhotoUrl(meta.url);
-  const size = await preloadPhoto(url, signal);
-  await decodePhoto(url);
-  if (signal?.aborted || size.width <= 0) return null;
-  return { idx, url, backdrop: toBgPhotoUrl(meta.url), size };
-};
 
 export const useGalleryStage = () => {
   const [status, setStatus] = useState<GalleryStageStatus>("loading");
@@ -51,6 +21,7 @@ export const useGalleryStage = () => {
   const [backdropShowB, setBackdropShowB] = useState(false);
   const [busy, setBusy] = useState(false);
   const [hasShuffled, setHasShuffled] = useState(false);
+  const [orbitTick, setOrbitTick] = useState(0);
 
   const photosRef = useRef<OssImageMeta[]>([]);
   const lastIndexRef = useRef(-1);
@@ -59,6 +30,7 @@ export const useGalleryStage = () => {
   const generationRef = useRef(0);
   const busyRef = useRef(false);
   const fadeTimerRef = useRef(0);
+  const prefetchTimerRef = useRef(0);
   const preparedRef = useRef<GalleryPreparedShot | null>(null);
   const prepareTaskRef = useRef<Promise<GalleryPreparedShot | null> | null>(null);
 
@@ -121,17 +93,7 @@ export const useGalleryStage = () => {
     setSlotB((prev) => (prev.motion === "leave" ? emptySlot() : prev));
   }, []);
 
-  const shuffle = useCallback(() => {
-    if (busyRef.current || status !== "ready") return;
-
-    const photos = photosRef.current;
-    if (photos.length <= 1) return;
-
-    const runGen = generationRef.current;
-    busyRef.current = true;
-    setBusy(true);
-    setHasShuffled(true);
-
+  const playShot = useCallback((shot: GalleryPreparedShot, runGen: number, onReveal?: () => void) => {
     const finishSwap = () => {
       window.clearTimeout(fadeTimerRef.current);
       fadeTimerRef.current = window.setTimeout(() => {
@@ -142,12 +104,51 @@ export const useGalleryStage = () => {
       }, GALLERY_FADE_MS);
     };
 
-    const reveal = (shot: GalleryPreparedShot) => {
+    const reveal = () => {
       if (runGen !== generationRef.current) return;
       commitIndex(shot.idx);
       swapBackdrop(shot.backdrop);
       setNaturalSize(shot.size);
+      onReveal?.();
     };
+
+    if (activeIsARef.current) {
+      setSlotB({ url: shot.url, motion: "enter" });
+      afterPaint(() => {
+        if (runGen !== generationRef.current) return;
+        setSlotA((prev) => ({ ...prev, motion: "leave" }));
+        setSlotB({ url: shot.url, motion: "show" });
+        activeIsARef.current = false;
+        reveal();
+        finishSwap();
+        queueNext(shot.idx, runGen);
+      });
+      return;
+    }
+
+    setSlotA({ url: shot.url, motion: "enter" });
+    afterPaint(() => {
+      if (runGen !== generationRef.current) return;
+      setSlotB((prev) => ({ ...prev, motion: "leave" }));
+      setSlotA({ url: shot.url, motion: "show" });
+      activeIsARef.current = true;
+      reveal();
+      finishSwap();
+      queueNext(shot.idx, runGen);
+    });
+  }, [commitIndex, queueNext, settleLeaving, swapBackdrop]);
+
+  const shuffle = useCallback(() => {
+    if (busyRef.current || status !== "ready") return;
+
+    const photos = photosRef.current;
+    if (photos.length <= 1) return;
+
+    const runGen = generationRef.current;
+    busyRef.current = true;
+    setBusy(true);
+    setHasShuffled(true);
+    setOrbitTick((n) => n + 1);
 
     const run = async () => {
       const shot = await takePrepared(runGen);
@@ -156,35 +157,41 @@ export const useGalleryStage = () => {
         setBusy(false);
         return;
       }
-
-      if (activeIsARef.current) {
-        setSlotB({ url: shot.url, motion: "enter" });
-        afterPaint(() => {
-          if (runGen !== generationRef.current) return;
-          setSlotA((prev) => ({ ...prev, motion: "leave" }));
-          setSlotB({ url: shot.url, motion: "show" });
-          activeIsARef.current = false;
-          reveal(shot);
-          finishSwap();
-          queueNext(shot.idx, runGen);
-        });
-        return;
-      }
-
-      setSlotA({ url: shot.url, motion: "enter" });
-      afterPaint(() => {
-        if (runGen !== generationRef.current) return;
-        setSlotB((prev) => ({ ...prev, motion: "leave" }));
-        setSlotA({ url: shot.url, motion: "show" });
-        activeIsARef.current = true;
-        reveal(shot);
-        finishSwap();
-        queueNext(shot.idx, runGen);
-      });
+      playShot(shot, runGen);
     };
 
     void run();
-  }, [commitIndex, queueNext, settleLeaving, status, swapBackdrop, takePrepared]);
+  }, [playShot, status, takePrepared]);
+
+  const adoptIndex = useCallback((idx: number, onReveal?: () => void) => {
+    if (busyRef.current || status !== "ready") return;
+    if (idx === lastIndexRef.current) return;
+
+    const photos = photosRef.current;
+    if (!photos[idx]) return;
+
+    const runGen = generationRef.current;
+    busyRef.current = true;
+    setBusy(true);
+    setHasShuffled(true);
+
+    const run = async () => {
+      const readyShot = preparedRef.current?.idx === idx ? preparedRef.current : null;
+      if (readyShot) {
+        preparedRef.current = null;
+        prepareTaskRef.current = null;
+      }
+      const shot = readyShot ?? (await loadShot(photos, idx));
+      if (!shot || runGen !== generationRef.current) {
+        busyRef.current = false;
+        setBusy(false);
+        return;
+      }
+      playShot(shot, runGen, onReveal);
+    };
+
+    void run();
+  }, [playShot, status]);
 
   const boot = useCallback((signal: AbortSignal) => {
     generationRef.current += 1;
@@ -192,6 +199,7 @@ export const useGalleryStage = () => {
     busyRef.current = false;
     preparedRef.current = null;
     prepareTaskRef.current = null;
+    window.clearTimeout(prefetchTimerRef.current);
     setBusy(false);
     setStatus("loading");
     setError(null);
@@ -228,7 +236,11 @@ export const useGalleryStage = () => {
         if (gen !== generationRef.current) return;
         setSlotA({ url: shot.url, motion: "show" });
       });
-      queueNext(shot.idx, gen, signal);
+      window.clearTimeout(prefetchTimerRef.current);
+      prefetchTimerRef.current = window.setTimeout(() => {
+        if (gen !== generationRef.current) return;
+        queueNext(shot.idx, gen, signal);
+      }, 720);
     };
 
     const cached = getCachedAllOssImages();
@@ -254,6 +266,7 @@ export const useGalleryStage = () => {
       generationRef.current += 1;
       abort.abort();
       window.clearTimeout(fadeTimerRef.current);
+      window.clearTimeout(prefetchTimerRef.current);
     };
   }, [boot]);
 
@@ -275,7 +288,10 @@ export const useGalleryStage = () => {
     naturalSize,
     busy,
     hasShuffled,
+    orbitTick,
+    heroSatUrl: photosRef.current[index] ? toSatPhotoUrl(photosRef.current[index].url) : "",
     shuffle,
+    adoptIndex,
     settleLeaving,
     retry,
   };

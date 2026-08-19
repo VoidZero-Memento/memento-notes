@@ -1,0 +1,145 @@
+@keyframes gallery-sat-float {
+  0%,
+  100% {
+    transform: translate3d(-50%, -50%, 0) rotate(var(--sat-tilt, 0deg)) translateY(-2px);
+  }
+  50% {
+    transform: translate3d(-50%, -50%, 0) rotate(var(--sat-tilt, 0deg)) translateY(2px);
+  }
+}
+
+@keyframes gallery-heart-pulse {
+  0%,
+  100% {
+    opacity: 0.42;
+  }
+  50% {
+    opacity: 0.78;
+  }
+}
+
+.traceLayer,
+.layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.traceLayer {
+  z-index: 3;
+}
+
+.traceCompact {
+  z-index: 1;
+}
+
+.layer {
+  z-index: 3;
+}
+
+.orbit {
+  position: relative;
+  width: var(--orbit-size, min(92cqw, 88cqh));
+  height: var(--orbit-size, min(92cqw, 88cqh));
+}
+
+.trace {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  opacity: 0;
+  transition: opacity 640ms ease;
+}
+
+.trace path {
+  fill: none;
+  stroke: url(#gallery-heart-stroke);
+  stroke-width: 0.45;
+  stroke-linejoin: round;
+}
+
+@supports (vector-effect: non-scaling-stroke) {
+  .trace path {
+    stroke-width: 1.5px;
+    vector-effect: non-scaling-stroke;
+  }
+}
+
+.layerShown .trace {
+  opacity: 1;
+}
+
+.layerShown .trace path {
+  animation: gallery-heart-pulse 5.6s ease-in-out infinite;
+}
+
+.item {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: none;
+  width: max-content;
+  height: max-content;
+  transform: translate3d(-50%, -50%, 0) rotate(var(--sat-tilt, 0deg));
+  opacity: 0;
+  background: transparent;
+  transition: opacity 560ms ease calc(var(--sat-index, 0) * 55ms);
+  contain: layout style;
+  pointer-events: auto;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.item:focus,
+.item:focus-visible {
+  outline: none;
+}
+
+.layerShown .item {
+  opacity: 1;
+  animation: gallery-sat-float var(--sat-dur, 8s) ease-in-out infinite;
+  animation-delay: var(--sat-delay, 0s);
+}
+
+.layerCompact.layerShown .item {
+  opacity: 0.92;
+}
+
+.photo {
+  display: block;
+  max-width: var(--sat-max, 104px);
+  max-height: var(--sat-max, 104px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.42),
+    0 0 18px rgba(var(--accent-rgb), 0.18);
+  pointer-events: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+:global([data-gallery-pause]) .item,
+:global([data-gallery-pause]) .trace path {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layerShown .item,
+  .trace path {
+    animation: none;
+  }
+
+  .item {
+    transition: opacity 300ms ease;
+  }
+}

@@ -4,9 +4,16 @@ export const SPLASH_MIN_MS = 3000;
 /** banner 等待上限，超时后不再阻塞挂载 */
 export const SPLASH_BANNER_TIMEOUT_MS = 10000;
 
-/** 与 index.html 首屏 banner 一致 */
-export const SPLASH_IMAGE_URL =
+/** 与 index.html 首屏 banner 一致：手机 163 / PC 30 */
+const SPLASH_IMAGE_MOBILE =
   "https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner163.png";
+const SPLASH_IMAGE_PC =
+  "https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner30.png";
+
+export const SPLASH_IMAGE_URL = () =>
+  window.matchMedia("(min-width: 861px)").matches
+    ? SPLASH_IMAGE_PC
+    : SPLASH_IMAGE_MOBILE;
 
 const loadImage = (src: string) =>
   new Promise<void>((resolve) => {
@@ -22,7 +29,10 @@ const sleep = (ms: number) =>
   });
 
 const waitBanner = () =>
-  Promise.race([loadImage(SPLASH_IMAGE_URL), sleep(SPLASH_BANNER_TIMEOUT_MS)]);
+  Promise.race([
+    loadImage(SPLASH_IMAGE_URL()),
+    sleep(SPLASH_BANNER_TIMEOUT_MS),
+  ]);
 
 /**
  * 等首屏 banner（含超时）就绪，且从导航起至少满 SPLASH_MIN_MS，再结束首屏占位。
