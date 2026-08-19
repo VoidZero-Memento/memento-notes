@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 import { Lightbox } from "@/components/common/Lightbox";
+import { GalleryLink } from "@/components/gallery/GalleryLink";
+
 import styles from "./NotesShell.module.css";
 
 type OwnerFooterProps = {
@@ -32,7 +34,9 @@ export const OwnerFooter = ({ login, avatarUrl }: OwnerFooterProps) => {
         {login}
       </span>
       {previewOpen && avatarUrl ? (
-        <Lightbox src={avatarUrl} alt={login} onClose={() => setPreviewOpen(false)} />
+        <Lightbox src={avatarUrl} alt={login} onClose={() => setPreviewOpen(false)}>
+          <GalleryLink />
+        </Lightbox>
       ) : null}
     </div>
   );

@@ -8,7 +8,7 @@ import type { LightboxProps } from "./Lightbox.types";
 const CLOSE_ANIMATION_MS = 380;
 const INNER_TICKS = Array.from({ length: 32 }, (_, index) => index);
 
-export const Lightbox = ({ src, alt, onClose }: LightboxProps) => {
+export const Lightbox = ({ src, alt, onClose, children }: LightboxProps) => {
   const [isClosing, setIsClosing] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -64,6 +64,7 @@ export const Lightbox = ({ src, alt, onClose }: LightboxProps) => {
           </div>
         </div>
       </div>
+      {children}
     </div>,
     document.body,
   );

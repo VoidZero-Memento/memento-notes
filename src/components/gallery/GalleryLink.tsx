@@ -1,32 +1,57 @@
-import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { GALLERY_PATH } from "@/lib/gallery/constants";
+import { useGalleryGate } from "@/lib/gallery/use-gallery-gate";
+
+import { GalleryGateField } from "@/components/gallery/GalleryGateField";
 
 import styles from "./GalleryLink.module.css";
 
+import type { MouseEvent } from "react";
 import type { GalleryLocationState } from "@/lib/gallery/gallery.types";
-
-const PrismIcon = () => (
-  <svg className={styles.icon} viewBox="0 0 16 16" aria-hidden>
-    <path
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.2"
-      strokeLinejoin="round"
-      d="M8 1.8 14.2 13.2H1.8Z"
-    />
-    <path fill="none" stroke="currentColor" strokeWidth="1.2" d="M8 1.8v11.4M4.2 10.2h7.6" />
-    <path fill="currentColor" d="M8 6.2 9 8.4 8 9.2 7 8.4Z" opacity="0.85" />
-  </svg>
-);
 
 export const GalleryLink = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { unlocked } = useGalleryGate();
+  const [prompting, setPrompting] = useState(false);
   const state: GalleryLocationState = { from: `${location.pathname}${location.search}` };
 
+  const enter = () => {
+    navigate(GALLERY_PATH, { state });
+  };
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.stopPropagation();
+    if (unlocked) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    setPrompting(true);
+  };
+
+  if (prompting && !unlocked) {
+    return (
+      <div className={styles.anchor} onClick={(event) => event.stopPropagation()}>
+        <GalleryGateField
+          variant="inline"
+          autoFocus
+          onUnlocked={enter}
+          onCancel={() => setPrompting(false)}
+        />
+      </div>
+    );
+  }
+
   return (
-    <Link className={styles.trigger} to={GALLERY_PATH} state={state} aria-label="打开画廊" title="画廊">
-      <PrismIcon />
+    <Link
+      className={styles.portal}
+      to={GALLERY_PATH}
+      state={state}
+      aria-label="打开画廊"
+      onClick={handleClick}
+    >
+      画廊
     </Link>
   );
 };

@@ -26,10 +26,10 @@ export const pickNextPhotoIndex = (length: number, lastIndex: number): number =>
   return idx;
 };
 
-export const preloadPhoto = (url: string, signal?: AbortSignal): Promise<void> =>
+export const preloadPhoto = (url: string, signal?: AbortSignal): Promise<{ width: number; height: number }> =>
   new Promise((resolve) => {
     if (signal?.aborted) {
-      resolve();
+      resolve({ width: 0, height: 0 });
       return;
     }
     const img = new Image();
@@ -37,7 +37,7 @@ export const preloadPhoto = (url: string, signal?: AbortSignal): Promise<void> =
       img.onload = null;
       img.onerror = null;
       signal?.removeEventListener("abort", onAbort);
-      resolve();
+      resolve({ width: img.naturalWidth, height: img.naturalHeight });
     };
     const onAbort = () => finish();
     img.onload = finish;
