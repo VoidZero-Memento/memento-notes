@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { HALL_FLIP_MS } from "@/lib/gallery/constants";
 import { fitViewerRect, invertOf } from "@/lib/gallery/hall-photo";
 import { useHallDesktop } from "@/lib/gallery/use-hall-desktop";
+import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
 
 import styles from "./GalleryViewer.module.css";
 
@@ -16,6 +17,7 @@ type GalleryViewerProps = {
 
 export const GalleryViewer = ({ onClose, selection }: GalleryViewerProps) => {
   const { origin, photo } = selection;
+  const alive = useKeepAliveActive();
   const desktop = useHallDesktop();
   const targetRef = useRef<HallRect | null>(null);
   if (!targetRef.current) targetRef.current = fitViewerRect(photo, desktop);
@@ -55,19 +57,22 @@ export const GalleryViewer = ({ onClose, selection }: GalleryViewerProps) => {
     warm.src = photo.viewerUrl;
     if (warm.complete && warm.naturalWidth > 0) onReady();
 
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") finishClose();
-    };
-    window.addEventListener("keydown", onKey);
-
     return () => {
       window.cancelAnimationFrame(frame);
       window.clearTimeout(timeoutRef.current);
       window.clearTimeout(settleRef.current);
       warm.removeEventListener("load", onReady);
-      window.removeEventListener("keydown", onKey);
     };
-  }, [finishClose, photo.viewerUrl]);
+  }, [photo.viewerUrl]);
+
+  useEffect(() => {
+    if (!alive) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") finishClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [alive, finishClose]);
 
   const vars = { "--hall-flip-ms": `${HALL_FLIP_MS}ms` } as CSSProperties;
 

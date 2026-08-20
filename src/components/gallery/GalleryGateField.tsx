@@ -13,6 +13,8 @@ type GalleryGateFieldProps = {
   onCancel?: () => void;
 };
 
+const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
+
 export const GalleryGateField = ({ autoFocus, label = "密钥", unlock, variant, onUnlocked, onCancel }: GalleryGateFieldProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const busyRef = useRef(false);
@@ -20,6 +22,7 @@ export const GalleryGateField = ({ autoFocus, label = "密钥", unlock, variant,
   const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
   const [denied, setDenied] = useState(false);
+  const mountFocus = Boolean(autoFocus) && (variant === "inline" || !isCoarsePointer());
 
   useEffect(() => {
     return () => {
@@ -67,6 +70,8 @@ export const GalleryGateField = ({ autoFocus, label = "密钥", unlock, variant,
   return (
     <form
       className={className}
+      lang="en"
+      autoComplete="off"
       onClick={(event) => event.stopPropagation()}
       onSubmit={(event) => {
         event.preventDefault();
@@ -77,14 +82,15 @@ export const GalleryGateField = ({ autoFocus, label = "密钥", unlock, variant,
         ref={inputRef}
         className={styles.input}
         type="text"
-        name="gallery-gate"
+        name="memento-gate"
         lang="en"
         inputMode="url"
+        enterKeyHint="go"
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="none"
         spellCheck={false}
-        autoFocus={autoFocus}
+        autoFocus={mountFocus}
         disabled={busy}
         placeholder="密钥"
         aria-label={label}

@@ -35,8 +35,8 @@ export const GALLERY_BG_GATE_SESSION_KEY = "memento-notes:gallery-bg-gate";
 export const HALL_COLUMNS = 2;
 export const HALL_DESKTOP_COLUMNS = 4;
 export const HALL_DESKTOP_MQ = "(min-width: 861px)";
+/** 展柜内边距由外框 padding 承担，不随瀑布流滚动消失 */
 export const HALL_PAD = 14;
-/** 桌面展柜留白由外框 padding 承担，与图片间距一致 */
 export const HALL_DESKTOP_PAD = 0;
 export const HALL_GAP = 16;
 export const HALL_DESKTOP_GAP = 24;

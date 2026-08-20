@@ -33,6 +33,8 @@
   min-width: 0;
   min-height: 0;
   width: 100%;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) calc(14px + env(safe-area-inset-right, 0px))
+    calc(14px + env(safe-area-inset-bottom, 0px)) calc(14px + env(safe-area-inset-left, 0px));
 }
 
 .vitrine {
@@ -43,11 +45,91 @@
   min-width: 0;
   min-height: 0;
   width: 100%;
+  max-height: 100%;
+  padding: var(--hall-frame-pad, 14px);
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .rim,
 .mark {
-  display: none;
+  display: block;
+  pointer-events: none;
+}
+
+.rim {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  padding: 1.5px;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.rimFlow {
+  position: absolute;
+  inset: -45%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(var(--accent-rgb), 0.16) 5%,
+    rgba(var(--accent-rgb), 0.95) 11%,
+    rgba(var(--accent-3-rgb), 0.42) 16%,
+    transparent 24%,
+    transparent 50%,
+    rgba(var(--accent-2-rgb), 0.18) 54%,
+    rgba(var(--accent-2-rgb), 0.88) 60%,
+    transparent 70%
+  );
+  animation: hall-rim-spin 14s linear infinite;
+}
+
+.mark {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+}
+
+.corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  box-sizing: border-box;
+}
+
+.cornerTl {
+  top: 0;
+  left: 0;
+  border-top: 1.5px solid rgba(var(--accent-rgb), 0.92);
+  border-left: 1.5px solid rgba(var(--accent-rgb), 0.92);
+}
+
+.cornerTr {
+  top: 0;
+  right: 0;
+  border-top: 1.5px solid rgba(var(--accent-2-rgb), 0.88);
+  border-right: 1.5px solid rgba(var(--accent-2-rgb), 0.88);
+}
+
+.cornerBl {
+  bottom: 0;
+  left: 0;
+  border-bottom: 1.5px solid rgba(var(--accent-2-rgb), 0.88);
+  border-left: 1.5px solid rgba(var(--accent-2-rgb), 0.88);
+}
+
+.cornerBr {
+  bottom: 0;
+  right: 0;
+  border-bottom: 1.5px solid rgba(var(--accent-rgb), 0.92);
+  border-right: 1.5px solid rgba(var(--accent-rgb), 0.92);
 }
 
 .status {
@@ -69,20 +151,7 @@
 }
 
 .back {
-  position: absolute;
-  top: max(14px, env(safe-area-inset-top));
-  left: max(12px, env(safe-area-inset-left));
-  z-index: 4;
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  padding: 0;
-  color: rgba(var(--fg-rgb), 0.38);
-  cursor: pointer;
+  display: none;
 }
 
 .backIcon {
@@ -111,95 +180,29 @@
     width: min(1100px, 100%);
     max-width: 1100px;
     max-height: 100%;
-    padding: var(--hall-frame-pad, 24px);
-    overflow: hidden;
+    padding: var(--hall-desktop-frame-pad, 24px);
     background: transparent;
-    isolation: isolate;
   }
 
-  .rim,
-  .mark {
-    display: block;
-    pointer-events: none;
-  }
-
-  .rim {
+  .back {
     position: absolute;
-    inset: 0;
-    z-index: 3;
-    overflow: hidden;
-    padding: 1.5px;
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-  }
-
-  .rimFlow {
-    position: absolute;
-    inset: -45%;
-    background: conic-gradient(
-      from 0deg,
-      transparent 0%,
-      rgba(var(--accent-rgb), 0.16) 5%,
-      rgba(var(--accent-rgb), 0.95) 11%,
-      rgba(var(--accent-3-rgb), 0.42) 16%,
-      transparent 24%,
-      transparent 50%,
-      rgba(var(--accent-2-rgb), 0.18) 54%,
-      rgba(var(--accent-2-rgb), 0.88) 60%,
-      transparent 70%
-    );
-    animation: hall-rim-spin 14s linear infinite;
-  }
-
-  .mark {
-    position: absolute;
-    inset: 0;
+    top: max(14px, env(safe-area-inset-top));
+    left: max(12px, env(safe-area-inset-left));
     z-index: 4;
-  }
-
-  .corner {
-    position: absolute;
-    width: 22px;
-    height: 22px;
-    box-sizing: border-box;
-  }
-
-  .cornerTl {
-    top: 0;
-    left: 0;
-    border-top: 1.5px solid rgba(var(--accent-rgb), 0.92);
-    border-left: 1.5px solid rgba(var(--accent-rgb), 0.92);
-  }
-
-  .cornerTr {
-    top: 0;
-    right: 0;
-    border-top: 1.5px solid rgba(var(--accent-2-rgb), 0.88);
-    border-right: 1.5px solid rgba(var(--accent-2-rgb), 0.88);
-  }
-
-  .cornerBl {
-    bottom: 0;
-    left: 0;
-    border-bottom: 1.5px solid rgba(var(--accent-2-rgb), 0.88);
-    border-left: 1.5px solid rgba(var(--accent-2-rgb), 0.88);
-  }
-
-  .cornerBr {
-    bottom: 0;
-    right: 0;
-    border-bottom: 1.5px solid rgba(var(--accent-rgb), 0.92);
-    border-right: 1.5px solid rgba(var(--accent-rgb), 0.92);
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    padding: 0;
+    color: rgba(var(--fg-rgb), 0.38);
+    cursor: pointer;
   }
 }
 
-@media (min-width: 861px) and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
   .rimFlow {
     animation: none;
   }

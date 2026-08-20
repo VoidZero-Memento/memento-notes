@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { isMarkdownPath } from "@/lib/github/repo-path";
+import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
+
 import styles from "./FileTree.module.css";
 
 import type { GithubFileTreeNode } from "@/lib/github/github.types";
@@ -154,6 +156,7 @@ const enableAnimateAfterPaint = (enable: () => void) => {
 };
 
 export const FileTree = ({ nodes, selectedPath, onSelect }: FileTreeProps) => {
+  const alive = useKeepAliveActive();
   const [expanded, setExpanded] = useState(() => new Set<string>());
   const treeRef = useRef<HTMLUListElement>(null);
   const highlightReadyRef = useRef(false);
@@ -189,6 +192,7 @@ export const FileTree = ({ nodes, selectedPath, onSelect }: FileTreeProps) => {
   }, [selectedPath]);
 
   useLayoutEffect(() => {
+    if (!alive) return;
     const tree = treeRef.current;
     if (!tree || !selectedPath) {
       highlightReadyRef.current = false;
@@ -228,7 +232,7 @@ export const FileTree = ({ nodes, selectedPath, onSelect }: FileTreeProps) => {
       cancelEnable?.();
       observer.disconnect();
     };
-  }, [selectedPath, expanded, nodes]);
+  }, [alive, selectedPath, expanded, nodes]);
 
   if (nodes.length === 0) {
     return <p className={styles.name}>暂无文件</p>;

@@ -14,6 +14,7 @@ export const useGalleryArtBox = (natural: GalleryNaturalSize) => {
     if (!el) return;
 
     const apply = (width: number, height: number) => {
+      if (width < 1 || height < 1) return;
       setMaxBox({
         width: Math.max(0, Math.floor(width) - GALLERY_MAT_GAP * 2),
         height: Math.max(0, Math.floor(height) - GALLERY_MAT_GAP * 2),

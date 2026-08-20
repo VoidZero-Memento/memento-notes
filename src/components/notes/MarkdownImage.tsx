@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
+
 import styles from "./MarkdownImage.module.css";
 
 type MarkdownImageProps = {
@@ -9,9 +11,14 @@ type MarkdownImageProps = {
 };
 
 export const MarkdownImage = ({ src, alt = "" }: MarkdownImageProps) => {
+  const alive = useKeepAliveActive();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    if (!alive) {
+      setOpen(false);
+      return;
+    }
     if (!open) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -20,7 +27,7 @@ export const MarkdownImage = ({ src, alt = "" }: MarkdownImageProps) => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [open]);
+  }, [alive, open]);
 
   return (
     <>
@@ -32,7 +39,7 @@ export const MarkdownImage = ({ src, alt = "" }: MarkdownImageProps) => {
       >
         <img className={styles.image} src={src} alt={alt} loading="lazy" decoding="async" />
       </button>
-      {open
+      {open && alive
         ? createPortal(
             <div
               className={styles.overlay}

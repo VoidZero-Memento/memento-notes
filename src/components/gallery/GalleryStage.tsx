@@ -1,3 +1,6 @@
+import { useCallback } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+
 import { GALLERY_BACKDROP_MS, GALLERY_FADE_MS, GALLERY_MAT_GAP } from "@/lib/gallery/constants";
 import { useGalleryArtBox } from "@/lib/gallery/use-gallery-art-box";
 import { useGalleryChrome } from "@/lib/gallery/use-gallery-chrome";
@@ -5,8 +8,8 @@ import { useGalleryStage } from "@/lib/gallery/use-gallery-stage";
 
 import styles from "./GalleryStage.module.css";
 
-import type { AnimationEvent, CSSProperties, SyntheticEvent } from "react";
-import type { GallerySlot, GallerySlotMotion } from "@/lib/gallery/gallery.types";
+import type { AnimationEvent, CSSProperties, MouseEvent, SyntheticEvent } from "react";
+import type { GalleryLocationState, GallerySlot, GallerySlotMotion } from "@/lib/gallery/gallery.types";
 
 const slotClass = (motion: GallerySlotMotion) =>
   `${styles.slot} ${motion === "leave" ? styles.slotLeave : styles.slotShow}`;
@@ -54,6 +57,8 @@ const AmbientLayer = ({ src, shown }: AmbientLayerProps) => (
 );
 
 export const GalleryStage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const {
     status,
     error,
@@ -70,6 +75,19 @@ export const GalleryStage = () => {
   } = useGalleryStage();
   const { canvasRef, art } = useGalleryArtBox(naturalSize);
   const { chromeOn, hintOn, dismissHint, pulseChrome } = useGalleryChrome(status === "ready");
+
+  const handleBack = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      const from = (location.state as GalleryLocationState | null)?.from;
+      if (from && from !== location.pathname) {
+        navigate(from);
+        return;
+      }
+      navigate("/", { replace: true });
+    },
+    [location.pathname, location.state, navigate],
+  );
 
   const fadeVars = {
     "--gallery-fade-ms": `${GALLERY_FADE_MS}ms`,
@@ -136,6 +154,19 @@ export const GalleryStage = () => {
           <p className={styles.statusLabel}>{statusLabel}</p>
         </div>
       ) : null}
+
+      <button type="button" className={styles.back} aria-label="返回笔记" onClick={handleBack}>
+        <svg className={styles.backIcon} viewBox="0 0 16 16" aria-hidden>
+          <path
+            d="M10.5 3.5 5.5 8l5 4.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
     </div>
   );
 };

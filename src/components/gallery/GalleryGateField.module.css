@@ -41,7 +41,7 @@
 
 .inline .input {
   font-size: 11px;
-  text-align: right;
+  text-align: center;
 }
 
 .page .input {
@@ -172,7 +172,7 @@
 }
 
 @media (max-width: 860px) {
-  .page .input {
+  .input {
     font-size: 16px;
     letter-spacing: 0.14em;
   }

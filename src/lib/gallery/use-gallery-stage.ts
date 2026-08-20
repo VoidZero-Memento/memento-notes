@@ -4,6 +4,7 @@ import { fetchAllOssImages, getCachedAllOssImages } from "@/lib/bg-photos/images
 import { pickNextPhotoIndex } from "@/lib/bg-photos/photo-utils";
 import { GALLERY_AUTO_INTERVAL_MS, GALLERY_FADE_MS } from "@/lib/gallery/constants";
 import { emptySize, emptySlot, loadShot } from "@/lib/gallery/load-shot";
+import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
 import { useSidebarBgLoop } from "@/lib/prefs/useSidebarBgLoop";
 
 import type { OssImageMeta } from "@/lib/bg-photos/bg-photos.types";
@@ -16,6 +17,7 @@ const nextIndex = (current: number, length: number) => {
 };
 
 export const useGalleryStage = () => {
+  const alive = useKeepAliveActive();
   const { looping } = useSidebarBgLoop();
   const [status, setStatus] = useState<GalleryStageStatus>("loading");
   const [error, setError] = useState<string | null>(null);
@@ -223,7 +225,7 @@ export const useGalleryStage = () => {
   advanceRef.current = advance;
 
   useEffect(() => {
-    if (!looping || status !== "ready") return;
+    if (!alive || !looping || status !== "ready") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const timer = window.setInterval(() => {
@@ -231,7 +233,7 @@ export const useGalleryStage = () => {
     }, GALLERY_AUTO_INTERVAL_MS);
 
     return () => window.clearInterval(timer);
-  }, [index, looping, status]);
+  }, [alive, index, looping, status]);
 
   return {
     status,

@@ -315,6 +315,36 @@
   text-transform: uppercase;
 }
 
+.back {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(12px, env(safe-area-inset-left));
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  padding: 0;
+  color: rgba(var(--fg-rgb), 0.38);
+  cursor: pointer;
+}
+
+.backIcon {
+  width: 15px;
+  height: 15px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .back:hover,
+  .back:focus-visible {
+    background: rgba(var(--accent-rgb), 0.1);
+    color: var(--accent);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .slotShow .photo,
   .rimFlow {

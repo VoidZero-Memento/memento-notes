@@ -1,6 +1,8 @@
 import { useCallback, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
+
 import { GalleryGateField } from "@/components/gallery/GalleryGateField";
 
 import fx from "./GalleryFx.module.css";
@@ -16,6 +18,7 @@ type GalleryGateProps = {
 export const GalleryGate = ({ title, unlock }: GalleryGateProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const alive = useKeepAliveActive();
 
   const handleBack = useCallback(() => {
     const from = (location.state as GalleryLocationState | null)?.from;
@@ -27,12 +30,13 @@ export const GalleryGate = ({ title, unlock }: GalleryGateProps) => {
   }, [location.pathname, location.state, navigate]);
 
   useEffect(() => {
+    if (!alive) return;
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") handleBack();
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleBack]);
+  }, [alive, handleBack]);
 
   return (
     <div className={styles.root}>

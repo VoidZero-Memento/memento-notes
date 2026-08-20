@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { HALL_COLUMNS, HALL_DESKTOP_COLUMNS, HALL_DESKTOP_GAP, HALL_DESKTOP_MAX_WIDTH, HALL_DESKTOP_PAD, HALL_GAP, HALL_MAX_WIDTH, HALL_OVERSCAN_SCREENS, HALL_PAD } from "@/lib/gallery/constants";
+import { HALL_COLUMNS, HALL_DESKTOP_COLUMNS, HALL_DESKTOP_GAP, HALL_DESKTOP_MAX_WIDTH, HALL_DESKTOP_PAD, HALL_GAP, HALL_MAX_WIDTH, HALL_OVERSCAN_SCREENS } from "@/lib/gallery/constants";
 import { layoutMasonry } from "@/lib/gallery/layout-masonry";
 import { useHallDesktop } from "@/lib/gallery/use-hall-desktop";
 
@@ -51,7 +51,7 @@ export const useHallMasonry = (photos: HallPhoto[], paused = false) => {
         columns: desktop ? HALL_DESKTOP_COLUMNS : HALL_COLUMNS,
         gap: desktop ? HALL_DESKTOP_GAP : HALL_GAP,
         maxWidth: desktop ? HALL_DESKTOP_MAX_WIDTH : HALL_MAX_WIDTH,
-        pad: desktop ? HALL_DESKTOP_PAD : HALL_PAD,
+        pad: HALL_DESKTOP_PAD,
       }),
     [desktop, photos, width],
   );

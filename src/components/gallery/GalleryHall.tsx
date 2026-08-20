@@ -1,11 +1,12 @@
 import { useCallback, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { HALL_DESKTOP_FRAME_PAD } from "@/lib/gallery/constants";
+import { HALL_DESKTOP_FRAME_PAD, HALL_PAD } from "@/lib/gallery/constants";
 import { readOriginRect } from "@/lib/gallery/hall-photo";
 import { useHallBackdrop } from "@/lib/gallery/use-hall-backdrop";
 import { useHallCatalog } from "@/lib/gallery/use-hall-catalog";
 import { useHallMasonry } from "@/lib/gallery/use-hall-masonry";
+import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
 
 import { GalleryHallBackdrop } from "@/components/gallery/GalleryHallBackdrop";
 import { GalleryMasonry } from "@/components/gallery/GalleryMasonry";
@@ -29,9 +30,10 @@ const FrameMark = () => (
 export const GalleryHall = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const alive = useKeepAliveActive();
   const { error, photos, status } = useHallCatalog();
   const [selection, setSelection] = useState<HallSelection | null>(null);
-  const paused = selection !== null;
+  const paused = !alive || selection !== null;
   const { height, onScroll, scrollerRef, visible } = useHallMasonry(photos, paused);
   const { slotA, slotB } = useHallBackdrop(photos, !paused);
 
@@ -58,7 +60,7 @@ export const GalleryHall = () => {
     <div className={styles.root}>
       <GalleryHallBackdrop paused={paused} slotA={slotA} slotB={slotB} />
       <div className={styles.well}>
-        <div className={styles.vitrine} style={{ "--hall-frame-pad": `${HALL_DESKTOP_FRAME_PAD}px` } as CSSProperties}>
+        <div className={styles.vitrine} style={{ "--hall-desktop-frame-pad": `${HALL_DESKTOP_FRAME_PAD}px`, "--hall-frame-pad": `${HALL_PAD}px` } as CSSProperties}>
           <div className={styles.rim} aria-hidden>
             <span className={styles.rimFlow} />
           </div>

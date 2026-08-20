@@ -1,20 +1,19 @@
 import { useEffect } from "react";
 
 import { useStageGate } from "@/lib/gallery/use-gallery-gate";
+import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
 
 import { GalleryGate } from "@/components/gallery/GalleryGate";
 import { GalleryStage } from "@/components/gallery/GalleryStage";
 
 export const StagePage = () => {
   const { unlocked, unlock } = useStageGate();
+  const alive = useKeepAliveActive();
 
   useEffect(() => {
-    const previous = document.title;
+    if (!alive) return;
     document.title = "Memento · 展台";
-    return () => {
-      document.title = previous;
-    };
-  }, []);
+  }, [alive]);
 
   if (!unlocked) return <GalleryGate title="展台" unlock={unlock} />;
 

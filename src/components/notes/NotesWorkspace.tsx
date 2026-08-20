@@ -5,6 +5,7 @@ import { useMediaQuery } from "@/lib/dom/use-media-query";
 import { useGalleryBgGate } from "@/lib/gallery/use-gallery-gate";
 import { describeGithubError } from "@/lib/github/describe-github-error";
 import { useRepos } from "@/lib/github/ReposContext";
+import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
 import { parseOutline } from "@/lib/markdown/parse-outline";
 import { getNoteTitleFromPath, getRepoWorkspaceTitle } from "@/lib/note-title";
 import { useNoteContent } from "@/lib/notes/use-note-content";
@@ -71,6 +72,7 @@ export const NotesWorkspace = ({
   onSelectPath,
 }: NotesWorkspaceProps) => {
   const { repos } = useRepos();
+  const alive = useKeepAliveActive();
   const isMobile = useMediaQuery(MOBILE_BG_MQ);
   const { unlocked: galleryBgUnlocked, unlock: unlockGalleryBg } = useGalleryBgGate();
   const { looping: sidebarBgLooping, setLooping: setSidebarBgLooping } = useSidebarBgLoop();
@@ -137,11 +139,9 @@ export const NotesWorkspace = ({
   const workspaceTitle = getRepoWorkspaceTitle(config.label);
 
   useEffect(() => {
+    if (!alive) return;
     document.title = getNoteTitleFromPath(selectedPath, config.label);
-    return () => {
-      document.title = workspaceTitle;
-    };
-  }, [selectedPath, config.label, workspaceTitle]);
+  }, [alive, selectedPath, config.label]);
 
   useEffect(() => {
     viewerBodyRef.current?.scrollTo({ top: 0 });
@@ -162,7 +162,7 @@ export const NotesWorkspace = ({
   }, [selectedPath, content]);
 
   useEffect(() => {
-    if (!mobileNavOpen) return;
+    if (!alive || !mobileNavOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMobileNavOpen(false);
@@ -170,7 +170,7 @@ export const NotesWorkspace = ({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [mobileNavOpen]);
+  }, [alive, mobileNavOpen]);
 
   const openMobileNav = (mode: SidebarMode) => {
     setSidebarMode(mode);
@@ -233,7 +233,7 @@ export const NotesWorkspace = ({
     >
       {mobileBgCarousel ? (
         <Suspense fallback={null}>
-          <MobileBgCarousel looping={sidebarBgLooping} />
+          <MobileBgCarousel looping={sidebarBgLooping && alive} />
         </Suspense>
       ) : null}
       <div

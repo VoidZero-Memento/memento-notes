@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
+
 import styles from "./Lightbox.module.css";
 
 import type { LightboxProps } from "./Lightbox.types";
@@ -9,6 +11,7 @@ const CLOSE_ANIMATION_MS = 380;
 const INNER_TICKS = Array.from({ length: 32 }, (_, index) => index);
 
 export const Lightbox = ({ src, alt, onClose, children }: LightboxProps) => {
+  const alive = useKeepAliveActive();
   const [isClosing, setIsClosing] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -20,6 +23,10 @@ export const Lightbox = ({ src, alt, onClose, children }: LightboxProps) => {
   };
 
   useEffect(() => {
+    if (!alive) {
+      onClose();
+      return;
+    }
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") requestClose();
     };
@@ -27,7 +34,7 @@ export const Lightbox = ({ src, alt, onClose, children }: LightboxProps) => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [alive]);
 
   useEffect(() => {
     return () => {
@@ -37,6 +44,8 @@ export const Lightbox = ({ src, alt, onClose, children }: LightboxProps) => {
 
   const overlayClassName = `${styles.overlay}${isClosing ? ` ${styles.overlayClosing}` : ""}`;
   const contentClassName = `${styles.content}${isClosing ? ` ${styles.contentClosing}` : ""}`;
+
+  if (!alive) return null;
 
   return createPortal(
     <div className={overlayClassName} onClick={requestClose}>
@@ -63,8 +72,8 @@ export const Lightbox = ({ src, alt, onClose, children }: LightboxProps) => {
             <img className={styles.image} src={src} alt={alt} />
           </div>
         </div>
+        {children ? <div className={styles.caption}>{children}</div> : null}
       </div>
-      {children}
     </div>,
     document.body,
   );
