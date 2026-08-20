@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { fetchAllOssImages, getCachedAllOssImages } from "@/lib/bg-photos/images";
-import { pickNextPhotoIndex, toSatPhotoUrl } from "@/lib/bg-photos/photo-utils";
+import { pickNextPhotoIndex } from "@/lib/bg-photos/photo-utils";
 import { GALLERY_FADE_MS } from "@/lib/gallery/constants";
-import { afterPaint, emptySize, emptySlot, loadShot } from "@/lib/gallery/load-shot";
+import { emptySize, emptySlot, loadShot } from "@/lib/gallery/load-shot";
 
 import type { OssImageMeta } from "@/lib/bg-photos/bg-photos.types";
 import type { GalleryNaturalSize, GalleryPreparedShot, GallerySlot, GalleryStageStatus } from "@/lib/gallery/gallery.types";
+
+const nextIndex = (current: number, length: number) => {
+  if (length <= 0) return -1;
+  if (length === 1) return 0;
+  return (current + 1) % length;
+};
 
 export const useGalleryStage = () => {
   const [status, setStatus] = useState<GalleryStageStatus>("loading");
@@ -15,13 +21,11 @@ export const useGalleryStage = () => {
   const [slotB, setSlotB] = useState<GallerySlot>(emptySlot);
   const [index, setIndex] = useState(0);
   const [total, setTotal] = useState(0);
-  const [naturalSize, setNaturalSize] = useState<GalleryNaturalSize>(emptySize);
   const [backdropA, setBackdropA] = useState("");
   const [backdropB, setBackdropB] = useState("");
   const [backdropShowB, setBackdropShowB] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [hasShuffled, setHasShuffled] = useState(false);
-  const [orbitTick, setOrbitTick] = useState(0);
+  const [naturalSize, setNaturalSize] = useState<GalleryNaturalSize>(emptySize);
 
   const photosRef = useRef<OssImageMeta[]>([]);
   const lastIndexRef = useRef(-1);
@@ -42,23 +46,19 @@ export const useGalleryStage = () => {
   const swapBackdrop = useCallback((url: string) => {
     if (backdropIsBRef.current) {
       setBackdropA(url);
-      afterPaint(() => {
-        setBackdropShowB(false);
-        backdropIsBRef.current = false;
-      });
+      setBackdropShowB(false);
+      backdropIsBRef.current = false;
       return;
     }
     setBackdropB(url);
-    afterPaint(() => {
-      setBackdropShowB(true);
-      backdropIsBRef.current = true;
-    });
+    setBackdropShowB(true);
+    backdropIsBRef.current = true;
   }, []);
 
   const queueNext = useCallback((excludeIdx: number, gen: number, signal?: AbortSignal) => {
     const photos = photosRef.current;
     if (photos.length <= 1) return;
-    const idx = pickNextPhotoIndex(photos.length, excludeIdx);
+    const idx = nextIndex(excludeIdx, photos.length);
     const task = loadShot(photos, idx, signal).then((shot) => {
       if (!shot || gen !== generationRef.current) return null;
       preparedRef.current = shot;
@@ -82,7 +82,7 @@ export const useGalleryStage = () => {
       if (shot && gen === generationRef.current) return shot;
     }
     const photos = photosRef.current;
-    const idx = pickNextPhotoIndex(photos.length, lastIndexRef.current);
+    const idx = nextIndex(lastIndexRef.current, photos.length);
     const shot = await loadShot(photos, idx);
     if (shot && gen === generationRef.current) return shot;
     return null;
@@ -93,62 +93,39 @@ export const useGalleryStage = () => {
     setSlotB((prev) => (prev.motion === "leave" ? emptySlot() : prev));
   }, []);
 
-  const playShot = useCallback((shot: GalleryPreparedShot, runGen: number, onReveal?: () => void) => {
-    const finishSwap = () => {
-      window.clearTimeout(fadeTimerRef.current);
-      fadeTimerRef.current = window.setTimeout(() => {
-        if (runGen !== generationRef.current) return;
-        settleLeaving();
-        busyRef.current = false;
-        setBusy(false);
-      }, GALLERY_FADE_MS);
-    };
-
-    const reveal = () => {
+  const playShot = useCallback((shot: GalleryPreparedShot, runGen: number) => {
+    window.clearTimeout(fadeTimerRef.current);
+    fadeTimerRef.current = window.setTimeout(() => {
       if (runGen !== generationRef.current) return;
-      commitIndex(shot.idx);
-      swapBackdrop(shot.backdrop);
-      setNaturalSize(shot.size);
-      onReveal?.();
-    };
+      settleLeaving();
+      busyRef.current = false;
+      setBusy(false);
+    }, GALLERY_FADE_MS);
 
     if (activeIsARef.current) {
-      setSlotB({ url: shot.url, motion: "enter" });
-      afterPaint(() => {
-        if (runGen !== generationRef.current) return;
-        setSlotA((prev) => ({ ...prev, motion: "leave" }));
-        setSlotB({ url: shot.url, motion: "show" });
-        activeIsARef.current = false;
-        reveal();
-        finishSwap();
-        queueNext(shot.idx, runGen);
-      });
-      return;
-    }
-
-    setSlotA({ url: shot.url, motion: "enter" });
-    afterPaint(() => {
-      if (runGen !== generationRef.current) return;
-      setSlotB((prev) => ({ ...prev, motion: "leave" }));
+      setSlotA((prev) => (prev.url ? { ...prev, motion: "leave" } : prev));
+      setSlotB({ url: shot.url, motion: "show" });
+      activeIsARef.current = false;
+    } else {
+      setSlotB((prev) => (prev.url ? { ...prev, motion: "leave" } : prev));
       setSlotA({ url: shot.url, motion: "show" });
       activeIsARef.current = true;
-      reveal();
-      finishSwap();
-      queueNext(shot.idx, runGen);
-    });
+    }
+
+    commitIndex(shot.idx);
+    setNaturalSize(shot.size);
+    swapBackdrop(shot.url);
+    queueNext(shot.idx, runGen);
   }, [commitIndex, queueNext, settleLeaving, swapBackdrop]);
 
-  const shuffle = useCallback(() => {
+  const advance = useCallback(() => {
     if (busyRef.current || status !== "ready") return;
-
     const photos = photosRef.current;
     if (photos.length <= 1) return;
 
     const runGen = generationRef.current;
     busyRef.current = true;
     setBusy(true);
-    setHasShuffled(true);
-    setOrbitTick((n) => n + 1);
 
     const run = async () => {
       const shot = await takePrepared(runGen);
@@ -163,36 +140,6 @@ export const useGalleryStage = () => {
     void run();
   }, [playShot, status, takePrepared]);
 
-  const adoptIndex = useCallback((idx: number, onReveal?: () => void) => {
-    if (busyRef.current || status !== "ready") return;
-    if (idx === lastIndexRef.current) return;
-
-    const photos = photosRef.current;
-    if (!photos[idx]) return;
-
-    const runGen = generationRef.current;
-    busyRef.current = true;
-    setBusy(true);
-    setHasShuffled(true);
-
-    const run = async () => {
-      const readyShot = preparedRef.current?.idx === idx ? preparedRef.current : null;
-      if (readyShot) {
-        preparedRef.current = null;
-        prepareTaskRef.current = null;
-      }
-      const shot = readyShot ?? (await loadShot(photos, idx));
-      if (!shot || runGen !== generationRef.current) {
-        busyRef.current = false;
-        setBusy(false);
-        return;
-      }
-      playShot(shot, runGen, onReveal);
-    };
-
-    void run();
-  }, [playShot, status]);
-
   const boot = useCallback((signal: AbortSignal) => {
     generationRef.current += 1;
     const gen = generationRef.current;
@@ -203,18 +150,17 @@ export const useGalleryStage = () => {
     setBusy(false);
     setStatus("loading");
     setError(null);
-    setHasShuffled(false);
-    setNaturalSize(emptySize());
     setBackdropA("");
     setBackdropB("");
     setBackdropShowB(false);
     backdropIsBRef.current = false;
+    setNaturalSize(emptySize());
 
     const startWith = async (photos: OssImageMeta[]) => {
       if (signal.aborted || gen !== generationRef.current) return;
       if (!photos.length) {
         setStatus("error");
-        setError("画廊暂无图片");
+        setError("展台暂无图片");
         return;
       }
 
@@ -226,21 +172,17 @@ export const useGalleryStage = () => {
       if (!shot || signal.aborted || gen !== generationRef.current) return;
 
       commitIndex(shot.idx);
-      setBackdropA(shot.backdrop);
       setNaturalSize(shot.size);
-      setSlotA({ url: shot.url, motion: "enter" });
+      setBackdropA(shot.url);
+      setSlotA({ url: shot.url, motion: "show" });
       setSlotB(emptySlot());
       activeIsARef.current = true;
       setStatus("ready");
-      afterPaint(() => {
-        if (gen !== generationRef.current) return;
-        setSlotA({ url: shot.url, motion: "show" });
-      });
       window.clearTimeout(prefetchTimerRef.current);
       prefetchTimerRef.current = window.setTimeout(() => {
         if (gen !== generationRef.current) return;
         queueNext(shot.idx, gen, signal);
-      }, 720);
+      }, 240);
     };
 
     const cached = getCachedAllOssImages();
@@ -255,7 +197,7 @@ export const useGalleryStage = () => {
         if (signal.aborted || gen !== generationRef.current) return;
         if (err instanceof DOMException && err.name === "AbortError") return;
         setStatus("error");
-        setError(err instanceof Error ? err.message : "画廊加载失败");
+        setError(err instanceof Error ? err.message : "展台加载失败");
       });
   }, [commitIndex, queueNext]);
 
@@ -287,11 +229,7 @@ export const useGalleryStage = () => {
     total,
     naturalSize,
     busy,
-    hasShuffled,
-    orbitTick,
-    heroSatUrl: photosRef.current[index] ? toSatPhotoUrl(photosRef.current[index].url) : "",
-    shuffle,
-    adoptIndex,
+    advance,
     settleLeaving,
     retry,
   };

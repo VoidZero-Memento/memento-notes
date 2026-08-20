@@ -9,7 +9,7 @@ export const fitFrameSize = (
   }
   const scale = Math.min(maxW / naturalW, maxH / naturalH);
   return {
-    width: Math.max(1, Math.round(naturalW * scale)),
-    height: Math.max(1, Math.round(naturalH * scale)),
+    width: Math.max(1, Math.floor(naturalW * scale)),
+    height: Math.max(1, Math.floor(naturalH * scale)),
   };
 };

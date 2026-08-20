@@ -1,7 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { useGalleryGate } from "@/lib/gallery/use-gallery-gate";
 import { GalleryGateField } from "@/components/gallery/GalleryGateField";
 
 import fx from "./GalleryFx.module.css";
@@ -9,10 +8,14 @@ import styles from "./GalleryGate.module.css";
 
 import type { GalleryLocationState } from "@/lib/gallery/gallery.types";
 
-export const GalleryGate = () => {
+type GalleryGateProps = {
+  title: string;
+  unlock: (raw: string) => Promise<boolean>;
+};
+
+export const GalleryGate = ({ title, unlock }: GalleryGateProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { unlock } = useGalleryGate();
 
   const handleBack = useCallback(() => {
     const from = (location.state as GalleryLocationState | null)?.from;
@@ -38,7 +41,7 @@ export const GalleryGate = () => {
       <div className={fx.vignette} aria-hidden />
 
       <div className={styles.panel}>
-        <p className={styles.title}>画廊</p>
+        <p className={styles.title}>{title}</p>
         <GalleryGateField variant="page" autoFocus unlock={unlock} />
       </div>
 

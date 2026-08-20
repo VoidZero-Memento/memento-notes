@@ -13,7 +13,7 @@ const withOssProcess = (url: string, process: string): string => {
 /** 背景轮播用低清 OSS 参数，非 OSS 原样返回 */
 export const toBgPhotoUrl = (url: string): string => withOssProcess(url, OSS_BG_PROCESS);
 
-/** 画廊主图：webp + 中等边长，切图时少解码 */
+/** 展台主图：webp + 中等边长，切图时少解码 */
 export const toGalleryPhotoUrl = (url: string): string => withOssProcess(url, OSS_GALLERY_PROCESS);
 
 /** 心形卫星小图：约 2x 显示尺寸 */

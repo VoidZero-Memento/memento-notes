@@ -81,7 +81,11 @@ export const BootErrorState = ({ message, onRetry }: BootErrorStateProps) => {
               id="github-token-input"
               className={styles.tokenInput}
               type="password"
+              lang="en"
+              inputMode="url"
               autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="none"
               spellCheck={false}
               placeholder="粘贴 gh_ / ghp_ 开头的令牌"
               value={tokenDraft}

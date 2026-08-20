@@ -3,10 +3,11 @@ import { useEffect } from "react";
 import { useGalleryGate } from "@/lib/gallery/use-gallery-gate";
 
 import { GalleryGate } from "@/components/gallery/GalleryGate";
-import { GalleryStage } from "@/components/gallery/GalleryStage";
+
+import styles from "@/components/gallery/GalleryGate.module.css";
 
 export const GalleryPage = () => {
-  const { unlocked } = useGalleryGate();
+  const { unlocked, unlock } = useGalleryGate();
 
   useEffect(() => {
     const previous = document.title;
@@ -16,7 +17,7 @@ export const GalleryPage = () => {
     };
   }, []);
 
-  if (!unlocked) return <GalleryGate />;
+  if (!unlocked) return <GalleryGate title="画廊" unlock={unlock} />;
 
-  return <GalleryStage />;
+  return <div className={styles.root} />;
 };

@@ -1,9 +1,12 @@
-.anchor,
-.portal {
+.cluster {
   position: absolute;
   right: max(18px, env(safe-area-inset-right));
   bottom: max(16px, env(safe-area-inset-bottom));
   z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
 }
 
 .portal {

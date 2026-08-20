@@ -13,7 +13,7 @@ type GalleryGateFieldProps = {
   onCancel?: () => void;
 };
 
-export const GalleryGateField = ({ autoFocus, label = "画廊密钥", unlock, variant, onUnlocked, onCancel }: GalleryGateFieldProps) => {
+export const GalleryGateField = ({ autoFocus, label = "密钥", unlock, variant, onUnlocked, onCancel }: GalleryGateFieldProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const busyRef = useRef(false);
   const shakeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -78,9 +78,11 @@ export const GalleryGateField = ({ autoFocus, label = "画廊密钥", unlock, va
         className={styles.input}
         type="text"
         name="gallery-gate"
+        lang="en"
+        inputMode="url"
         autoComplete="off"
         autoCorrect="off"
-        autoCapitalize="off"
+        autoCapitalize="none"
         spellCheck={false}
         autoFocus={autoFocus}
         disabled={busy}
