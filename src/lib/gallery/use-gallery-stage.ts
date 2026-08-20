@@ -2,8 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { fetchAllOssImages, getCachedAllOssImages } from "@/lib/bg-photos/images";
 import { pickNextPhotoIndex } from "@/lib/bg-photos/photo-utils";
-import { GALLERY_FADE_MS } from "@/lib/gallery/constants";
+import { GALLERY_AUTO_INTERVAL_MS, GALLERY_FADE_MS } from "@/lib/gallery/constants";
 import { emptySize, emptySlot, loadShot } from "@/lib/gallery/load-shot";
+import { useSidebarBgLoop } from "@/lib/prefs/useSidebarBgLoop";
 
 import type { OssImageMeta } from "@/lib/bg-photos/bg-photos.types";
 import type { GalleryNaturalSize, GalleryPreparedShot, GallerySlot, GalleryStageStatus } from "@/lib/gallery/gallery.types";
@@ -15,6 +16,7 @@ const nextIndex = (current: number, length: number) => {
 };
 
 export const useGalleryStage = () => {
+  const { looping } = useSidebarBgLoop();
   const [status, setStatus] = useState<GalleryStageStatus>("loading");
   const [error, setError] = useState<string | null>(null);
   const [slotA, setSlotA] = useState<GallerySlot>(emptySlot);
@@ -216,6 +218,20 @@ export const useGalleryStage = () => {
     window.clearTimeout(fadeTimerRef.current);
     boot(new AbortController().signal);
   }, [boot]);
+
+  const advanceRef = useRef(advance);
+  advanceRef.current = advance;
+
+  useEffect(() => {
+    if (!looping || status !== "ready") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const timer = window.setInterval(() => {
+      advanceRef.current();
+    }, GALLERY_AUTO_INTERVAL_MS);
+
+    return () => window.clearInterval(timer);
+  }, [index, looping, status]);
 
   return {
     status,

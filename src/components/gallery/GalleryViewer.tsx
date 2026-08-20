@@ -1,34 +1,24 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { HALL_FLIP_MS } from "@/lib/gallery/constants";
-import { fitContainRect } from "@/lib/gallery/hall-photo";
+import { fitViewerRect, invertOf } from "@/lib/gallery/hall-photo";
+import { useHallDesktop } from "@/lib/gallery/use-hall-desktop";
 
 import styles from "./GalleryViewer.module.css";
 
 import type { CSSProperties } from "react";
-import type { HallPhoto, HallRect, HallSelection } from "@/lib/gallery/hall.types";
+import type { HallRect, HallSelection } from "@/lib/gallery/hall.types";
 
 type GalleryViewerProps = {
   onClose: () => void;
   selection: HallSelection;
 };
 
-const invertOf = (origin: HallRect, target: HallRect) => {
-  const sx = origin.width / Math.max(1, target.width);
-  const sy = origin.height / Math.max(1, target.height);
-  return `translate(${origin.left - target.left}px, ${origin.top - target.top}px) scale(${sx}, ${sy})`;
-};
-
-const measureTarget = (photo: HallPhoto): HallRect => {
-  const vw = window.visualViewport?.width ?? window.innerWidth;
-  const vh = window.visualViewport?.height ?? window.innerHeight;
-  return fitContainRect(photo, vw, vh);
-};
-
 export const GalleryViewer = ({ onClose, selection }: GalleryViewerProps) => {
   const { origin, photo } = selection;
+  const desktop = useHallDesktop();
   const targetRef = useRef<HallRect | null>(null);
-  if (!targetRef.current) targetRef.current = measureTarget(photo);
+  if (!targetRef.current) targetRef.current = fitViewerRect(photo, desktop);
   const target = targetRef.current;
 
   const [open, setOpen] = useState(false);
@@ -83,14 +73,19 @@ export const GalleryViewer = ({ onClose, selection }: GalleryViewerProps) => {
 
   return (
     <div className={styles.root} style={vars} role="dialog" aria-modal aria-label="照片">
-      <button type="button" className={`${styles.dim}${open ? ` ${styles.dimOn}` : ""}`} aria-label="关闭" onClick={finishClose} />
+      <div className={`${styles.dim}${open ? ` ${styles.dimOn}` : ""}`} aria-hidden>
+        {desktop ? (
+          <img className={styles.fill} src={photo.desktopBackdropUrl} alt="" decoding="async" draggable={false} />
+        ) : null}
+      </div>
+      <button type="button" className={styles.hit} aria-label="关闭" onClick={finishClose} />
       <div
         className={`${styles.stage}${settled ? ` ${styles.shown}` : ""}`}
         style={{
           height: target.height,
           left: target.left,
           top: target.top,
-          transform: open ? "none" : invert,
+          transform: open ? "translate(0px, 0px) scale(1)" : invert,
           width: target.width,
         }}
       >

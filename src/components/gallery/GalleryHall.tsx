@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { HALL_DESKTOP_FRAME_PAD } from "@/lib/gallery/constants";
 import { readOriginRect } from "@/lib/gallery/hall-photo";
 import { useHallBackdrop } from "@/lib/gallery/use-hall-backdrop";
 import { useHallCatalog } from "@/lib/gallery/use-hall-catalog";
@@ -12,16 +13,27 @@ import { GalleryViewer } from "@/components/gallery/GalleryViewer";
 
 import styles from "./GalleryHall.module.css";
 
+import type { CSSProperties } from "react";
 import type { GalleryLocationState } from "@/lib/gallery/gallery.types";
 import type { HallPhoto, HallSelection } from "@/lib/gallery/hall.types";
+
+const FrameMark = () => (
+  <div className={styles.mark} aria-hidden>
+    <span className={`${styles.corner} ${styles.cornerTl}`} />
+    <span className={`${styles.corner} ${styles.cornerTr}`} />
+    <span className={`${styles.corner} ${styles.cornerBl}`} />
+    <span className={`${styles.corner} ${styles.cornerBr}`} />
+  </div>
+);
 
 export const GalleryHall = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { error, photos, status } = useHallCatalog();
   const [selection, setSelection] = useState<HallSelection | null>(null);
-  const { height, onScroll, scrollerRef, visible } = useHallMasonry(photos);
-  const { slotA, slotB } = useHallBackdrop(photos, selection === null);
+  const paused = selection !== null;
+  const { height, onScroll, scrollerRef, visible } = useHallMasonry(photos, paused);
+  const { slotA, slotB } = useHallBackdrop(photos, !paused);
 
   const handleBack = useCallback(() => {
     if (selection) {
@@ -44,17 +56,25 @@ export const GalleryHall = () => {
 
   return (
     <div className={styles.root}>
-      <GalleryHallBackdrop paused={selection !== null} slotA={slotA} slotB={slotB} />
-      <GalleryMasonry
-        ghostId={selection?.photo.id ?? null}
-        height={height}
-        onOpen={handleOpen}
-        onScroll={onScroll}
-        paused={selection !== null}
-        photos={photos}
-        scrollerRef={scrollerRef}
-        visible={visible}
-      />
+      <GalleryHallBackdrop paused={paused} slotA={slotA} slotB={slotB} />
+      <div className={styles.well}>
+        <div className={styles.vitrine} style={{ "--hall-frame-pad": `${HALL_DESKTOP_FRAME_PAD}px` } as CSSProperties}>
+          <div className={styles.rim} aria-hidden>
+            <span className={styles.rimFlow} />
+          </div>
+          <FrameMark />
+          <GalleryMasonry
+            ghostId={selection?.photo.id ?? null}
+            height={height}
+            onOpen={handleOpen}
+            onScroll={onScroll}
+            paused={paused}
+            photos={photos}
+            scrollerRef={scrollerRef}
+            visible={visible}
+          />
+        </div>
+      </div>
       {selection ? <GalleryViewer selection={selection} onClose={() => setSelection(null)} /> : null}
       {statusLabel ? (
         <div className={styles.status}>

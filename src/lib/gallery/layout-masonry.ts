@@ -1,6 +1,6 @@
 import { HALL_COLUMNS, HALL_GAP, HALL_MAX_WIDTH, HALL_PAD } from "@/lib/gallery/constants";
 
-import type { HallBox, HallPhoto } from "@/lib/gallery/hall.types";
+import type { HallBox, HallMasonryOptions, HallPhoto } from "@/lib/gallery/hall.types";
 
 export type HallMasonryLayout = {
   boxes: HallBox[];
@@ -8,17 +8,25 @@ export type HallMasonryLayout = {
   innerWidth: number;
 };
 
-export const layoutMasonry = (photos: HallPhoto[], containerWidth: number): HallMasonryLayout => {
+export const layoutMasonry = (
+  photos: HallPhoto[],
+  containerWidth: number,
+  options: HallMasonryOptions = {},
+): HallMasonryLayout => {
   if (containerWidth <= 0 || photos.length === 0) {
     return { boxes: [], height: 0, innerWidth: 0 };
   }
 
-  const usable = Math.min(containerWidth, HALL_MAX_WIDTH);
+  const columns = options.columns ?? HALL_COLUMNS;
+  const gap = options.gap ?? HALL_GAP;
+  const maxWidth = options.maxWidth ?? HALL_MAX_WIDTH;
+  const pad = options.pad ?? HALL_PAD;
+  const usable = Math.min(containerWidth, maxWidth);
   const offsetX = (containerWidth - usable) / 2;
-  const innerWidth = Math.max(1, usable - HALL_PAD * 2);
-  const columnWidth = Math.max(1, (innerWidth - HALL_GAP * (HALL_COLUMNS - 1)) / HALL_COLUMNS);
-  const xs = Array.from({ length: HALL_COLUMNS }, (_, col) => offsetX + HALL_PAD + col * (columnWidth + HALL_GAP));
-  const colHeights = Array.from({ length: HALL_COLUMNS }, () => HALL_PAD);
+  const innerWidth = Math.max(1, usable - pad * 2);
+  const columnWidth = Math.max(1, (innerWidth - gap * (columns - 1)) / columns);
+  const xs = Array.from({ length: columns }, (_, col) => offsetX + pad + col * (columnWidth + gap));
+  const colHeights = Array.from({ length: columns }, () => pad);
   const boxes: HallBox[] = [];
 
   for (let index = 0; index < photos.length; index += 1) {
@@ -35,13 +43,13 @@ export const layoutMasonry = (photos: HallPhoto[], containerWidth: number): Hall
       id: photo.id,
       index,
       width: columnWidth,
-      x: xs[col] ?? HALL_PAD,
-      y: colHeights[col] ?? HALL_PAD,
+      x: xs[col] ?? pad,
+      y: colHeights[col] ?? pad,
     });
-    colHeights[col] = (colHeights[col] ?? HALL_PAD) + height + HALL_GAP;
+    colHeights[col] = (colHeights[col] ?? pad) + height + gap;
   }
 
-  const tallest = colHeights.reduce((max, h) => (h > max ? h : max), HALL_PAD);
-  const height = photos.length === 0 ? 0 : tallest - HALL_GAP + HALL_PAD;
+  const tallest = colHeights.reduce((max, h) => (h > max ? h : max), pad);
+  const height = photos.length === 0 ? 0 : tallest - gap + pad;
   return { boxes, height, innerWidth };
 };

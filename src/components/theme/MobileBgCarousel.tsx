@@ -9,7 +9,19 @@ type MobileBgCarouselProps = {
   looping: boolean;
 };
 
-/** 仅手机正文背景轮播层；须由父级在 isMobile && bgEnabled 时条件挂载 */
+type CarouselSlotProps = {
+  url: string;
+  visible: boolean;
+};
+
+const CarouselSlot = ({ url, visible }: CarouselSlotProps) => (
+  <div className={`${styles.slot}${visible ? ` ${styles.slotVisible}` : ""}`}>
+    <img className={styles.cover} src={url} alt="" decoding="async" />
+    <img className={styles.portrait} src={url} alt="" decoding="async" />
+  </div>
+);
+
+/** 背景轮播层：手机铺满；PC 为两侧磨砂 + 中间原图竖条 */
 export const MobileBgCarousel = ({ looping }: MobileBgCarouselProps) => {
   const { slotA, slotB } = useMobileBgCarousel({ looping });
 
@@ -19,22 +31,8 @@ export const MobileBgCarousel = ({ looping }: MobileBgCarouselProps) => {
 
   return (
     <div className={styles.root} style={fadeVars} aria-hidden>
-      {slotA.url ? (
-        <img
-          className={`${styles.slot}${slotA.visible ? ` ${styles.slotVisible}` : ""}`}
-          src={slotA.url}
-          alt=""
-          decoding="async"
-        />
-      ) : null}
-      {slotB.url ? (
-        <img
-          className={`${styles.slot}${slotB.visible ? ` ${styles.slotVisible}` : ""}`}
-          src={slotB.url}
-          alt=""
-          decoding="async"
-        />
-      ) : null}
+      {slotA.url ? <CarouselSlot url={slotA.url} visible={slotA.visible} /> : null}
+      {slotB.url ? <CarouselSlot url={slotB.url} visible={slotB.visible} /> : null}
       <div className={styles.veil} />
     </div>
   );

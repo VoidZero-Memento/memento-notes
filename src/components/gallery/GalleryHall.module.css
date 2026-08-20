@@ -1,3 +1,9 @@
+@keyframes hall-rim-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
 .root {
   position: fixed;
   inset: 0;
@@ -17,6 +23,31 @@
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+.well {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+}
+
+.vitrine {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+}
+
+.rim,
+.mark {
+  display: none;
 }
 
 .status {
@@ -64,5 +95,112 @@
   .back:focus-visible {
     background: rgba(var(--accent-rgb), 0.1);
     color: var(--accent);
+  }
+}
+
+@media (min-width: 861px) {
+  .well {
+    align-items: center;
+    justify-content: center;
+    padding: 36px;
+  }
+
+  .vitrine {
+    flex: 0 1 auto;
+    align-self: stretch;
+    width: min(1100px, 100%);
+    max-width: 1100px;
+    max-height: 100%;
+    padding: var(--hall-frame-pad, 24px);
+    overflow: hidden;
+    background: transparent;
+    isolation: isolate;
+  }
+
+  .rim,
+  .mark {
+    display: block;
+    pointer-events: none;
+  }
+
+  .rim {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    overflow: hidden;
+    padding: 1.5px;
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  .rimFlow {
+    position: absolute;
+    inset: -45%;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0%,
+      rgba(var(--accent-rgb), 0.16) 5%,
+      rgba(var(--accent-rgb), 0.95) 11%,
+      rgba(var(--accent-3-rgb), 0.42) 16%,
+      transparent 24%,
+      transparent 50%,
+      rgba(var(--accent-2-rgb), 0.18) 54%,
+      rgba(var(--accent-2-rgb), 0.88) 60%,
+      transparent 70%
+    );
+    animation: hall-rim-spin 14s linear infinite;
+  }
+
+  .mark {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+  }
+
+  .corner {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    box-sizing: border-box;
+  }
+
+  .cornerTl {
+    top: 0;
+    left: 0;
+    border-top: 1.5px solid rgba(var(--accent-rgb), 0.92);
+    border-left: 1.5px solid rgba(var(--accent-rgb), 0.92);
+  }
+
+  .cornerTr {
+    top: 0;
+    right: 0;
+    border-top: 1.5px solid rgba(var(--accent-2-rgb), 0.88);
+    border-right: 1.5px solid rgba(var(--accent-2-rgb), 0.88);
+  }
+
+  .cornerBl {
+    bottom: 0;
+    left: 0;
+    border-bottom: 1.5px solid rgba(var(--accent-2-rgb), 0.88);
+    border-left: 1.5px solid rgba(var(--accent-2-rgb), 0.88);
+  }
+
+  .cornerBr {
+    bottom: 0;
+    right: 0;
+    border-bottom: 1.5px solid rgba(var(--accent-rgb), 0.92);
+    border-right: 1.5px solid rgba(var(--accent-rgb), 0.92);
+  }
+}
+
+@media (min-width: 861px) and (prefers-reduced-motion: reduce) {
+  .rimFlow {
+    animation: none;
   }
 }

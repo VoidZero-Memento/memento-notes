@@ -1,3 +1,6 @@
+/** 循环播放时自动切图间隔 */
+export const GALLERY_AUTO_INTERVAL_MS = 5_000;
+
 /** 切图叠化时长 */
 export const GALLERY_FADE_MS = 420;
 
@@ -30,10 +33,17 @@ export const GALLERY_GATE_SESSION_KEY = "memento-notes:gallery-gate";
 export const GALLERY_BG_GATE_SESSION_KEY = "memento-notes:gallery-bg-gate";
 
 export const HALL_COLUMNS = 2;
+export const HALL_DESKTOP_COLUMNS = 4;
+export const HALL_DESKTOP_MQ = "(min-width: 861px)";
 export const HALL_PAD = 14;
+/** 桌面展柜留白由外框 padding 承担，与图片间距一致 */
+export const HALL_DESKTOP_PAD = 0;
 export const HALL_GAP = 16;
+export const HALL_DESKTOP_GAP = 24;
+export const HALL_DESKTOP_FRAME_PAD = HALL_DESKTOP_GAP;
 export const HALL_RADIUS = 10;
 export const HALL_MAX_WIDTH = 640;
+export const HALL_DESKTOP_MAX_WIDTH = 1100;
 export const HALL_OVERSCAN_SCREENS = 1.5;
 export const HALL_BG_HOLD_MS = 6500;
 export const HALL_BG_FADE_MS = 2000;
@@ -43,3 +53,5 @@ export const HALL_PROBE_CONCURRENCY = 8;
 export const HALL_PROBE_CACHE_KEY = "memento-notes:hall-sizes-v1";
 export const HALL_VIEWER_PAD_X = 22;
 export const HALL_VIEWER_PAD_Y = 48;
+export const HALL_VIEWER_DESKTOP_PAD_X = 0;
+export const HALL_VIEWER_DESKTOP_PAD_Y = 0;

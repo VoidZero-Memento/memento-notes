@@ -5,6 +5,7 @@ export type HallNaturalSize = {
 
 export type HallPhoto = {
   backdropUrl: string;
+  desktopBackdropUrl: string;
   height: number;
   id: string;
   thumbUrl: string;
@@ -22,6 +23,13 @@ export type HallBox = {
   y: number;
 };
 
+export type HallMasonryOptions = {
+  columns?: number;
+  gap?: number;
+  maxWidth?: number;
+  pad?: number;
+};
+
 export type HallRect = {
   height: number;
   left: number;
@@ -35,6 +43,7 @@ export type HallSelection = {
 };
 
 export type HallBackdropSlot = {
+  desktopUrl: string;
   shown: boolean;
   url: string;
 };

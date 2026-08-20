@@ -8,8 +8,6 @@ import styles from "./GalleryStage.module.css";
 import type { AnimationEvent, CSSProperties, SyntheticEvent } from "react";
 import type { GallerySlot, GallerySlotMotion } from "@/lib/gallery/gallery.types";
 
-const pad = (n: number) => String(n).padStart(2, "0");
-
 const slotClass = (motion: GallerySlotMotion) =>
   `${styles.slot} ${motion === "leave" ? styles.slotLeave : styles.slotShow}`;
 
@@ -64,8 +62,6 @@ export const GalleryStage = () => {
     backdropA,
     backdropB,
     backdropShowB,
-    index,
-    total,
     naturalSize,
     busy,
     advance,
@@ -78,7 +74,6 @@ export const GalleryStage = () => {
   const fadeVars = {
     "--gallery-fade-ms": `${GALLERY_FADE_MS}ms`,
     "--gallery-backdrop-ms": `${GALLERY_BACKDROP_MS}ms`,
-    "--gallery-progress": total > 0 ? `${((index + 1) / total) * 100}%` : "0%",
     "--art-w": `${art.width}px`,
     "--art-h": `${art.height}px`,
     "--gallery-mat": `${GALLERY_MAT_GAP}px`,
@@ -134,16 +129,6 @@ export const GalleryStage = () => {
 
       <div className={`${styles.hud}${chromeOn && status === "ready" ? ` ${styles.hudOn}` : ""}`}>
         <p className={`${styles.hint}${hintOn ? ` ${styles.hintOn}` : ""}`}>TAP TO EXPLORE</p>
-        <div className={styles.pager}>
-          <span className={styles.count}>
-            {pad(index + 1)}
-            <span className={styles.countSep}> / </span>
-            {pad(total)}
-          </span>
-          <span className={styles.rail}>
-            <span className={styles.fill} />
-          </span>
-        </div>
       </div>
 
       {statusLabel ? (

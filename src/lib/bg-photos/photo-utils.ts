@@ -6,6 +6,7 @@ const OSS_BACKDROP_PROCESS = "x-oss-process=image/resize,w_64/blur,r_30,s_30/qua
 const OSS_HALL_THUMB_PROCESS = "x-oss-process=image/resize,w_480/quality,q_62/format,webp";
 const OSS_HALL_PROBE_PROCESS = "x-oss-process=image/resize,w_32/quality,q_30/format,webp";
 const OSS_HALL_BACKDROP_PROCESS = "x-oss-process=image/resize,w_720/blur,r_10,s_8/quality,q_55/format,webp";
+const OSS_HALL_DESKTOP_BACKDROP_PROCESS = "x-oss-process=image/resize,w_1440/quality,q_64/format,webp";
 
 const withOssProcess = (url: string, process: string): string => {
   if (!OSS_HOST_RE.test(url) || url.includes("x-oss-process")) return url;
@@ -33,6 +34,9 @@ export const toHallProbeUrl = (url: string): string => withOssProcess(url, OSS_H
 
 /** 画廊动态背景：轻模糊，能看出人物轮廓 */
 export const toHallBackdropUrl = (url: string): string => withOssProcess(url, OSS_HALL_BACKDROP_PROCESS);
+
+/** 画廊 PC 背景：清晰底图，磨砂由 CSS 叠颗粒完成 */
+export const toHallDesktopBackdropUrl = (url: string): string => withOssProcess(url, OSS_HALL_DESKTOP_BACKDROP_PROCESS);
 
 export const pickNextPhotoIndex = (length: number, lastIndex: number): number => {
   if (length <= 0) return -1;

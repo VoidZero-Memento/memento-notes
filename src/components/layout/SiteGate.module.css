@@ -36,6 +36,17 @@
   gap: 28px;
 }
 
+@media (min-width: 861px) {
+  .root {
+    overflow: hidden;
+  }
+
+  .rootBg::before {
+    filter: saturate(1.05) brightness(0.42) blur(36px);
+    transform: scale(1.2);
+  }
+}
+
 @media (max-width: 860px) {
   .rootBg::before {
     background:

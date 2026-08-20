@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { HALL_OVERSCAN_SCREENS } from "@/lib/gallery/constants";
+import { HALL_COLUMNS, HALL_DESKTOP_COLUMNS, HALL_DESKTOP_GAP, HALL_DESKTOP_MAX_WIDTH, HALL_DESKTOP_PAD, HALL_GAP, HALL_MAX_WIDTH, HALL_OVERSCAN_SCREENS, HALL_PAD } from "@/lib/gallery/constants";
 import { layoutMasonry } from "@/lib/gallery/layout-masonry";
+import { useHallDesktop } from "@/lib/gallery/use-hall-desktop";
 
 import type { HallBox, HallPhoto } from "@/lib/gallery/hall.types";
 
@@ -32,16 +33,28 @@ const pickVisible = (boxes: HallBox[], scrollTop: number, viewH: number): Visibl
   return { boxes: visible, from: Math.max(0, from), to: Math.max(0, to) };
 };
 
-export const useHallMasonry = (photos: HallPhoto[]) => {
+export const useHallMasonry = (photos: HallPhoto[], paused = false) => {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const scrollTopRef = useRef(0);
   const viewHRef = useRef(0);
   const frameRef = useRef(0);
+  const pausedRef = useRef(paused);
+  const desktop = useHallDesktop();
   const [width, setWidth] = useState(0);
   const [viewH, setViewH] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
+  pausedRef.current = paused;
 
-  const layout = useMemo(() => layoutMasonry(photos, width), [photos, width]);
+  const layout = useMemo(
+    () =>
+      layoutMasonry(photos, width, {
+        columns: desktop ? HALL_DESKTOP_COLUMNS : HALL_COLUMNS,
+        gap: desktop ? HALL_DESKTOP_GAP : HALL_GAP,
+        maxWidth: desktop ? HALL_DESKTOP_MAX_WIDTH : HALL_MAX_WIDTH,
+        pad: desktop ? HALL_DESKTOP_PAD : HALL_PAD,
+      }),
+    [desktop, photos, width],
+  );
 
   const visible = useMemo(
     () => pickVisible(layout.boxes, scrollTop, viewH),
@@ -50,6 +63,7 @@ export const useHallMasonry = (photos: HallPhoto[]) => {
 
   const flushScroll = useCallback(() => {
     frameRef.current = 0;
+    if (pausedRef.current) return;
     const node = scrollerRef.current;
     if (!node) return;
     const nextTop = node.scrollTop;
@@ -70,6 +84,7 @@ export const useHallMasonry = (photos: HallPhoto[]) => {
     if (!node) return;
 
     const measure = () => {
+      if (pausedRef.current) return;
       setWidth(node.clientWidth);
       setViewH(node.clientHeight);
       scrollTopRef.current = node.scrollTop;
@@ -83,6 +98,15 @@ export const useHallMasonry = (photos: HallPhoto[]) => {
       window.cancelAnimationFrame(frameRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (paused) return;
+    const node = scrollerRef.current;
+    if (!node) return;
+    setWidth(node.clientWidth);
+    setViewH(node.clientHeight);
+    scrollTopRef.current = node.scrollTop;
+  }, [paused]);
 
   return { height: layout.height, onScroll, scrollerRef, visible: visible.boxes };
 };
