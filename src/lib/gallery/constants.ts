@@ -26,5 +26,20 @@ export const STAGE_GATE_SESSION_KEY = "memento-notes:stage-gate";
 /** 本会话已通过画廊门禁（值为 peppered digest，改密钥后自动失效） */
 export const GALLERY_GATE_SESSION_KEY = "memento-notes:gallery-gate";
 
-/** 本会话已通过背景图门禁（与展台同钥，独立会话，互不带过） */
+/** 本会话已通过背景图门禁（独立会话，改密钥后自动失效） */
 export const GALLERY_BG_GATE_SESSION_KEY = "memento-notes:gallery-bg-gate";
+
+export const HALL_COLUMNS = 2;
+export const HALL_PAD = 14;
+export const HALL_GAP = 16;
+export const HALL_RADIUS = 10;
+export const HALL_MAX_WIDTH = 640;
+export const HALL_OVERSCAN_SCREENS = 1.5;
+export const HALL_BG_HOLD_MS = 6500;
+export const HALL_BG_FADE_MS = 2000;
+export const HALL_FLIP_MS = 380;
+export const HALL_ENTER_MS = 280;
+export const HALL_PROBE_CONCURRENCY = 8;
+export const HALL_PROBE_CACHE_KEY = "memento-notes:hall-sizes-v1";
+export const HALL_VIEWER_PAD_X = 22;
+export const HALL_VIEWER_PAD_Y = 48;

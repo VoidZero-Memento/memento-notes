@@ -1,0 +1,58 @@
+@keyframes hall-ken {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.04);
+  }
+}
+
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.slot {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--hall-bg-fade-ms, 2000ms) ease;
+}
+
+.slotShow {
+  opacity: 1;
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.8) brightness(0.72);
+  transform: scale(1);
+  animation: hall-ken 9s ease-in-out infinite alternate;
+}
+
+.paused .img {
+  animation-play-state: paused;
+}
+
+.veil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 78% 68% at 50% 42%, transparent 0%, rgba(0, 0, 0, 0.32) 100%),
+    rgba(0, 0, 0, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .img {
+    animation: none;
+  }
+
+  .slot {
+    transition: none;
+  }
+}

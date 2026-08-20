@@ -3,6 +3,9 @@ const OSS_BG_PROCESS = "x-oss-process=image/resize,w_720/quality,q_55";
 const OSS_GALLERY_PROCESS = "x-oss-process=image/resize,w_1440/quality,q_78/format,webp";
 const OSS_SAT_PROCESS = "x-oss-process=image/resize,w_320/quality,q_58/format,webp";
 const OSS_BACKDROP_PROCESS = "x-oss-process=image/resize,w_64/blur,r_30,s_30/quality,q_40/format,webp";
+const OSS_HALL_THUMB_PROCESS = "x-oss-process=image/resize,w_480/quality,q_62/format,webp";
+const OSS_HALL_PROBE_PROCESS = "x-oss-process=image/resize,w_32/quality,q_30/format,webp";
+const OSS_HALL_BACKDROP_PROCESS = "x-oss-process=image/resize,w_720/blur,r_10,s_8/quality,q_55/format,webp";
 
 const withOssProcess = (url: string, process: string): string => {
   if (!OSS_HOST_RE.test(url) || url.includes("x-oss-process")) return url;
@@ -21,6 +24,15 @@ export const toSatPhotoUrl = (url: string): string => withOssProcess(url, OSS_SA
 
 /** 全屏氛围底：极小图 + OSS 模糊，避免浏览器 filter:blur */
 export const toBackdropPhotoUrl = (url: string): string => withOssProcess(url, OSS_BACKDROP_PROCESS);
+
+/** 画廊瀑布流缩略图：约 2x 列宽 */
+export const toHallThumbUrl = (url: string): string => withOssProcess(url, OSS_HALL_THUMB_PROCESS);
+
+/** 画廊比例探测：极小图，只读 naturalWidth/Height */
+export const toHallProbeUrl = (url: string): string => withOssProcess(url, OSS_HALL_PROBE_PROCESS);
+
+/** 画廊动态背景：轻模糊，能看出人物轮廓 */
+export const toHallBackdropUrl = (url: string): string => withOssProcess(url, OSS_HALL_BACKDROP_PROCESS);
 
 export const pickNextPhotoIndex = (length: number, lastIndex: number): number => {
   if (length <= 0) return -1;

@@ -14,25 +14,36 @@ const SITE_DIGEST_CHUNKS = [
 ] as const;
 
 const STAGE_DIGEST_CHUNKS = [
-  "6b61c02b",
-  "0883f63d",
-  "a7ce9699",
-  "6600e64d",
-  "2266b5bb",
-  "34e3e48a",
-  "abc6dd2a",
-  "0c5cc08f",
+  "80a921a2",
+  "57c6a00a",
+  "839addd0",
+  "c275a3ed",
+  "b1b82d3e",
+  "979ea4a9",
+  "424a52a9",
+  "1164c2e9",
 ] as const;
 
 const GALLERY_DIGEST_CHUNKS = [
-  "019a4249",
-  "fe1960e4",
-  "0a4f5eaf",
-  "3c9997f9",
-  "7f3bc792",
-  "b0fcf1ce",
-  "c27983c8",
-  "65432a4e",
+  "696c38ba",
+  "a7c98156",
+  "c486ceb3",
+  "218636c3",
+  "ec86b091",
+  "1aef189c",
+  "7cba6183",
+  "7f2a5501",
+] as const;
+
+const BG_DIGEST_CHUNKS = [
+  "f4dc4ba5",
+  "dd41c3cf",
+  "b4c88610",
+  "1e796a34",
+  "0b135b1c",
+  "ed0cb976",
+  "ad8b70e5",
+  "5112a735",
 ] as const;
 
 export const expectedSiteDigest = () => SITE_DIGEST_CHUNKS.join("");
@@ -40,6 +51,8 @@ export const expectedSiteDigest = () => SITE_DIGEST_CHUNKS.join("");
 export const expectedStageDigest = () => STAGE_DIGEST_CHUNKS.join("");
 
 export const expectedGalleryDigest = () => GALLERY_DIGEST_CHUNKS.join("");
+
+export const expectedBgDigest = () => BG_DIGEST_CHUNKS.join("");
 
 const toHex = (bytes: ArrayLike<number>) =>
   Array.from(bytes as ArrayLike<number>, (b) =>

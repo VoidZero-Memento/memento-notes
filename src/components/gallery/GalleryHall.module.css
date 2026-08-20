@@ -1,0 +1,68 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  background: var(--background-deep);
+  color: rgba(var(--fg-rgb), 0.5);
+  font-family: var(--font-geist-sans);
+  touch-action: pan-y;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.status {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.statusLabel {
+  margin: 0;
+  color: rgba(var(--fg-rgb), 0.38);
+  font-family: var(--font-geist-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.42em;
+}
+
+.back {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(12px, env(safe-area-inset-left));
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  padding: 0;
+  color: rgba(var(--fg-rgb), 0.38);
+  cursor: pointer;
+}
+
+.backIcon {
+  width: 15px;
+  height: 15px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .back:hover,
+  .back:focus-visible {
+    background: rgba(var(--accent-rgb), 0.1);
+    color: var(--accent);
+  }
+}

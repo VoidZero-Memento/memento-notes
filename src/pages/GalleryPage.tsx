@@ -3,8 +3,7 @@ import { useEffect } from "react";
 import { useGalleryGate } from "@/lib/gallery/use-gallery-gate";
 
 import { GalleryGate } from "@/components/gallery/GalleryGate";
-
-import styles from "@/components/gallery/GalleryGate.module.css";
+import { GalleryHall } from "@/components/gallery/GalleryHall";
 
 export const GalleryPage = () => {
   const { unlocked, unlock } = useGalleryGate();
@@ -19,5 +18,5 @@ export const GalleryPage = () => {
 
   if (!unlocked) return <GalleryGate title="画廊" unlock={unlock} />;
 
-  return <div className={styles.root} />;
+  return <GalleryHall />;
 };
