@@ -162,3 +162,22 @@
 .optionSelected .optionState {
   color: rgba(var(--accent-2-rgb), 0.9);
 }
+
+.prompt {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 10;
+  min-width: 168px;
+  border: 1px solid rgba(var(--accent-rgb), 0.28);
+  border-radius: 14px;
+  background: rgba(8, 14, 28, 0.78);
+  box-shadow:
+    0 0 0 1px rgba(var(--accent-rgb), 0.08),
+    0 0 22px rgba(var(--accent-rgb), 0.14),
+    0 14px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  padding: 10px 12px;
+}

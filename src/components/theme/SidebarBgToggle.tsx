@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 
 import { useAnimatedOpen } from "@/lib/dom/use-animated-open";
+import { GalleryGateField } from "@/components/gallery/GalleryGateField";
 
 import styles from "./SidebarBgToggle.module.css";
 
@@ -33,6 +34,8 @@ type SidebarBgToggleProps = {
   /** 为 true 时展示弹出菜单（含循环项）；PC 为 false 时仍直接开关背景 */
   menuMode: boolean;
   disabled?: boolean;
+  needsUnlock?: boolean;
+  unlock?: (raw: string) => Promise<boolean>;
   onEnabledChange: (enabled: boolean) => void;
   onLoopingChange: (looping: boolean) => void;
 };
@@ -42,25 +45,32 @@ export const SidebarBgToggle = ({
   looping,
   menuMode,
   disabled = false,
+  needsUnlock = false,
+  unlock,
   onEnabledChange,
   onLoopingChange,
 }: SidebarBgToggleProps) => {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const [prompting, setPrompting] = useState(false);
   const { mounted, visible } = useAnimatedOpen(open);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open && !prompting) return;
 
     const handlePointerDown = (event: MouseEvent) => {
       if (!rootRef.current?.contains(event.target as Node)) {
         setOpen(false);
+        setPrompting(false);
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        setOpen(false);
+        setPrompting(false);
+      }
     };
 
     document.addEventListener("mousedown", handlePointerDown);
@@ -69,31 +79,52 @@ export const SidebarBgToggle = ({
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open]);
+  }, [open, prompting]);
 
   useEffect(() => {
     if (!menuMode) setOpen(false);
   }, [menuMode]);
 
+  const requestEnable = () => {
+    if (needsUnlock && unlock) {
+      setOpen(false);
+      setPrompting(true);
+      return;
+    }
+    onEnabledChange(true);
+  };
+
   const handleTriggerClick = () => {
     if (disabled) return;
     if (!menuMode) {
-      onEnabledChange(!enabled);
+      if (enabled) onEnabledChange(false);
+      else if (prompting) setPrompting(false);
+      else requestEnable();
       return;
     }
+    setPrompting(false);
     setOpen((prev) => !prev);
   };
 
   const handleToggleEnabled = () => {
     if (disabled) return;
-    onEnabledChange(!enabled);
-    setOpen(false);
+    if (enabled) {
+      onEnabledChange(false);
+      setOpen(false);
+      return;
+    }
+    requestEnable();
   };
 
   const handleToggleLooping = () => {
     if (disabled || !enabled) return;
     onLoopingChange(!looping);
     setOpen(false);
+  };
+
+  const handleUnlocked = () => {
+    setPrompting(false);
+    onEnabledChange(true);
   };
 
   return (
@@ -160,6 +191,18 @@ export const SidebarBgToggle = ({
             </button>
           </li>
         </ul>
+      ) : null}
+
+      {prompting && unlock ? (
+        <div className={styles.prompt} onClick={(event) => event.stopPropagation()}>
+          <GalleryGateField
+            variant="inline"
+            autoFocus
+            unlock={unlock}
+            onUnlocked={handleUnlocked}
+            onCancel={() => setPrompting(false)}
+          />
+        </div>
       ) : null}
     </div>
   );

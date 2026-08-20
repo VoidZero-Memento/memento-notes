@@ -1,7 +1,7 @@
 export const SIDEBAR_BG_STORAGE_KEY = "memento-notes:sidebar-bg";
 
-/** 默认开启，与当前已落地的侧栏氛围底图一致 */
-export const DEFAULT_SIDEBAR_BG_ENABLED = true;
+/** 默认关闭；用户手动开启后写入 localStorage */
+export const DEFAULT_SIDEBAR_BG_ENABLED = false;
 
 /** 开启背景时全屏过渡蒙层展示时长 */
 export const BG_TRANSITION_HOLD_MS = 3000;

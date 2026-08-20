@@ -1,0 +1,51 @@
+.root {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  width: 100%;
+}
+
+.rootBg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(4, 7, 14, 0.36) 0%,
+      rgba(4, 7, 14, 0.26) 42%,
+      rgba(4, 7, 14, 0.42) 100%
+    ),
+    url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png") 50% 72% /
+      cover no-repeat;
+  filter: saturate(0.8) brightness(0.82);
+}
+
+.panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+@media (max-width: 860px) {
+  .rootBg::before {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(4, 7, 14, 0.36) 0%,
+        rgba(4, 7, 14, 0.26) 42%,
+        rgba(4, 7, 14, 0.42) 100%
+      ),
+      url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner8.png") center /
+        cover no-repeat;
+  }
+}

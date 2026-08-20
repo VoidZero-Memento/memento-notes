@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .inline {
@@ -19,8 +20,11 @@
   border-bottom: 1px solid rgba(var(--fg-rgb), 0.22);
   border-radius: 0;
   background: transparent;
+  background-color: transparent;
+  box-shadow: none;
   padding: 4px 2px 6px;
   color: rgba(var(--fg-rgb), 0.72);
+  caret-color: rgba(var(--fg-rgb), 0.72);
   font-family: var(--font-geist-mono);
   font-size: 12px;
   font-weight: 500;
@@ -28,6 +32,10 @@
   outline: none;
   -webkit-appearance: none;
   appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-fill-color: rgba(var(--fg-rgb), 0.72);
+  -webkit-text-security: disc;
+  color-scheme: dark;
   transition: border-color 0.18s ease, color 0.18s ease;
 }
 
@@ -38,23 +46,67 @@
 
 .page .input {
   text-align: center;
-  font-size: 13px;
+  font-size: 14px;
   padding: 8px 2px 10px;
+  color: rgba(var(--fg-rgb), 0.94);
+  caret-color: var(--accent);
+  border-bottom: none;
+  background-color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    rgba(var(--accent-rgb), 0.42) 0%,
+    rgba(var(--accent-2-rgb), 0.42) 33%,
+    rgba(var(--accent-3-rgb), 0.42) 66%,
+    rgba(var(--accent-rgb), 0.42) 100%
+  );
+  background-size: 10rem 1.5px;
+  background-position: 0 100%;
+  background-repeat: repeat-x;
+  -webkit-text-fill-color: rgba(var(--fg-rgb), 0.94);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+  animation: gateLineFlow 3.6s linear infinite;
+  will-change: background-position;
 }
 
 .input::placeholder {
   color: rgba(var(--fg-rgb), 0.28);
+  -webkit-text-fill-color: rgba(var(--fg-rgb), 0.28);
   letter-spacing: 0.22em;
+  opacity: 1;
+}
+
+.input:hover,
+.input:focus,
+.input:active {
+  background-color: transparent;
+  box-shadow: none;
 }
 
 .input:focus {
   border-bottom-color: rgba(var(--accent-rgb), 0.7);
   color: rgba(var(--fg-rgb), 0.92);
+  caret-color: rgba(var(--fg-rgb), 0.92);
+  -webkit-text-fill-color: rgba(var(--fg-rgb), 0.92);
+}
+
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus {
+  -webkit-text-fill-color: rgba(var(--fg-rgb), 0.92);
+  caret-color: rgba(var(--fg-rgb), 0.92);
+  background-color: transparent;
+  box-shadow: 0 0 0 1000px transparent inset;
+  transition: background-color 99999s ease-out;
 }
 
 .denied .input {
   border-bottom-color: rgba(220, 90, 90, 0.7);
   animation: gateShake 0.42s ease;
+}
+
+.page.denied .input {
+  background-image: linear-gradient(90deg, #ff5a6a 0%, #ff9aa8 50%, #ff5a6a 100%);
+  animation: gateShake 0.42s ease, gateLineFlow 3.6s linear infinite;
 }
 
 .busy .input {
@@ -70,8 +122,34 @@
   letter-spacing: 0.2em;
 }
 
+.page .input::placeholder {
+  color: rgba(var(--fg-rgb), 0.58);
+  -webkit-text-fill-color: rgba(var(--fg-rgb), 0.58);
+}
+
+.page .input:focus {
+  color: var(--foreground);
+  caret-color: var(--accent);
+  -webkit-text-fill-color: var(--foreground);
+}
+
+.page .hint {
+  color: rgba(var(--fg-rgb), 0.48);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
 .denied .hint {
   color: rgba(220, 90, 90, 0.72);
+}
+
+.page.denied .hint {
+  color: #ff9aa8;
+}
+
+@keyframes gateLineFlow {
+  to {
+    background-position: 10rem 100%;
+  }
 }
 
 @keyframes gateShake {
@@ -103,5 +181,11 @@
 @media (prefers-reduced-motion: reduce) {
   .denied .input {
     animation: none;
+  }
+
+  .page .input {
+    animation: none;
+    will-change: auto;
+    background-position: 0 100%;
   }
 }

@@ -1,7 +1,353 @@
-/* 主题通过 html[data-theme="1"…"9"] 切换，选中值持久化在 localStorage */
+/* 主题通过 html[data-theme] 切换，选中值持久化在 localStorage */
 
 :root,
+[data-theme="1"] {
+  --accent-rgb: 252, 195, 7;
+  --accent-2-rgb: 42, 222, 159;
+  --accent-3-rgb: 255, 224, 138;
+  --fg-rgb: 255, 250, 230;
+  --accent: #fcc307;
+  --accent-2: #2ade9f;
+  --accent-3: #ffe08a;
+  --accent-magenta: var(--accent-2);
+  --accent-dim: rgba(var(--accent-rgb), 0.18);
+  --accent-magenta-dim: rgba(var(--accent-2-rgb), 0.18);
+  --accent-gold: var(--accent-3);
+  --accent-gold-dim: rgba(var(--accent-3-rgb), 0.18);
+  --link: #ffd24a;
+  --link-hover: #2ade9f;
+  --background: #0a0a06;
+  --background-deep: #050503;
+  --background-mid: #14140c;
+  --foreground: rgba(var(--fg-rgb), 0.95);
+  --panel-bg: rgba(18, 16, 8, 0.58);
+  --panel-border: rgba(var(--accent-rgb), 0.18);
+  --glow-cyan: 0 0 12px rgba(var(--accent-rgb), 0.55), 0 0 28px rgba(var(--accent-rgb), 0.25);
+  --glow-magenta: 0 0 12px rgba(var(--accent-2-rgb), 0.55), 0 0 28px rgba(var(--accent-2-rgb), 0.25);
+  --glow-gold: 0 0 12px rgba(var(--accent-3-rgb), 0.55), 0 0 28px rgba(var(--accent-3-rgb), 0.28);
+  --glow-mixed: 0 0 10px rgba(var(--accent-rgb), 0.4), 0 0 22px rgba(var(--accent-2-rgb), 0.3);
+  --hologram: linear-gradient(135deg, #fcc307 0%, #ffe08a 48%, #2ade9f 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.42), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.4), transparent 54%),
+    radial-gradient(ellipse 55% 50% at 68% 18%, rgba(var(--accent-3-rgb), 0.16), transparent 48%),
+    radial-gradient(ellipse 45% 40% at 48% 62%, rgba(var(--accent-rgb), 0.1), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.12), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool: radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.4), transparent 62%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.45);
+  --title-color: var(--foreground);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-2-rgb), 0.12);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(28, 22, 8, 0.98) 0%, #100e06 55%, #080704 100%);
+  --inline-code: #2ade9f;
+  --hljs-fg: #f5ead0;
+  --hljs-keyword: #2ade9f;
+  --hljs-title: #ffd24a;
+  --hljs-literal: #fcc307;
+  --hljs-string: #7eecc4;
+  --hljs-built-in: #ffe08a;
+  --hljs-comment: #8a7a50;
+  --hljs-name: #5dffb0;
+}
+
+/* 2 松花苏梅 */
 [data-theme="2"] {
+  --accent-rgb: 168, 198, 134;
+  --accent-2-rgb: 228, 151, 164;
+  --accent-3-rgb: 242, 230, 208;
+  --fg-rgb: 252, 248, 242;
+  --accent: #a8c686;
+  --accent-2: #e497a4;
+  --accent-3: #f2e6d0;
+  --link: #b8d49a;
+  --link-hover: #e497a4;
+  --background: #0c0a08;
+  --background-deep: #070605;
+  --background-mid: #161210;
+  --panel-bg: rgba(20, 16, 14, 0.55);
+  --hologram: linear-gradient(135deg, #a8c686 0%, #e497a4 50%, #f2e6d0 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.42), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.38), transparent 54%),
+    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.14), transparent 50%),
+    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.12), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.1), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.38), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.2), transparent 55%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.48);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-2-rgb), 0.14);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(24, 20, 16, 0.98) 0%, #100c0a 55%, #0a0806 100%);
+  --inline-code: #e497a4;
+  --hljs-fg: #f0e8dc;
+  --hljs-keyword: #e497a4;
+  --hljs-title: #c4dca0;
+  --hljs-literal: #a8c686;
+  --hljs-string: #f0c0c8;
+  --hljs-built-in: #f2e6d0;
+  --hljs-comment: #8a7e70;
+  --hljs-name: #d4b0b8;
+}
+
+/* 3 青紫双撞 */
+[data-theme="3"] {
+  --accent-rgb: 0, 240, 255;
+  --accent-2-rgb: 157, 0, 255;
+  --accent-3-rgb: 199, 125, 255;
+  --fg-rgb: 236, 244, 255;
+  --accent: #00f0ff;
+  --accent-2: #9d00ff;
+  --accent-3: #c77dff;
+  --link: #00e5ff;
+  --link-hover: #c77dff;
+  --background: #0a0018;
+  --background-deep: #060010;
+  --background-mid: #160824;
+  --panel-bg: rgba(14, 4, 28, 0.58);
+  --hologram: linear-gradient(135deg, #00f0ff 0%, #9d00ff 50%, #c77dff 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.42), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.4), transparent 54%),
+    radial-gradient(ellipse 55% 50% at 68% 18%, rgba(var(--accent-3-rgb), 0.18), transparent 48%),
+    radial-gradient(ellipse 45% 40% at 48% 62%, rgba(var(--accent-rgb), 0.1), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.14), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool: radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.4), transparent 62%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.5);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-2-rgb), 0.16);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(16, 4, 36, 0.98) 0%, #0a0218 55%, #060010 100%);
+  --inline-code: #c77dff;
+  --hljs-fg: #dce8f8;
+  --hljs-keyword: #c77dff;
+  --hljs-title: #00f0ff;
+  --hljs-literal: #00e5ff;
+  --hljs-string: #d4a8ff;
+  --hljs-built-in: #9d00ff;
+  --hljs-comment: #6e5a88;
+  --hljs-name: #7af0ff;
+}
+
+/* 4 丁香柳芽 */
+[data-theme="4"] {
+  --accent-rgb: 193, 161, 202;
+  --accent-2-rgb: 150, 194, 78;
+  --accent-3-rgb: 140, 100, 160;
+  --fg-rgb: 248, 244, 250;
+  --accent: #c1a1ca;
+  --accent-2: #96c24e;
+  --accent-3: #8c64a0;
+  --link: #d4b8dc;
+  --link-hover: #96c24e;
+  --background: #0a080c;
+  --background-deep: #060508;
+  --background-mid: #141018;
+  --panel-bg: rgba(18, 14, 22, 0.55);
+  --hologram: linear-gradient(135deg, #c1a1ca 0%, #96c24e 50%, #8c64a0 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.44), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.36), transparent 54%),
+    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.16), transparent 50%),
+    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.12), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.1), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.38), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.22), transparent 55%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.5);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-2-rgb), 0.12);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(22, 16, 28, 0.98) 0%, #100c14 55%, #0a0810 100%);
+  --inline-code: #96c24e;
+  --hljs-fg: #ece4f0;
+  --hljs-keyword: #c1a1ca;
+  --hljs-title: #b8d878;
+  --hljs-literal: #96c24e;
+  --hljs-string: #dcc0e4;
+  --hljs-built-in: #8c64a0;
+  --hljs-comment: #7a6e80;
+  --hljs-name: #c8e090;
+}
+
+/* 5 碧青栀子 */
+[data-theme="5"] {
+  --accent-rgb: 114, 175, 186;
+  --accent-2-rgb: 233, 196, 106;
+  --accent-3-rgb: 250, 211, 144;
+  --fg-rgb: 244, 248, 250;
+  --accent: #72afba;
+  --accent-2: #e9c46a;
+  --accent-3: #fad390;
+  --link: #8ec4cc;
+  --link-hover: #e9c46a;
+  --background: #080a0c;
+  --background-deep: #050608;
+  --background-mid: #101418;
+  --panel-bg: rgba(12, 16, 20, 0.55);
+  --hologram: linear-gradient(135deg, #72afba 0%, #e9c46a 50%, #fad390 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.42), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.36), transparent 54%),
+    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.16), transparent 50%),
+    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.12), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.1), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.38), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.22), transparent 55%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.5);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-2-rgb), 0.12);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(12, 20, 24, 0.98) 0%, #0a1014 55%, #06080a 100%);
+  --inline-code: #e9c46a;
+  --hljs-fg: #e0ecf0;
+  --hljs-keyword: #72afba;
+  --hljs-title: #e9c46a;
+  --hljs-literal: #8ec4cc;
+  --hljs-string: #fad390;
+  --hljs-built-in: #d4af37;
+  --hljs-comment: #6a7a80;
+  --hljs-name: #a8d4dc;
+}
+
+/* 8 炭黑甜粉 */
+[data-theme="8"] {
+  --accent-rgb: 230, 57, 124;
+  --accent-2-rgb: 255, 138, 176;
+  --accent-3-rgb: 248, 244, 246;
+  --fg-rgb: 248, 240, 244;
+  --accent: #e6397c;
+  --accent-2: #ff8ab0;
+  --accent-3: #f8f4f6;
+  --link: #ff6b9a;
+  --link-hover: #ff8ab0;
+  --background: #1a1a1d;
+  --background-deep: #0e0e10;
+  --background-mid: #242428;
+  --panel-bg: rgba(26, 26, 29, 0.72);
+  --hologram: linear-gradient(135deg, #e6397c 0%, #1a1a1d 50%, #ff8ab0 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.4), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.28), transparent 54%),
+    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-rgb), 0.14), transparent 50%),
+    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.1), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.1), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.36), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-rgb), 0.22), transparent 55%);
+  --shell-inset: inset 0 0 120px rgba(0, 0, 0, 0.55);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.36), 0 0 32px rgba(var(--accent-2-rgb), 0.18);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(32, 18, 24, 0.98) 0%, #141214 55%, #0e0e10 100%);
+  --inline-code: #ff8ab0;
+  --hljs-fg: #f0e4ea;
+  --hljs-keyword: #e6397c;
+  --hljs-title: #ff8ab0;
+  --hljs-literal: #ff6b9a;
+  --hljs-string: #ffc0d4;
+  --hljs-built-in: #f8f4f6;
+  --hljs-comment: #8a6e78;
+  --hljs-name: #ff9ab8;
+}
+
+/* 9 湖青黛紫 */
+[data-theme="9"] {
+  --accent-rgb: 56, 176, 176;
+  --accent-2-rgb: 129, 92, 148;
+  --accent-3-rgb: 168, 136, 188;
+  --fg-rgb: 240, 246, 248;
+  --accent: #38b0b0;
+  --accent-2: #815c94;
+  --accent-3: #a888bc;
+  --link: #5cc8c8;
+  --link-hover: #a888bc;
+  --background: #080a0e;
+  --background-deep: #050608;
+  --background-mid: #10141a;
+  --panel-bg: rgba(12, 16, 22, 0.55);
+  --hologram: linear-gradient(135deg, #38b0b0 0%, #815c94 50%, #a888bc 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.42), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.38), transparent 54%),
+    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.16), transparent 50%),
+    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.12), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.1), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.38), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.22), transparent 55%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.5);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-2-rgb), 0.14);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(10, 22, 24, 0.98) 0%, #0a1014 55%, #06080c 100%);
+  --inline-code: #a888bc;
+  --hljs-fg: #dce8ec;
+  --hljs-keyword: #a888bc;
+  --hljs-title: #38b0b0;
+  --hljs-literal: #5cc8c8;
+  --hljs-string: #c8b0d8;
+  --hljs-built-in: #815c94;
+  --hljs-comment: #6a7080;
+  --hljs-name: #7ed4d4;
+}
+
+/* 10 米白星蓝 */
+[data-theme="10"] {
+  --accent-rgb: 65, 187, 200;
+  --accent-2-rgb: 252, 249, 232;
+  --accent-3-rgb: 126, 212, 220;
+  --fg-rgb: 244, 250, 248;
+  --accent: #41bbc8;
+  --accent-2: #fcf9e8;
+  --accent-3: #7ed4dc;
+  --link: #6eccd6;
+  --link-hover: #fcf9e8;
+  --background: #080a0c;
+  --background-deep: #050708;
+  --background-mid: #101418;
+  --panel-bg: rgba(12, 18, 20, 0.55);
+  --hologram: linear-gradient(135deg, #41bbc8 0%, #fcf9e8 50%, #7ed4dc 100%);
+  --shell-bg:
+    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.42), transparent 56%),
+    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.16), transparent 54%),
+    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.16), transparent 50%),
+    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.12), transparent 52%),
+    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-3-rgb), 0.1), transparent 50%),
+    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
+  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
+  --shell-blob-cool:
+    radial-gradient(circle at 58% 48%, rgba(var(--accent-3-rgb), 0.36), transparent 62%),
+    radial-gradient(circle at 42% 62%, rgba(var(--accent-2-rgb), 0.14), transparent 55%);
+  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.48);
+  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-3-rgb), 0.12);
+  --code-block-bg:
+    linear-gradient(165deg, rgba(10, 22, 26, 0.98) 0%, #0a1214 55%, #060a0c 100%);
+  --inline-code: #7ed4dc;
+  --hljs-fg: #e4f0f2;
+  --hljs-keyword: #41bbc8;
+  --hljs-title: #7ed4dc;
+  --hljs-literal: #6eccd6;
+  --hljs-string: #fcf9e8;
+  --hljs-built-in: #b8e4e8;
+  --hljs-comment: #6a7a80;
+  --hljs-name: #a8e0e8;
+}
+
+/* ========== 原主题（ID 11–19，便于和新配色对比）========== */
+
+/* 12 赛博霓虹 */
+[data-theme="12"] {
   --accent-rgb: 0, 240, 255;
   --accent-2-rgb: 255, 45, 149;
   --accent-3-rgb: 0, 240, 255;
@@ -52,8 +398,8 @@
   --hljs-name: #5dffb0;
 }
 
-/* 1 极光紫金 */
-[data-theme="1"] {
+/* 11 极光紫金 */
+[data-theme="11"] {
   --accent-rgb: 167, 139, 250;
   --accent-2-rgb: 240, 171, 252;
   --accent-3-rgb: 251, 191, 36;
@@ -94,50 +440,8 @@
   --hljs-name: #e9d5ff;
 }
 
-/* 3 冰焰蓝橙 */
-[data-theme="3"] {
-  --accent-rgb: 56, 189, 248;
-  --accent-2-rgb: 129, 140, 248;
-  --accent-3-rgb: 251, 146, 60;
-  --fg-rgb: 230, 242, 255;
-  --accent: #38bdf8;
-  --accent-2: #818cf8;
-  --accent-3: #fb923c;
-  --link: #7dd3fc;
-  --link-hover: #818cf8;
-  --background: #020617;
-  --background-deep: #01040f;
-  --background-mid: #0a1228;
-  --panel-bg: rgba(6, 12, 28, 0.55);
-  --hologram: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #fb923c 100%);
-  --shell-bg:
-    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.44), transparent 56%),
-    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.38), transparent 54%),
-    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.16), transparent 50%),
-    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.12), transparent 52%),
-    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.1), transparent 50%),
-    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
-  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
-  --shell-blob-cool:
-    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.38), transparent 62%),
-    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.22), transparent 55%);
-  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.55);
-  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-3-rgb), 0.12);
-  --code-block-bg:
-    linear-gradient(165deg, rgba(6, 14, 36, 0.98) 0%, #030816 55%, #020612 100%);
-  --inline-code: #818cf8;
-  --hljs-fg: #d6e4ff;
-  --hljs-keyword: #a5b4fc;
-  --hljs-title: #7dd3fc;
-  --hljs-literal: #38bdf8;
-  --hljs-string: #fdba74;
-  --hljs-built-in: #fb923c;
-  --hljs-comment: #64748b;
-  --hljs-name: #86efac;
-}
-
-/* 4 全息虹彩 */
-[data-theme="4"] {
+/* 14 全息虹彩 */
+[data-theme="14"] {
   --accent-rgb: 34, 211, 238;
   --accent-2-rgb: 168, 85, 247;
   --accent-3-rgb: 244, 114, 182;
@@ -179,8 +483,8 @@
   --hljs-name: #67e8f9;
 }
 
-/* 5 激光红黑 */
-[data-theme="5"] {
+/* 15 激光红黑 */
+[data-theme="15"] {
   --accent-rgb: 255, 0, 60;
   --accent-2-rgb: 255, 107, 0;
   --accent-3-rgb: 255, 255, 255;
@@ -224,50 +528,8 @@
   --hljs-name: #ff8fa3;
 }
 
-/* 6 樱花粉黛 —— 偏粉嫩樱色 */
-[data-theme="6"] {
-  --accent-rgb: 255, 158, 187;
-  --accent-2-rgb: 255, 183, 213;
-  --accent-3-rgb: 255, 214, 228;
-  --fg-rgb: 255, 245, 249;
-  --accent: #ff9ebb;
-  --accent-2: #ffb7d5;
-  --accent-3: #ffd6e4;
-  --link: #ff9ebb;
-  --link-hover: #ffb7d5;
-  --background: #160a10;
-  --background-deep: #0e060a;
-  --background-mid: #221018;
-  --panel-bg: rgba(28, 12, 20, 0.55);
-  --hologram: linear-gradient(135deg, #ff9ebb 0%, #ffb7d5 48%, #ffd6e4 100%);
-  --shell-bg:
-    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.46), transparent 56%),
-    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.4), transparent 54%),
-    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.22), transparent 50%),
-    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.14), transparent 52%),
-    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.12), transparent 50%),
-    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
-  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.48), transparent 58%);
-  --shell-blob-cool:
-    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.4), transparent 62%),
-    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.24), transparent 55%);
-  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.4);
-  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.36), 0 0 32px rgba(var(--accent-2-rgb), 0.18);
-  --code-block-bg:
-    linear-gradient(165deg, rgba(32, 12, 22, 0.98) 0%, #14080e 55%, #10060a 100%);
-  --inline-code: #ffb7d5;
-  --hljs-fg: #ffe8f0;
-  --hljs-keyword: #ff9ebb;
-  --hljs-title: #ffb7d5;
-  --hljs-literal: #ffc2d8;
-  --hljs-string: #ffd6e4;
-  --hljs-built-in: #ffc4a8;
-  --hljs-comment: #b08a98;
-  --hljs-name: #f0c0d8;
-}
-
-/* 7 翠雾森岚 */
-[data-theme="7"] {
+/* 17 翠雾森岚 */
+[data-theme="17"] {
   --accent-rgb: 52, 211, 153;
   --accent-2-rgb: 45, 212, 191;
   --accent-3-rgb: 163, 230, 53;
@@ -308,8 +570,8 @@
   --hljs-name: #5eead4;
 }
 
-/* 8 琥珀暖金 */
-[data-theme="8"] {
+/* 18 琥珀暖金 */
+[data-theme="18"] {
   --accent-rgb: 251, 191, 36;
   --accent-2-rgb: 245, 158, 11;
   --accent-3-rgb: 234, 88, 12;
@@ -350,8 +612,8 @@
   --hljs-name: #fcd34d;
 }
 
-/* 9 熔金光环 —— 头像轨道原始橙金光晕 */
-[data-theme="9"] {
+/* 19 熔金光环 —— 头像轨道原始橙金光晕 */
+[data-theme="19"] {
   --accent-rgb: 255, 190, 100;
   --accent-2-rgb: 255, 140, 40;
   --accent-3-rgb: 255, 210, 140;

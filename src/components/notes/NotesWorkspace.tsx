@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
 import { MOBILE_BG_MQ } from "@/lib/bg-photos/constants";
 import { useMediaQuery } from "@/lib/dom/use-media-query";
+import { useGalleryBgGate } from "@/lib/gallery/use-gallery-gate";
 import { describeGithubError } from "@/lib/github/describe-github-error";
 import { useRepos } from "@/lib/github/ReposContext";
 import { parseOutline } from "@/lib/markdown/parse-outline";
@@ -71,6 +72,7 @@ export const NotesWorkspace = ({
 }: NotesWorkspaceProps) => {
   const { repos } = useRepos();
   const isMobile = useMediaQuery(MOBILE_BG_MQ);
+  const { unlocked: galleryBgUnlocked, unlock: unlockGalleryBg } = useGalleryBgGate();
   const { looping: sidebarBgLooping, setLooping: setSidebarBgLooping } = useSidebarBgLoop();
   const {
     enabled: sidebarBgEnabled,
@@ -334,6 +336,8 @@ export const NotesWorkspace = ({
                 looping={sidebarBgLooping}
                 menuMode={isMobile}
                 disabled={bgTransitionBusy}
+                needsUnlock={!galleryBgUnlocked}
+                unlock={unlockGalleryBg}
                 onEnabledChange={setSidebarBgEnabled}
                 onLoopingChange={(next) => {
                   setSidebarBgLooping(next);

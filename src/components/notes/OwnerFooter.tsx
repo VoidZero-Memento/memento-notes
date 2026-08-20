@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useSidebarBg } from "@/lib/prefs/useSidebarBg";
 import { Lightbox } from "@/components/common/Lightbox";
 import { GalleryLink } from "@/components/gallery/GalleryLink";
 
@@ -12,6 +13,7 @@ type OwnerFooterProps = {
 
 export const OwnerFooter = ({ login, avatarUrl }: OwnerFooterProps) => {
   const [previewOpen, setPreviewOpen] = useState(false);
+  const { enabled: bgEnabled } = useSidebarBg();
 
   return (
     <div className={styles.ownerIdentity}>
@@ -35,7 +37,7 @@ export const OwnerFooter = ({ login, avatarUrl }: OwnerFooterProps) => {
       </span>
       {previewOpen && avatarUrl ? (
         <Lightbox src={avatarUrl} alt={login} onClose={() => setPreviewOpen(false)}>
-          <GalleryLink />
+          {bgEnabled ? <GalleryLink /> : null}
         </Lightbox>
       ) : null}
     </div>

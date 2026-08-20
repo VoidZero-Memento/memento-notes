@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import { GALLERY_PATH } from "@/lib/gallery/constants";
 import { useRepos, ReposProvider } from "@/lib/github/ReposContext";
 import { AppShell } from "@/components/layout/AppShell";
+import { SiteGate } from "@/components/layout/SiteGate";
 import { BootErrorState } from "@/components/notes/BootErrorState";
 import { LoadingState } from "@/components/notes/LoadingState";
 import { NotesShellRoot } from "@/components/notes/NotesShellRoot";
@@ -41,14 +42,16 @@ const AppRoutes = () => {
 };
 
 const App = () => (
-  <ReposProvider>
-    <AppShell>
-      <Routes>
-        <Route path={GALLERY_PATH} element={<GalleryPage />} />
-        <Route path="*" element={<AppRoutes />} />
-      </Routes>
-    </AppShell>
-  </ReposProvider>
+  <AppShell>
+    <SiteGate>
+      <ReposProvider>
+        <Routes>
+          <Route path={GALLERY_PATH} element={<GalleryPage />} />
+          <Route path="*" element={<AppRoutes />} />
+        </Routes>
+      </ReposProvider>
+    </SiteGate>
+  </AppShell>
 );
 
 export default App;

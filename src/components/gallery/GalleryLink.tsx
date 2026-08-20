@@ -14,7 +14,7 @@ import type { GalleryLocationState } from "@/lib/gallery/gallery.types";
 export const GalleryLink = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { unlocked } = useGalleryGate();
+  const { unlocked, unlock } = useGalleryGate();
   const [prompting, setPrompting] = useState(false);
   const state: GalleryLocationState = { from: `${location.pathname}${location.search}` };
 
@@ -36,6 +36,7 @@ export const GalleryLink = () => {
         <GalleryGateField
           variant="inline"
           autoFocus
+          unlock={unlock}
           onUnlocked={enter}
           onCancel={() => setPrompting(false)}
         />

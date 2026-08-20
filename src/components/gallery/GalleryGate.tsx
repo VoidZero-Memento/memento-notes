@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { useGalleryGate } from "@/lib/gallery/use-gallery-gate";
 import { GalleryGateField } from "@/components/gallery/GalleryGateField";
 
 import fx from "./GalleryFx.module.css";
@@ -11,6 +12,7 @@ import type { GalleryLocationState } from "@/lib/gallery/gallery.types";
 export const GalleryGate = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { unlock } = useGalleryGate();
 
   const handleBack = useCallback(() => {
     const from = (location.state as GalleryLocationState | null)?.from;
@@ -37,7 +39,7 @@ export const GalleryGate = () => {
 
       <div className={styles.panel}>
         <p className={styles.title}>画廊</p>
-        <GalleryGateField variant="page" autoFocus />
+        <GalleryGateField variant="page" autoFocus unlock={unlock} />
       </div>
 
       <button type="button" className={styles.back} aria-label="返回笔记" onClick={handleBack}>

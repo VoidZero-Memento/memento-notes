@@ -1,20 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 
-import { useGalleryGate } from "@/lib/gallery/use-gallery-gate";
-
 import styles from "./GalleryGateField.module.css";
 
 import type { KeyboardEvent } from "react";
 
 type GalleryGateFieldProps = {
   autoFocus?: boolean;
+  label?: string;
+  unlock: (raw: string) => Promise<boolean>;
   variant: "inline" | "page";
   onUnlocked?: () => void;
   onCancel?: () => void;
 };
 
-export const GalleryGateField = ({ autoFocus, variant, onUnlocked, onCancel }: GalleryGateFieldProps) => {
-  const { unlock } = useGalleryGate();
+export const GalleryGateField = ({ autoFocus, label = "画廊密钥", unlock, variant, onUnlocked, onCancel }: GalleryGateFieldProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const busyRef = useRef(false);
   const shakeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -77,7 +76,7 @@ export const GalleryGateField = ({ autoFocus, variant, onUnlocked, onCancel }: G
       <input
         ref={inputRef}
         className={styles.input}
-        type="password"
+        type="text"
         name="gallery-gate"
         autoComplete="off"
         autoCorrect="off"
@@ -86,7 +85,7 @@ export const GalleryGateField = ({ autoFocus, variant, onUnlocked, onCancel }: G
         autoFocus={autoFocus}
         disabled={busy}
         placeholder="密钥"
-        aria-label="画廊密钥"
+        aria-label={label}
         aria-invalid={denied}
         value={value}
         onChange={(event) => setValue(event.target.value)}

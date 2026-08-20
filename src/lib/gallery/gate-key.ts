@@ -2,7 +2,7 @@ const PEPPER_PREFIX = "mg::";
 const PEPPER_SUFFIX = "::gate";
 
 /** SHA-256 digest fragments (of peppered secret) — not stored as one obvious string */
-const DIGEST_CHUNKS = [
+const SITE_DIGEST_CHUNKS = [
   "5fff3199",
   "b8e95fc0",
   "549712e9",
@@ -13,7 +13,20 @@ const DIGEST_CHUNKS = [
   "1bf8ee7d",
 ] as const;
 
-export const expectedDigest = () => DIGEST_CHUNKS.join("");
+const GALLERY_DIGEST_CHUNKS = [
+  "9b687037",
+  "72847832",
+  "f5d369c5",
+  "d7309f2c",
+  "546dda2e",
+  "e8e4ce58",
+  "6e13aae9",
+  "49d6c047",
+] as const;
+
+export const expectedSiteDigest = () => SITE_DIGEST_CHUNKS.join("");
+
+export const expectedGalleryDigest = () => GALLERY_DIGEST_CHUNKS.join("");
 
 const toHex = (bytes: ArrayLike<number>) =>
   Array.from(bytes as ArrayLike<number>, (b) => b.toString(16).padStart(2, "0")).join("");
@@ -127,8 +140,8 @@ export const hashGateKey = async (raw: string) => {
   return sha256Fallback(payload);
 };
 
-export const verifyGateKey = async (raw: string) => {
+export const verifyGateKey = async (raw: string, expected: string) => {
   if (!raw.trim()) return false;
   const actual = await hashGateKey(raw);
-  return sameDigest(actual, expectedDigest());
+  return sameDigest(actual, expected);
 };
