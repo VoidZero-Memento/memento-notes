@@ -31,24 +31,28 @@ const ImageIcon = () => (
 type SidebarBgToggleProps = {
   enabled: boolean;
   looping: boolean;
-  /** 为 true 时展示弹出菜单（含循环项）；PC 为 false 时仍直接开关背景 */
-  menuMode: boolean;
+  /** 是否展示"循环播放"这一项；目前只对手机端轮播图有意义 */
+  showLoopOption: boolean;
+  borderFlowEnabled: boolean;
   disabled?: boolean;
   needsUnlock?: boolean;
   unlock?: (raw: string) => Promise<boolean>;
   onEnabledChange: (enabled: boolean) => void;
   onLoopingChange: (looping: boolean) => void;
+  onBorderFlowChange: (enabled: boolean) => void;
 };
 
 export const SidebarBgToggle = ({
   enabled,
   looping,
-  menuMode,
+  showLoopOption,
+  borderFlowEnabled,
   disabled = false,
   needsUnlock = false,
   unlock,
   onEnabledChange,
   onLoopingChange,
+  onBorderFlowChange,
 }: SidebarBgToggleProps) => {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -81,10 +85,6 @@ export const SidebarBgToggle = ({
     };
   }, [open, prompting]);
 
-  useEffect(() => {
-    if (!menuMode) setOpen(false);
-  }, [menuMode]);
-
   const requestEnable = () => {
     if (needsUnlock && unlock) {
       setOpen(false);
@@ -96,12 +96,6 @@ export const SidebarBgToggle = ({
 
   const handleTriggerClick = () => {
     if (disabled) return;
-    if (!menuMode) {
-      if (enabled) onEnabledChange(false);
-      else if (prompting) setPrompting(false);
-      else requestEnable();
-      return;
-    }
     setPrompting(false);
     setOpen((prev) => !prev);
   };
@@ -122,6 +116,11 @@ export const SidebarBgToggle = ({
     setOpen(false);
   };
 
+  const handleToggleBorderFlow = () => {
+    onBorderFlowChange(!borderFlowEnabled);
+    setOpen(false);
+  };
+
   const handleUnlocked = () => {
     setPrompting(false);
     onEnabledChange(true);
@@ -132,29 +131,19 @@ export const SidebarBgToggle = ({
       <button
         type="button"
         className={`${styles.trigger}${enabled ? ` ${styles.triggerOn}` : ""}${open ? ` ${styles.triggerOpen}` : ""}`}
-        role={menuMode ? undefined : "switch"}
-        aria-checked={menuMode ? undefined : enabled}
         aria-busy={disabled || undefined}
-        aria-label="背景图"
-        aria-haspopup={menuMode ? "menu" : undefined}
-        aria-expanded={menuMode ? open : undefined}
-        aria-controls={menuMode ? listId : undefined}
-        title={
-          disabled
-            ? "背景切换中"
-            : menuMode
-              ? "背景图设置"
-              : enabled
-                ? "关闭背景图"
-                : "开启背景图"
-        }
+        aria-label="外观设置"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-controls={listId}
+        title={disabled ? "背景切换中" : "外观设置"}
         disabled={disabled}
         onClick={handleTriggerClick}
       >
         <ImageIcon />
       </button>
 
-      {menuMode && mounted ? (
+      {mounted ? (
         <ul
           id={listId}
           className={`${styles.menu}${visible ? ` ${styles.menuVisible}` : ""}`}
@@ -176,18 +165,33 @@ export const SidebarBgToggle = ({
               <span className={styles.optionState}>{enabled ? "开" : "关"}</span>
             </button>
           </li>
+          {showLoopOption ? (
+            <li role="presentation">
+              <button
+                type="button"
+                role="menuitemcheckbox"
+                aria-checked={looping}
+                tabIndex={visible && enabled ? 0 : -1}
+                className={`${styles.option}${looping && enabled ? ` ${styles.optionSelected}` : ""}`}
+                disabled={disabled || !enabled}
+                onClick={handleToggleLooping}
+              >
+                <span className={styles.optionLabel}>循环播放</span>
+                <span className={styles.optionState}>{looping ? "开" : "关"}</span>
+              </button>
+            </li>
+          ) : null}
           <li role="presentation">
             <button
               type="button"
               role="menuitemcheckbox"
-              aria-checked={looping}
-              tabIndex={visible && enabled ? 0 : -1}
-              className={`${styles.option}${looping && enabled ? ` ${styles.optionSelected}` : ""}`}
-              disabled={disabled || !enabled}
-              onClick={handleToggleLooping}
+              aria-checked={borderFlowEnabled}
+              tabIndex={visible ? 0 : -1}
+              className={`${styles.option}${borderFlowEnabled ? ` ${styles.optionSelected}` : ""}`}
+              onClick={handleToggleBorderFlow}
             >
-              <span className={styles.optionLabel}>循环播放</span>
-              <span className={styles.optionState}>{looping ? "开" : "关"}</span>
+              <span className={styles.optionLabel}>边框流光</span>
+              <span className={styles.optionState}>{borderFlowEnabled ? "开" : "关"}</span>
             </button>
           </li>
         </ul>

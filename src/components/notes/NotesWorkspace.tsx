@@ -9,10 +9,12 @@ import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
 import { parseOutline } from "@/lib/markdown/parse-outline";
 import { getNoteTitleFromPath, getRepoWorkspaceTitle } from "@/lib/note-title";
 import { useNoteContent } from "@/lib/notes/use-note-content";
+import { useBorderFlow } from "@/lib/prefs/useBorderFlow";
 import { useSidebarBgLoop } from "@/lib/prefs/useSidebarBgLoop";
 import { useSidebarBgTransition } from "@/lib/prefs/useSidebarBgTransition";
 import { toast } from "@/lib/toast/toast";
 import { EmptyState } from "@/components/common/EmptyState";
+import { GalleryLink } from "@/components/gallery/GalleryLink";
 import { BgTransitionOverlay } from "@/components/theme/BgTransitionOverlay";
 import { SidebarBgToggle } from "@/components/theme/SidebarBgToggle";
 import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
@@ -76,6 +78,7 @@ export const NotesWorkspace = ({
   const isMobile = useMediaQuery(MOBILE_BG_MQ);
   const { unlocked: galleryBgUnlocked, unlock: unlockGalleryBg } = useGalleryBgGate();
   const { looping: sidebarBgLooping, setLooping: setSidebarBgLooping } = useSidebarBgLoop();
+  const { enabled: borderFlowEnabled, setEnabled: setBorderFlowEnabled } = useBorderFlow();
   const {
     enabled: sidebarBgEnabled,
     setBgEnabled: setSidebarBgEnabled,
@@ -95,6 +98,8 @@ export const NotesWorkspace = ({
   const [sidebarFx, setSidebarFx] = useState<"idle" | "collapse" | "expand">("idle");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [scrollAtTop, setScrollAtTop] = useState(true);
+  const [scrollAtBottom, setScrollAtBottom] = useState(true);
   const sidebarFxTimerRef = useRef<number | null>(null);
 
   const clearSidebarFxTimer = () => {
@@ -154,6 +159,10 @@ export const NotesWorkspace = ({
 
     const handleScroll = () => {
       setShowBackToTop(container.scrollTop > 320);
+      setScrollAtTop(container.scrollTop <= 4);
+      setScrollAtBottom(
+        container.scrollTop + container.clientHeight >= container.scrollHeight - 4,
+      );
     };
 
     handleScroll();
@@ -227,6 +236,8 @@ export const NotesWorkspace = ({
         sidebarFx === "expand" ? styles.rootFxExpand : "",
         sidebarBgEnabled ? styles.rootBgEnabled : "",
         mobileBgCarousel ? styles.rootBgCarousel : "",
+        !borderFlowEnabled ? styles.borderFlowOff : "",
+        mobileNavOpen ? styles.rootMobileNavOpen : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -241,6 +252,7 @@ export const NotesWorkspace = ({
           styles.sidebarRailFx,
           sidebarFx === "collapse" ? styles.sidebarRailFxCollapse : "",
           sidebarFx === "expand" ? styles.sidebarRailFxExpand : "",
+          sidebarFx === "idle" && !sidebarHidden ? styles.sidebarRailFxIdle : "",
         ]
           .filter(Boolean)
           .join(" ")}
@@ -334,7 +346,8 @@ export const NotesWorkspace = ({
               <SidebarBgToggle
                 enabled={sidebarBgEnabled}
                 looping={sidebarBgLooping}
-                menuMode={isMobile}
+                showLoopOption={isMobile}
+                borderFlowEnabled={borderFlowEnabled}
                 disabled={bgTransitionBusy}
                 needsUnlock={!galleryBgUnlocked}
                 unlock={unlockGalleryBg}
@@ -343,10 +356,15 @@ export const NotesWorkspace = ({
                   setSidebarBgLooping(next);
                   toast.success(next ? "已开启循环播放" : "已固定当前背景");
                 }}
+                onBorderFlowChange={(next) => {
+                  setBorderFlowEnabled(next);
+                  toast.success(next ? "已开启边框流光" : "已关闭边框流光");
+                }}
               />
               <ThemeSwitcher />
             </div>
           </div>
+          {sidebarBgEnabled ? <GalleryLink /> : null}
         </div>
       </aside>
       <BgTransitionOverlay open={bgOverlayOpen} crawlProgress={bgOverlayCrawl} />
@@ -379,57 +397,67 @@ export const NotesWorkspace = ({
               <p className={styles.viewerPath}>{selectedPath}</p>
             </div>
           ) : null}
-          <div
-            className={`${styles.viewerBody}${pending ? ` ${styles.viewerBodyPending}` : ""}`}
-            ref={viewerBodyRef}
-          >
-            {treeLoading ? <LoadingState label="加载文件树" /> : null}
-            {!treeLoading && !selectedPath ? (
-              <EmptyState
-                title="请选择一个 Markdown 文件"
-                description="从左侧文件列表中选一篇笔记开始阅读"
-                action={{ label: "浏览文件", onClick: handleBrowseFiles }}
-              />
-            ) : null}
-            {!treeLoading && selectedPath && loading ? <LoadingState label="加载中" /> : null}
-            {!treeLoading && selectedPath && error && !loading ? (
-              <EmptyState
-                variant="error"
-                title="无法加载笔记"
-                description={describeNoteLoadError(error)}
-                action={{ label: "重试", onClick: () => void retry() }}
-              />
-            ) : null}
-            {!treeLoading && selectedPath && content && !loading ? (
-              <NoteEnter key={selectedPath}>
-                <MarkdownViewer content={content} headingIds={outlineItems.map((item) => item.id)} />
-              </NoteEnter>
-            ) : null}
+          <div className={styles.viewerBodyWrap}>
+            <div
+              className={`${styles.scrollFadeTop}${!scrollAtTop ? ` ${styles.scrollFadeVisible}` : ""}`}
+              aria-hidden
+            />
+            <div
+              className={`${styles.viewerBody}${pending ? ` ${styles.viewerBodyPending}` : ""}`}
+              ref={viewerBodyRef}
+            >
+              {treeLoading ? <LoadingState label="加载文件树" /> : null}
+              {!treeLoading && !selectedPath ? (
+                <EmptyState
+                  title="请选择一个 Markdown 文件"
+                  description="从左侧文件列表中选一篇笔记开始阅读"
+                  action={{ label: "浏览文件", onClick: handleBrowseFiles }}
+                />
+              ) : null}
+              {!treeLoading && selectedPath && loading ? <LoadingState label="加载中" /> : null}
+              {!treeLoading && selectedPath && error && !loading ? (
+                <EmptyState
+                  variant="error"
+                  title="无法加载笔记"
+                  description={describeNoteLoadError(error)}
+                  action={{ label: "重试", onClick: () => void retry() }}
+                />
+              ) : null}
+              {!treeLoading && selectedPath && content && !loading ? (
+                <NoteEnter key={selectedPath}>
+                  <MarkdownViewer content={content} headingIds={outlineItems.map((item) => item.id)} />
+                </NoteEnter>
+              ) : null}
+            </div>
+            <div
+              className={`${styles.scrollFadeBottom}${!scrollAtBottom ? ` ${styles.scrollFadeVisible}` : ""}`}
+              aria-hidden
+            />
           </div>
           {pending ? (
             <div className={styles.pendingOverlay}>
               <LoadingState label="加载中" />
             </div>
           ) : null}
-          {showBackToTop ? (
-            <button
-              type="button"
-              className={styles.backToTop}
-              aria-label="回到顶部"
-              onClick={handleBackToTop}
-            >
-              <svg className={styles.backToTopIcon} viewBox="0 0 16 16" aria-hidden>
-                <path
-                  d="M8 3.5 3.5 8M8 3.5 12.5 8M8 3.5v9"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          ) : null}
+          <button
+            type="button"
+            className={`${styles.backToTop}${showBackToTop ? ` ${styles.backToTopVisible}` : ""}`}
+            aria-label="回到顶部"
+            aria-hidden={!showBackToTop}
+            tabIndex={showBackToTop ? 0 : -1}
+            onClick={handleBackToTop}
+          >
+            <svg className={styles.backToTopIcon} viewBox="0 0 16 16" aria-hidden>
+              <path
+                d="M8 3.5 3.5 8M8 3.5 12.5 8M8 3.5v9"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
         </div>
       </main>
     </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { GALLERY_PATH, STAGE_PATH } from "@/lib/gallery/constants";
@@ -17,14 +17,16 @@ type GatePortalProps = {
   path: string;
   unlocked: boolean;
   unlock: (raw: string) => Promise<boolean>;
+  prompting: boolean;
+  onPromptingChange: (prompting: boolean) => void;
 };
 
-const GatePortal = ({ from, label, path, unlocked, unlock }: GatePortalProps) => {
+const GatePortal = ({ from, label, path, unlocked, unlock, prompting, onPromptingChange }: GatePortalProps) => {
   const navigate = useNavigate();
-  const [prompting, setPrompting] = useState(false);
   const state: GalleryLocationState = { from };
 
   const enter = () => {
+    onPromptingChange(false);
     navigate(path, { state });
   };
 
@@ -33,7 +35,7 @@ const GatePortal = ({ from, label, path, unlocked, unlock }: GatePortalProps) =>
     if (unlocked) return;
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
-    setPrompting(true);
+    onPromptingChange(true);
   };
 
   if (prompting && !unlocked) {
@@ -45,7 +47,7 @@ const GatePortal = ({ from, label, path, unlocked, unlock }: GatePortalProps) =>
           label={`${label}密钥`}
           unlock={unlock}
           onUnlocked={enter}
-          onCancel={() => setPrompting(false)}
+          onCancel={() => onPromptingChange(false)}
         />
       </div>
     );
@@ -58,16 +60,59 @@ const GatePortal = ({ from, label, path, unlocked, unlock }: GatePortalProps) =>
   );
 };
 
+type PromptingKey = "stage" | "gallery" | null;
+
 export const GalleryLink = () => {
   const location = useLocation();
   const from = `${location.pathname}${location.search}`;
   const stage = useStageGate();
   const gallery = useGalleryGate();
+  const [promptingKey, setPromptingKey] = useState<PromptingKey>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!promptingKey) return;
+
+    const handlePointerDown = (event: globalThis.MouseEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setPromptingKey(null);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPromptingKey(null);
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [promptingKey]);
 
   return (
-    <div className={styles.cluster} onClick={(event) => event.stopPropagation()}>
-      <GatePortal path={STAGE_PATH} label="展台" from={from} unlocked={stage.unlocked} unlock={stage.unlock} />
-      <GatePortal path={GALLERY_PATH} label="画廊" from={from} unlocked={gallery.unlocked} unlock={gallery.unlock} />
+    <div className={styles.cluster} ref={rootRef} onClick={(event) => event.stopPropagation()}>
+      {promptingKey !== "gallery" ? (
+        <GatePortal
+          path={STAGE_PATH}
+          label="展台"
+          from={from}
+          unlocked={stage.unlocked}
+          unlock={stage.unlock}
+          prompting={promptingKey === "stage"}
+          onPromptingChange={(next) => setPromptingKey(next ? "stage" : null)}
+        />
+      ) : null}
+      {promptingKey !== "stage" ? (
+        <GatePortal
+          path={GALLERY_PATH}
+          label="画廊"
+          from={from}
+          unlocked={gallery.unlocked}
+          unlock={gallery.unlock}
+          prompting={promptingKey === "gallery"}
+          onPromptingChange={(next) => setPromptingKey(next ? "gallery" : null)}
+        />
+      ) : null}
     </div>
   );
 };

@@ -49,6 +49,22 @@
   animation: sidebarRailExpand 0.58s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+.sidebarRailFxIdle {
+  left: 316px;
+  opacity: 0.28;
+  animation: sidebarRailIdleBreathe 4.5s ease-in-out infinite;
+}
+
+@keyframes sidebarRailIdleBreathe {
+  0%,
+  100% {
+    opacity: 0.16;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
 .sidebar,
 .viewer {
   position: relative;
@@ -60,6 +76,72 @@
     0 0 18px rgba(var(--accent-rgb), 0.08),
     0 10px 36px rgba(0, 0, 0, 0.32),
     inset 0 1px 0 rgba(var(--accent-rgb), 0.08);
+}
+
+/* 流动描边：以矩形中心为原点旋转 conic-gradient，光点依次沿边框流动一圈；
+   仅描边环（约 2px）参与重绘，其余大面积区域不受影响，性能开销极小 */
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.sidebar::after,
+.viewer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 0deg,
+    transparent 270deg,
+    rgba(var(--accent-rgb), 0.15) 300deg,
+    rgba(var(--accent-2-rgb), 0.7) 335deg,
+    rgba(var(--accent-3-rgb), 1) 352deg,
+    rgba(var(--accent-rgb), 0.6) 359deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: panelBorderSpin 7s linear infinite;
+}
+
+@keyframes panelBorderSpin {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+/* 边框流光关闭：直接停掉动画，避免无意义的常驻重绘 */
+.borderFlowOff .sidebar::after,
+.borderFlowOff .viewer::after {
+  animation: none;
+  opacity: 0;
+}
+
+.sidebar::before,
+.viewer::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 42%;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0) 100%
+  );
+  pointer-events: none;
 }
 
 .sidebar {
@@ -260,9 +342,12 @@
   }
 
   .sidebarRailFx,
+  .sidebarRailFxIdle,
   .sidebarFxExpand,
   .rootFxCollapse .viewer,
-  .rootFxExpand .viewer {
+  .rootFxExpand .viewer,
+  .sidebar::after,
+  .viewer::after {
     animation: none !important;
   }
 
@@ -704,6 +789,15 @@
   padding: 16px 28px 12px;
 }
 
+.viewerBodyWrap {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  flex-direction: column;
+}
+
 .viewerBody {
   display: flex;
   flex: 1;
@@ -718,6 +812,32 @@
 .viewerBodyPending {
   opacity: 0.5;
   pointer-events: none;
+}
+
+.scrollFadeTop,
+.scrollFadeBottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  height: 32px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.scrollFadeTop {
+  top: 0;
+  background: linear-gradient(180deg, rgba(4, 7, 14, 0.5), rgba(4, 7, 14, 0));
+}
+
+.scrollFadeBottom {
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(4, 7, 14, 0.5), rgba(4, 7, 14, 0));
+}
+
+.scrollFadeVisible {
+  opacity: 1;
 }
 
 .backToTop {
@@ -735,32 +855,43 @@
   background:
     linear-gradient(
       180deg,
-      rgba(var(--accent-rgb), 0.18),
-      rgba(var(--accent-2-rgb), 0.12)
+      rgba(var(--accent-rgb), 0.14),
+      rgba(var(--accent-2-rgb), 0.08)
     ),
-    rgba(8, 12, 22, 0.72);
+    rgba(8, 12, 22, 0.5);
   box-shadow:
-    inset 0 0 0 1px rgba(var(--accent-rgb), 0.28),
-    0 0 16px rgba(var(--accent-rgb), 0.18),
-    0 8px 24px rgba(0, 0, 0, 0.28);
+    inset 0 0 0 1px rgba(var(--accent-rgb), 0.2),
+    0 0 12px rgba(var(--accent-rgb), 0.12),
+    0 6px 18px rgba(0, 0, 0, 0.2);
   padding: 0;
-  color: rgba(var(--fg-rgb), 0.88);
+  color: rgba(var(--fg-rgb), 0.72);
   cursor: pointer;
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
   -webkit-appearance: none;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  opacity: 0;
+  transform: translateY(10px) scale(0.82);
+  pointer-events: none;
   transition:
+    opacity 0.32s cubic-bezier(0.34, 1.4, 0.64, 1),
+    transform 0.32s cubic-bezier(0.34, 1.4, 0.64, 1),
     background 0.15s ease,
     box-shadow 0.15s ease,
-    color 0.15s ease,
-    transform 0.15s ease;
+    color 0.15s ease;
+}
+
+.backToTopVisible {
+  opacity: 0.58;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
 }
 
 .backToTop:hover,
 .backToTop:focus-visible {
+  opacity: 1;
   background:
     linear-gradient(
       180deg,
@@ -773,22 +904,44 @@
     0 0 18px rgba(var(--accent-rgb), 0.28),
     0 10px 28px rgba(0, 0, 0, 0.32);
   color: var(--foreground);
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.04);
+}
+
+.backToTop:active {
+  transform: translateY(0) scale(0.96);
+  transition-duration: 0.1s;
 }
 
 .backToTopIcon {
   display: block;
   width: 16px;
   height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.backToTop:hover .backToTopIcon {
+  transform: translateY(-1px);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .backToTop {
-    transition: none;
+    transition: opacity 0.15s ease;
+    transform: none;
+  }
+
+  .backToTopVisible {
+    transform: none;
   }
 
   .backToTop:hover,
-  .backToTop:focus-visible {
+  .backToTop:focus-visible,
+  .backToTop:active {
+    transform: none;
+  }
+
+  .backToTopIcon,
+  .backToTop:hover .backToTopIcon {
+    transition: none;
     transform: none;
   }
 }
@@ -885,7 +1038,9 @@
     inset: 0;
     z-index: 30;
     border: none;
-    background: rgba(0, 4, 12, 0.55);
+    background: rgba(0, 4, 12, 0.78);
+    -webkit-backdrop-filter: blur(10px) saturate(0.7);
+    backdrop-filter: blur(10px) saturate(0.7);
     padding: 0;
     opacity: 0;
     pointer-events: none;
@@ -897,6 +1052,12 @@
     opacity: 1;
     pointer-events: auto;
     cursor: pointer;
+  }
+
+  /* 抽屉打开时，viewer 的流光边框会透过遮罩与背后文字叠在一起显得杂乱，直接停掉 */
+  .rootMobileNavOpen .viewer::after {
+    animation: none !important;
+    opacity: 0;
   }
 
   .sidebarRailFx,
@@ -944,6 +1105,7 @@
     content: "";
     position: absolute;
     inset: 0;
+    height: 100%;
     z-index: -1;
     border-radius: inherit;
     pointer-events: none;

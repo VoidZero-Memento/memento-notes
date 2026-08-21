@@ -87,29 +87,24 @@
         height: 100%;
         object-fit: cover;
         object-position: center 28%;
-        transform: scale(1.06);
-        opacity: 0.82;
-        filter: saturate(1.08) brightness(1.02);
-        animation: splashDrift 12s ease-in-out infinite alternate;
+        transform-origin: 50% 40%;
+        filter: saturate(1.08) contrast(1.03);
+        animation: splashDrift 16s ease-in-out infinite alternate;
       }
 
       #app-splash .splash-veil {
         position: absolute;
         inset: 0;
         pointer-events: none;
-        background:
-          linear-gradient(
-            180deg,
-            rgba(4, 7, 14, 0.08) 0%,
-            rgba(4, 7, 14, 0.04) 36%,
-            rgba(4, 7, 14, 0.38) 62%,
-            rgba(4, 7, 14, 0.72) 100%
-          ),
-          radial-gradient(
-            ellipse at 50% 18%,
-            rgba(255, 154, 196, 0.14),
-            transparent 55%
-          );
+        background: linear-gradient(
+          180deg,
+          transparent 0%,
+          transparent 50%,
+          rgba(4, 7, 14, 0.22) 68%,
+          rgba(4, 7, 14, 0.62) 82%,
+          rgba(4, 7, 14, 0.92) 96%,
+          rgba(4, 7, 14, 0.96) 100%
+        );
       }
 
       #app-splash .splash-panel {
@@ -117,9 +112,50 @@
         left: 0;
         right: 0;
         bottom: 0;
-        padding: max(40px, 8svh) 24px
-          max(36px, calc(6svh + env(safe-area-inset-bottom, 0px)));
+        display: flex;
+        justify-content: center;
+        padding: max(40px, 8svh) 20px
+          max(28px, calc(5svh + env(safe-area-inset-bottom, 0px)));
+      }
+
+      #app-splash .splash-card {
+        position: relative;
+        width: min(320px, 100%);
         text-align: center;
+        animation: splashCardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+      }
+
+      #app-splash .splash-brand-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      #app-splash .splash-mark {
+        position: relative;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        flex: none;
+        background: conic-gradient(
+          from 0deg,
+          #00f0ff,
+          #7c5cff,
+          #ff2d95,
+          #ffb86c,
+          #00f0ff
+        );
+        box-shadow: 0 0 10px rgba(124, 92, 255, 0.55);
+        animation: splashSpin 2.6s linear infinite;
+      }
+
+      #app-splash .splash-mark::after {
+        content: "";
+        position: absolute;
+        inset: 3px;
+        border-radius: 50%;
+        background: #0b0a12;
       }
 
       #app-splash .splash-brand {
@@ -136,16 +172,25 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        margin: 8px 0 0;
-        color: rgba(245, 240, 255, 0.96);
-        font-size: 20px;
+        gap: 6px;
+        margin: 10px 0 0;
+        font-size: 19px;
         font-weight: 700;
         letter-spacing: 0.06em;
         line-height: 1.35;
-        text-shadow:
-          0 1px 2px rgba(0, 0, 0, 0.35),
-          0 8px 28px rgba(0, 0, 0, 0.4);
+      }
+
+      #app-splash .splash-title span:first-child {
+        background: linear-gradient(
+          92deg,
+          #f5f0ff 0%,
+          #cdeeff 45%,
+          #ffd6ea 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
       }
 
       #app-splash .splash-dots {
@@ -171,34 +216,34 @@
         animation-delay: 0.36s;
       }
 
-      #app-splash .splash-label {
-        margin: 8px 0 0;
-        max-width: 22em;
-        margin-left: auto;
-        margin-right: auto;
-        color: rgba(245, 240, 255, 0.68);
-        font-size: 13px;
-        font-weight: 500;
-        letter-spacing: 0.03em;
-        line-height: 1.55;
-        text-shadow: 0 1px 14px rgba(0, 0, 0, 0.4);
+      #app-splash .splash-progress-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin: 16px 0 0;
       }
 
       #app-splash .splash-track {
         position: relative;
-        width: min(280px, 72%);
+        flex: none;
+        width: min(200px, 60%);
         height: 7px;
-        margin: 18px auto 0;
         overflow: hidden;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.1);
-        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+          inset 0 1px 3px rgba(0, 0, 0, 0.5),
+          0 2px 10px rgba(0, 0, 0, 0.35);
       }
 
       #app-splash .splash-fill {
+        position: relative;
         display: block;
         height: 100%;
         width: 0%;
+        overflow: hidden;
         border-radius: inherit;
         background: linear-gradient(
           90deg,
@@ -208,18 +253,48 @@
           #ffb86c 100%
         );
         box-shadow:
-          0 0 10px rgba(0, 240, 255, 0.35),
-          0 0 18px rgba(255, 45, 149, 0.28);
+          0 0 10px rgba(0, 240, 255, 0.4),
+          0 0 18px rgba(255, 45, 149, 0.32);
         transition: width 0.35s ease;
+        animation: splashGlowPulse 2.2s ease-in-out infinite;
+      }
+
+      #app-splash .splash-fill-sheen {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -60%;
+        width: 45%;
+        background: linear-gradient(
+          100deg,
+          transparent,
+          rgba(255, 255, 255, 0.75),
+          transparent
+        );
+        animation: splashSheen 1.8s ease-in-out infinite;
       }
 
       #app-splash .splash-percent {
-        margin: 10px 0 0;
-        color: rgba(245, 240, 255, 0.58);
+        flex: none;
+        min-width: 2.6em;
+        margin: 0;
+        color: rgba(245, 240, 255, 0.75);
         font-size: 12px;
-        font-weight: 500;
-        letter-spacing: 0.08em;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-align: right;
         font-variant-numeric: tabular-nums;
+        text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+      }
+
+      #app-splash .splash-label {
+        margin: 12px 0 0;
+        color: rgba(245, 240, 255, 0.68);
+        font-size: 12.5px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        line-height: 1.5;
+        text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55);
       }
 
       @keyframes splashDot {
@@ -246,12 +321,51 @@
         }
       }
 
-      @keyframes splashDrift {
+      @keyframes splashCardIn {
         from {
-          transform: scale(1.06) translateY(0);
+          opacity: 0;
+          transform: translateY(14px) scale(0.96);
         }
         to {
-          transform: scale(1.12) translateY(-1.5%);
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes splashDrift {
+        0% {
+          transform: scale(1.05) translate(0, 0);
+        }
+        50% {
+          transform: scale(1.1) translate(-1.2%, -1.8%);
+        }
+        100% {
+          transform: scale(1.16) translate(1%, -2.6%);
+        }
+      }
+
+      @keyframes splashSpin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes splashSheen {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(280%);
+        }
+      }
+
+      @keyframes splashGlowPulse {
+        0%,
+        100% {
+          filter: brightness(1);
+        }
+        50% {
+          filter: brightness(1.18);
         }
       }
 
@@ -263,8 +377,8 @@
 
       @media (max-width: 860px) {
         #app-splash .splash-panel {
-          padding: max(32px, 6svh) 20px
-            max(28px, calc(5svh + env(safe-area-inset-bottom, 0px)));
+          padding: max(32px, 6svh) 18px
+            max(24px, calc(4svh + env(safe-area-inset-bottom, 0px)));
         }
 
         #app-splash .splash-title {
@@ -277,15 +391,18 @@
         }
 
         #app-splash .splash-track {
-          width: min(240px, 78%);
+          width: min(260px, 70%);
         }
       }
 
       @media (prefers-reduced-motion: reduce) {
         #app-splash .splash-stage,
         #app-splash .splash-banner,
+        #app-splash .splash-card,
+        #app-splash .splash-mark,
         #app-splash .splash-dots span,
-        #app-splash .splash-fill {
+        #app-splash .splash-fill,
+        #app-splash .splash-fill-sheen {
           animation: none;
           transition: none;
         }
@@ -317,20 +434,29 @@
           </picture>
           <div class="splash-veil" aria-hidden="true"></div>
           <div class="splash-panel">
-            <p class="splash-brand">Memento</p>
-            <p class="splash-title">
-              <span>资源加载中</span>
-              <span class="splash-dots" aria-hidden="true">
-                <span></span><span></span><span></span>
-              </span>
-            </p>
-            <p class="splash-label" id="splash-label">
-              正在准备笔记空间，请稍候
-            </p>
-            <div class="splash-track" aria-hidden="true">
-              <span class="splash-fill" id="splash-fill"></span>
+            <div class="splash-card">
+              <div class="splash-brand-row">
+                <span class="splash-mark" aria-hidden="true"></span>
+                <p class="splash-brand">Memento</p>
+              </div>
+              <p class="splash-title">
+                <span>资源加载中</span>
+                <span class="splash-dots" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </span>
+              </p>
+              <div class="splash-progress-row">
+                <div class="splash-track" aria-hidden="true">
+                  <span class="splash-fill" id="splash-fill">
+                    <span class="splash-fill-sheen"></span>
+                  </span>
+                </div>
+                <p class="splash-percent" id="splash-percent">0%</p>
+              </div>
+              <p class="splash-label" id="splash-label">
+                正在准备笔记空间，请稍候
+              </p>
             </div>
-            <p class="splash-percent" id="splash-percent">0%</p>
           </div>
         </div>
       </div>

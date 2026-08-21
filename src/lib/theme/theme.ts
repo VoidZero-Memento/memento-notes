@@ -1,5 +1,5 @@
-/** 按颜色相似度排序：红橙粉 → 暖金 → 金青 → 翠绿 → 青蓝紫 → 霓虹 */
-export const THEME_IDS = ["15", "8", "19", "18", "1", "5", "17", "2", "4", "10", "9", "3", "14", "12", "11"] as const;
+/** 按颜色相似度排序：青紫霓虹 → 金青绿 → 苏梅柳芽 → 暖金激光甜粉 → 极光紫金 */
+export const THEME_IDS = ["3", "14", "12", "1", "5", "17", "2", "4", "10", "19", "18", "15", "8", "11"] as const;
 
 export type ThemeId = (typeof THEME_IDS)[number];
 
@@ -17,7 +17,6 @@ export const THEME_LABELS: Record<ThemeId, string> = {
   "2": "松花苏梅",
   "4": "丁香柳芽",
   "10": "米白星蓝",
-  "9": "湖青黛紫",
   "3": "青紫双撞",
   "14": "全息虹彩",
   "12": "赛博霓虹",
@@ -35,7 +34,6 @@ export const THEME_PREVIEWS: Record<ThemeId, string> = {
   "2": "linear-gradient(135deg, #a8c686 0%, #e497a4 50%, #f2e6d0 100%)",
   "4": "linear-gradient(135deg, #c1a1ca 0%, #96c24e 50%, #8c64a0 100%)",
   "10": "linear-gradient(135deg, #41bbc8 0%, #fcf9e8 50%, #7ed4dc 100%)",
-  "9": "linear-gradient(135deg, #38b0b0 0%, #815c94 50%, #a888bc 100%)",
   "3": "linear-gradient(135deg, #00f0ff 0%, #9d00ff 50%, #c77dff 100%)",
   "14": "linear-gradient(135deg, #22d3ee 0%, #a855f7 48%, #f472b6 100%)",
   "12": "linear-gradient(135deg, #00f0ff 0%, #7c5cff 48%, #ff2d95 100%)",

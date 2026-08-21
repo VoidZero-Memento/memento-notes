@@ -222,11 +222,11 @@
 [data-theme="8"] {
   --accent-rgb: 230, 57, 124;
   --accent-2-rgb: 255, 138, 176;
-  --accent-3-rgb: 248, 244, 246;
+  --accent-3-rgb: 255, 179, 214;
   --fg-rgb: 248, 240, 244;
   --accent: #e6397c;
   --accent-2: #ff8ab0;
-  --accent-3: #f8f4f6;
+  --accent-3: #ffb3d6;
   --link: #ff6b9a;
   --link-hover: #ff8ab0;
   --background: #1a1a1d;
@@ -255,51 +255,9 @@
   --hljs-title: #ff8ab0;
   --hljs-literal: #ff6b9a;
   --hljs-string: #ffc0d4;
-  --hljs-built-in: #f8f4f6;
+  --hljs-built-in: #ffb3d6;
   --hljs-comment: #8a6e78;
   --hljs-name: #ff9ab8;
-}
-
-/* 9 湖青黛紫 */
-[data-theme="9"] {
-  --accent-rgb: 56, 176, 176;
-  --accent-2-rgb: 129, 92, 148;
-  --accent-3-rgb: 168, 136, 188;
-  --fg-rgb: 240, 246, 248;
-  --accent: #38b0b0;
-  --accent-2: #815c94;
-  --accent-3: #a888bc;
-  --link: #5cc8c8;
-  --link-hover: #a888bc;
-  --background: #080a0e;
-  --background-deep: #050608;
-  --background-mid: #10141a;
-  --panel-bg: rgba(12, 16, 22, 0.55);
-  --hologram: linear-gradient(135deg, #38b0b0 0%, #815c94 50%, #a888bc 100%);
-  --shell-bg:
-    radial-gradient(ellipse 90% 72% at 10% 12%, rgba(var(--accent-rgb), 0.42), transparent 56%),
-    radial-gradient(ellipse 78% 68% at 92% 88%, rgba(var(--accent-2-rgb), 0.38), transparent 54%),
-    radial-gradient(ellipse 50% 46% at 72% 22%, rgba(var(--accent-3-rgb), 0.16), transparent 50%),
-    radial-gradient(ellipse 55% 50% at 48% 58%, rgba(var(--accent-rgb), 0.12), transparent 52%),
-    radial-gradient(ellipse 120% 90% at 50% 120%, rgba(var(--accent-2-rgb), 0.1), transparent 50%),
-    linear-gradient(165deg, var(--background-deep) 0%, var(--background) 38%, var(--background-mid) 72%, var(--background-deep) 100%);
-  --shell-blob-warm: radial-gradient(circle at 45% 42%, rgba(var(--accent-rgb), 0.45), transparent 58%);
-  --shell-blob-cool:
-    radial-gradient(circle at 58% 48%, rgba(var(--accent-2-rgb), 0.38), transparent 62%),
-    radial-gradient(circle at 42% 62%, rgba(var(--accent-3-rgb), 0.22), transparent 55%);
-  --shell-inset: inset 0 0 100px rgba(0, 0, 0, 0.5);
-  --title-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28), 0 0 32px rgba(var(--accent-2-rgb), 0.14);
-  --code-block-bg:
-    linear-gradient(165deg, rgba(10, 22, 24, 0.98) 0%, #0a1014 55%, #06080c 100%);
-  --inline-code: #a888bc;
-  --hljs-fg: #dce8ec;
-  --hljs-keyword: #a888bc;
-  --hljs-title: #38b0b0;
-  --hljs-literal: #5cc8c8;
-  --hljs-string: #c8b0d8;
-  --hljs-built-in: #815c94;
-  --hljs-comment: #6a7080;
-  --hljs-name: #7ed4d4;
 }
 
 /* 10 米白星蓝 */
@@ -487,11 +445,11 @@
 [data-theme="15"] {
   --accent-rgb: 255, 0, 60;
   --accent-2-rgb: 255, 107, 0;
-  --accent-3-rgb: 255, 255, 255;
+  --accent-3-rgb: 255, 77, 109;
   --fg-rgb: 255, 248, 248;
   --accent: #ff003c;
   --accent-2: #ff6b00;
-  --accent-3: #ffffff;
+  --accent-3: #ff4d6d;
   --link: #ff4d6d;
   --link-hover: #ff6b00;
   --background: #0a0000;

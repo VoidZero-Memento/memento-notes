@@ -30,6 +30,11 @@ export const GalleryGateField = ({ autoFocus, label = "密钥", unlock, variant,
     };
   }, []);
 
+  useEffect(() => {
+    // busy=false 落到 DOM（移除 disabled）之后再聚焦，否则聚焦会被浏览器静默忽略
+    if (denied) inputRef.current?.focus();
+  }, [denied]);
+
   const submit = async () => {
     if (busyRef.current) return;
     const raw = value.trim();
@@ -46,7 +51,6 @@ export const GalleryGateField = ({ autoFocus, label = "密钥", unlock, variant,
     setValue("");
     setDenied(true);
     setBusy(false);
-    inputRef.current?.focus();
     if (shakeTimerRef.current) clearTimeout(shakeTimerRef.current);
     shakeTimerRef.current = setTimeout(() => setDenied(false), 520);
   };
@@ -72,6 +76,7 @@ export const GalleryGateField = ({ autoFocus, label = "密钥", unlock, variant,
       className={className}
       lang="en"
       autoComplete="off"
+      noValidate
       onClick={(event) => event.stopPropagation()}
       onSubmit={(event) => {
         event.preventDefault();
@@ -81,7 +86,7 @@ export const GalleryGateField = ({ autoFocus, label = "密钥", unlock, variant,
       <input
         ref={inputRef}
         className={styles.input}
-        type="text"
+        type="url"
         name="memento-gate"
         lang="en"
         inputMode="url"
