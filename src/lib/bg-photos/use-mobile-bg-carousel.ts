@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { MOBILE_BG_FALLBACK_URL, MOBILE_BG_INTERVAL_MS } from "@/lib/bg-photos/constants";
 import { fetchGalleryBannerUrls, getCachedGalleryBannerUrls } from "@/lib/bg-photos/images";
-import { pickNextPhotoIndex, preloadPhoto, toBgPhotoUrl } from "@/lib/bg-photos/photo-utils";
+import { pickNextPhotoIndex, toBgPhotoUrl } from "@/lib/bg-photos/photo-utils";
 import { takePreparedMobileBg } from "@/lib/bg-photos/prepare-mobile-bg";
+import { runBgCrossfade } from "@/lib/bg-photos/run-bg-crossfade";
 
 import type { BgPhotoSlot } from "@/lib/bg-photos/bg-photos.types";
+import type { BgCrossfadeRefs } from "@/lib/bg-photos/run-bg-crossfade";
 
 const emptySlot = (): BgPhotoSlot => ({ url: "", visible: false });
 
@@ -36,67 +38,54 @@ export const useMobileBgCarousel = ({ looping }: UseMobileBgCarouselOptions) => 
   const generationRef = useRef(0);
   const loopingRef = useRef(looping);
   const activeIsARef = useRef(true);
+  const busyRef = useRef(false);
   const intervalRef = useRef(0);
+  const abortRef = useRef<AbortController | null>(null);
   const hadPreparedRef = useRef(!!prepared);
+  const reducedRef = useRef(false);
 
   loopingRef.current = looping;
 
+  const fadeRefsRef = useRef<BgCrossfadeRefs>({
+    urlsRef,
+    lastIndexRef,
+    generationRef,
+    loopingRef,
+    activeIsARef,
+    busyRef,
+    setSlotA,
+    setSlotB,
+  });
+
+  const clearCarousel = () => {
+    window.clearInterval(intervalRef.current);
+    intervalRef.current = 0;
+  };
+
+  const armInterval = useCallback(() => {
+    window.clearInterval(intervalRef.current);
+    intervalRef.current = 0;
+    if (reducedRef.current || urlsRef.current.length <= 1 || !loopingRef.current) return;
+    intervalRef.current = window.setInterval(() => {
+      void runBgCrossfade(fadeRefsRef.current, true, abortRef.current?.signal);
+    }, MOBILE_BG_INTERVAL_MS);
+  }, []);
+
+  const advance = useCallback(() => {
+    void runBgCrossfade(fadeRefsRef.current, false, abortRef.current?.signal).then((ok) => {
+      if (ok && loopingRef.current) armInterval();
+    });
+  }, [armInterval]);
+
   useEffect(() => {
-    const reducedMotion = window.matchMedia(REDUCED_QUERY).matches;
+    reducedRef.current = window.matchMedia(REDUCED_QUERY).matches;
     const abort = new AbortController();
+    abortRef.current = abort;
     generationRef.current += 1;
     const gen = generationRef.current;
 
-    const clearCarousel = () => {
-      window.clearInterval(intervalRef.current);
-      intervalRef.current = 0;
-    };
-
-    const crossfade = async () => {
-      const urls = urlsRef.current;
-      if (urls.length <= 1 || !loopingRef.current) return;
-
-      const runGen = generationRef.current;
-      const idx = pickNextPhotoIndex(urls.length, lastIndexRef.current);
-      const nextUrl = urls[idx];
-      if (!nextUrl) return;
-
-      await preloadPhoto(nextUrl, abort.signal);
-      if (abort.signal.aborted || runGen !== generationRef.current || !loopingRef.current) return;
-
-      lastIndexRef.current = idx;
-
-      if (activeIsARef.current) {
-        setSlotB({ url: nextUrl, visible: false });
-        requestAnimationFrame(() => {
-          if (abort.signal.aborted || runGen !== generationRef.current) return;
-          setSlotA((prev) => ({ ...prev, visible: false }));
-          setSlotB({ url: nextUrl, visible: true });
-          activeIsARef.current = false;
-        });
-        return;
-      }
-
-      setSlotA({ url: nextUrl, visible: false });
-      requestAnimationFrame(() => {
-        if (abort.signal.aborted || runGen !== generationRef.current) return;
-        setSlotB((prev) => ({ ...prev, visible: false }));
-        setSlotA({ url: nextUrl, visible: true });
-        activeIsARef.current = true;
-      });
-    };
-
-    const armInterval = () => {
-      clearCarousel();
-      if (reducedMotion || urlsRef.current.length <= 1 || !loopingRef.current) return;
-      intervalRef.current = window.setInterval(() => {
-        void crossfade();
-      }, MOBILE_BG_INTERVAL_MS);
-    };
-
     const startCarousel = (photoUrls: string[], forceNew: boolean) => {
       if (gen !== generationRef.current) return;
-
       urlsRef.current = photoUrls;
       if (!photoUrls.length) return;
 
@@ -134,64 +123,16 @@ export const useMobileBgCarousel = ({ looping }: UseMobileBgCarouselOptions) => 
       clearCarousel();
       abort.abort();
     };
-  }, []);
+  }, [armInterval]);
 
   useEffect(() => {
-    const reducedMotion = window.matchMedia(REDUCED_QUERY).matches;
-    const clearCarousel = () => {
-      window.clearInterval(intervalRef.current);
-      intervalRef.current = 0;
-    };
-
-    if (!looping || reducedMotion || urlsRef.current.length <= 1) {
+    if (!looping) {
       clearCarousel();
       return clearCarousel;
     }
-
-    if (intervalRef.current) return clearCarousel;
-
-    const gen = generationRef.current;
-    const crossfade = async () => {
-      const urls = urlsRef.current;
-      if (urls.length <= 1 || !loopingRef.current) return;
-
-      const runGen = generationRef.current;
-      const idx = pickNextPhotoIndex(urls.length, lastIndexRef.current);
-      const nextUrl = urls[idx];
-      if (!nextUrl) return;
-
-      await preloadPhoto(nextUrl);
-      if (runGen !== generationRef.current || !loopingRef.current) return;
-
-      lastIndexRef.current = idx;
-
-      if (activeIsARef.current) {
-        setSlotB({ url: nextUrl, visible: false });
-        requestAnimationFrame(() => {
-          if (runGen !== generationRef.current) return;
-          setSlotA((prev) => ({ ...prev, visible: false }));
-          setSlotB({ url: nextUrl, visible: true });
-          activeIsARef.current = false;
-        });
-        return;
-      }
-
-      setSlotA({ url: nextUrl, visible: false });
-      requestAnimationFrame(() => {
-        if (runGen !== generationRef.current) return;
-        setSlotB((prev) => ({ ...prev, visible: false }));
-        setSlotA({ url: nextUrl, visible: true });
-        activeIsARef.current = true;
-      });
-    };
-
-    intervalRef.current = window.setInterval(() => {
-      if (gen !== generationRef.current) return;
-      void crossfade();
-    }, MOBILE_BG_INTERVAL_MS);
-
+    armInterval();
     return clearCarousel;
-  }, [looping]);
+  }, [looping, armInterval]);
 
-  return { slotA, slotB };
+  return { slotA, slotB, advance };
 };

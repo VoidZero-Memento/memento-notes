@@ -16,6 +16,7 @@ import { toast } from "@/lib/toast/toast";
 import { EmptyState } from "@/components/common/EmptyState";
 import { GalleryLink } from "@/components/gallery/GalleryLink";
 import { BgTransitionOverlay } from "@/components/theme/BgTransitionOverlay";
+import { ChromeSwipeLayer } from "@/components/theme/ChromeSwipeLayer";
 import { SidebarBgToggle } from "@/components/theme/SidebarBgToggle";
 import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import { FileTree } from "./FileTree";
@@ -27,6 +28,7 @@ import { OwnerFooter } from "./OwnerFooter";
 import { RepoSelect } from "./RepoSelect";
 import styles from "./NotesShell.module.css";
 
+import type { MobileBgCarouselHandle } from "@/components/theme/MobileBgCarousel";
 import type { GithubRepoConfig } from "@/config/github.types";
 import type { GithubFileTreeNode } from "@/lib/github/github.types";
 
@@ -88,6 +90,7 @@ export const NotesWorkspace = ({
   } = useSidebarBgTransition({ isMobile });
   const mobileBgCarousel = isMobile && sidebarBgEnabled;
   const viewerBodyRef = useRef<HTMLDivElement>(null);
+  const bgCarouselRef = useRef<MobileBgCarouselHandle>(null);
   const { content, loading, pending, error, selectNote, retry } = useNoteContent(
     config,
     selectedPath,
@@ -226,9 +229,14 @@ export const NotesWorkspace = ({
   /** 手机+背景：有正文可看时保留磨砂（含切文 pending）；首载/空态/失败不铺 */
   const viewingMarkdown = !treeLoading && !!selectedPath && !!content && !loading;
   const showViewerGlass = !mobileBgCarousel || viewingMarkdown;
+  /** 未选文件时收起顶栏与外框，让背景铺满 */
+  const immersiveBgEmpty = mobileBgCarousel && !treeLoading && !selectedPath;
 
   return (
-    <div
+    <ChromeSwipeLayer
+      enabled={mobileBgCarousel && alive}
+      blocked={mobileNavOpen || bgOverlayOpen}
+      onClearTap={() => bgCarouselRef.current?.advance()}
       className={[
         styles.root,
         sidebarHidden ? styles.rootSidebarHidden : "",
@@ -236,17 +244,20 @@ export const NotesWorkspace = ({
         sidebarFx === "expand" ? styles.rootFxExpand : "",
         sidebarBgEnabled ? styles.rootBgEnabled : "",
         mobileBgCarousel ? styles.rootBgCarousel : "",
+        immersiveBgEmpty ? styles.rootBgEmpty : "",
         !borderFlowEnabled ? styles.borderFlowOff : "",
         mobileNavOpen ? styles.rootMobileNavOpen : "",
       ]
         .filter(Boolean)
         .join(" ")}
+      background={
+        mobileBgCarousel ? (
+          <Suspense fallback={null}>
+            <MobileBgCarousel ref={bgCarouselRef} looping={sidebarBgLooping && alive} />
+          </Suspense>
+        ) : null
+      }
     >
-      {mobileBgCarousel ? (
-        <Suspense fallback={null}>
-          <MobileBgCarousel looping={sidebarBgLooping && alive} />
-        </Suspense>
-      ) : null}
       <div
         className={[
           styles.sidebarRailFx,
@@ -371,17 +382,19 @@ export const NotesWorkspace = ({
       <main className={styles.viewer}>
         {showViewerGlass ? <div className={styles.viewerGlass} aria-hidden /> : null}
         <div className={styles.viewerContent}>
-          <div className={styles.mobileBar}>
-            <h2 className={styles.mobileBarTitle}>{workspaceTitle}</h2>
-            <div className={styles.mobileBarActions}>
-              <button type="button" className={styles.mobileBarBtn} onClick={() => openMobileNav("files")}>
-                文件
-              </button>
-              <button type="button" className={styles.mobileBarBtn} onClick={() => openMobileNav("outline")}>
-                大纲
-              </button>
+          {immersiveBgEmpty ? null : (
+            <div className={styles.mobileBar}>
+              <h2 className={styles.mobileBarTitle}>{workspaceTitle}</h2>
+              <div className={styles.mobileBarActions}>
+                <button type="button" className={styles.mobileBarBtn} onClick={() => openMobileNav("files")}>
+                  文件
+                </button>
+                <button type="button" className={styles.mobileBarBtn} onClick={() => openMobileNav("outline")}>
+                  大纲
+                </button>
+              </div>
             </div>
-          </div>
+          )}
           {sidebarHidden ? (
             <button
               type="button"
@@ -460,6 +473,6 @@ export const NotesWorkspace = ({
           </button>
         </div>
       </main>
-    </div>
+    </ChromeSwipeLayer>
   );
 };

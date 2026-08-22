@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { pickNextPhotoIndex, preloadPhoto, sleep } from "@/lib/bg-photos/photo-utils";
 import { HALL_BG_FADE_MS, HALL_BG_HOLD_MS } from "@/lib/gallery/constants";
@@ -25,9 +25,66 @@ export const useHallBackdrop = (photos: HallPhoto[], playing: boolean) => {
   const playingRef = useRef(playing);
   const photosRef = useRef(photos);
   const desktopRef = useRef(desktop);
+  const busyRef = useRef(false);
+  const lastSwitchRef = useRef(Date.now());
+  const abortRef = useRef<AbortController | null>(null);
+  const runningRef = useRef(true);
   playingRef.current = playing;
   photosRef.current = photos;
   desktopRef.current = desktop;
+
+  const runCrossfade = useCallback(async (requirePlaying: boolean) => {
+    if (busyRef.current) return false;
+    if (requirePlaying && !playingRef.current) return false;
+    const list = photosRef.current;
+    if (list.length <= 1) return false;
+    const idx = pickNextPhotoIndex(list.length, lastIndexRef.current);
+    const next = list[idx];
+    if (!next) return false;
+
+    busyRef.current = true;
+    const signal = abortRef.current?.signal;
+    const preloadUrl = desktopRef.current ? next.desktopBackdropUrl : next.backdropUrl;
+    await preloadPhoto(preloadUrl, signal);
+    if (signal?.aborted || !runningRef.current || (requirePlaying && !playingRef.current)) {
+      busyRef.current = false;
+      return false;
+    }
+
+    lastIndexRef.current = idx;
+    lastSwitchRef.current = Date.now();
+    if (activeIsARef.current) {
+      setSlotB(toSlot(next, false));
+      requestAnimationFrame(() => {
+        if (!runningRef.current || signal?.aborted) {
+          busyRef.current = false;
+          return;
+        }
+        setSlotA((prev) => ({ ...prev, shown: false }));
+        setSlotB(toSlot(next, true));
+        activeIsARef.current = false;
+        busyRef.current = false;
+      });
+      return true;
+    }
+
+    setSlotA(toSlot(next, false));
+    requestAnimationFrame(() => {
+      if (!runningRef.current || signal?.aborted) {
+        busyRef.current = false;
+        return;
+      }
+      setSlotB((prev) => ({ ...prev, shown: false }));
+      setSlotA(toSlot(next, true));
+      activeIsARef.current = true;
+      busyRef.current = false;
+    });
+    return true;
+  }, []);
+
+  const advance = useCallback(() => {
+    void runCrossfade(false);
+  }, [runCrossfade]);
 
   useEffect(() => {
     if (seededRef.current || photos.length === 0) return;
@@ -36,6 +93,7 @@ export const useHallBackdrop = (photos: HallPhoto[], playing: boolean) => {
     seededRef.current = true;
     lastIndexRef.current = photos.indexOf(first);
     activeIsARef.current = true;
+    lastSwitchRef.current = Date.now();
     setSlotA(toSlot(first, true));
     setSlotB(emptySlot());
   }, [photos]);
@@ -43,60 +101,31 @@ export const useHallBackdrop = (photos: HallPhoto[], playing: boolean) => {
   useEffect(() => {
     const reduced = window.matchMedia(REDUCED_QUERY).matches;
     const abort = new AbortController();
-    let running = true;
+    abortRef.current = abort;
+    runningRef.current = true;
 
-    const crossfade = async () => {
-      while (running && !abort.signal.aborted && photosRef.current.length <= 1) {
+    const loop = async () => {
+      while (runningRef.current && !abort.signal.aborted) {
         await sleep(240, abort.signal);
-      }
-
-      while (running && !abort.signal.aborted) {
-        await sleep(HALL_BG_HOLD_MS, abort.signal);
-        if (!running || abort.signal.aborted) return;
+        if (!runningRef.current || abort.signal.aborted) return;
         if (!playingRef.current || reduced) continue;
-
-        const list = photosRef.current;
-        if (list.length <= 1) continue;
-        const idx = pickNextPhotoIndex(list.length, lastIndexRef.current);
-        const next = list[idx];
-        if (!next) continue;
-
-        const preloadUrl = desktopRef.current ? next.desktopBackdropUrl : next.backdropUrl;
-        await preloadPhoto(preloadUrl, abort.signal);
-        if (!running || abort.signal.aborted || !playingRef.current) continue;
-
-        lastIndexRef.current = idx;
-        if (activeIsARef.current) {
-          setSlotB(toSlot(next, false));
-          requestAnimationFrame(() => {
-            if (!running || abort.signal.aborted) return;
-            setSlotA((prev) => ({ ...prev, shown: false }));
-            setSlotB(toSlot(next, true));
-            activeIsARef.current = false;
-          });
-        } else {
-          setSlotA(toSlot(next, false));
-          requestAnimationFrame(() => {
-            if (!running || abort.signal.aborted) return;
-            setSlotB((prev) => ({ ...prev, shown: false }));
-            setSlotA(toSlot(next, true));
-            activeIsARef.current = true;
-          });
-        }
-
+        if (Date.now() - lastSwitchRef.current < HALL_BG_HOLD_MS) continue;
+        const faded = await runCrossfade(true);
+        if (!runningRef.current || abort.signal.aborted) return;
+        if (!faded) continue;
         await sleep(HALL_BG_FADE_MS, abort.signal);
-        if (!running || abort.signal.aborted) return;
+        if (!runningRef.current || abort.signal.aborted) return;
         if (activeIsARef.current) setSlotB(emptySlot());
         else setSlotA(emptySlot());
       }
     };
 
-    void crossfade();
+    void loop();
     return () => {
-      running = false;
+      runningRef.current = false;
       abort.abort();
     };
-  }, []);
+  }, [runCrossfade]);
 
-  return { slotA, slotB };
+  return { slotA, slotB, advance };
 };

@@ -41,11 +41,13 @@
 
 .frost {
   display: none;
+  opacity: calc(1 - var(--chrome-swipe-progress, 0));
 }
 
 .veil {
   position: absolute;
   inset: 0;
+  opacity: calc(1 - var(--chrome-swipe-progress, 0));
   background:
     radial-gradient(ellipse 78% 68% at 50% 42%, transparent 0%, rgba(0, 0, 0, 0.32) 100%),
     rgba(0, 0, 0, 0.2);

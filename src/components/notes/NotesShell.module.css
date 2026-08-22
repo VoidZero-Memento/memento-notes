@@ -1205,6 +1205,20 @@
     padding: 0;
   }
 
+  .rootBgEmpty {
+    padding: 0;
+  }
+
+  .rootBgEmpty .viewer {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .rootBgEmpty .viewer::before,
+  .rootBgEmpty .viewer::after {
+    content: none;
+  }
+
   .mobileBar {
     display: flex;
     align-items: center;

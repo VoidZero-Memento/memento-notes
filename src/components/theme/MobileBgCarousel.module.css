@@ -47,6 +47,7 @@
   position: absolute;
   inset: 0;
   z-index: 1;
+  opacity: calc(1 - var(--chrome-swipe-progress, 0));
   background: linear-gradient(
     180deg,
     rgba(4, 7, 14, 0.36) 0%,

@@ -1,10 +1,15 @@
 import { useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { MOBILE_BG_MQ } from "@/lib/bg-photos/constants";
+import { useMediaQuery } from "@/lib/dom/use-media-query";
 import { GALLERY_BACKDROP_MS, GALLERY_FADE_MS, GALLERY_MAT_GAP } from "@/lib/gallery/constants";
 import { useGalleryArtBox } from "@/lib/gallery/use-gallery-art-box";
 import { useGalleryChrome } from "@/lib/gallery/use-gallery-chrome";
 import { useGalleryStage } from "@/lib/gallery/use-gallery-stage";
+import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
+
+import { ChromeSwipeLayer } from "@/components/theme/ChromeSwipeLayer";
 
 import styles from "./GalleryStage.module.css";
 
@@ -59,6 +64,8 @@ const AmbientLayer = ({ src, shown }: AmbientLayerProps) => (
 export const GalleryStage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const alive = useKeepAliveActive();
+  const isMobile = useMediaQuery(MOBILE_BG_MQ);
   const {
     status,
     error,
@@ -117,17 +124,22 @@ export const GalleryStage = () => {
   const statusLabel = status === "error" ? (error ?? "UNABLE TO LOAD") : status === "loading" ? "LOADING" : null;
 
   return (
-    <div
+    <ChromeSwipeLayer
+      enabled={isMobile && alive && status === "ready"}
+      onClearTap={advance}
       className={`${styles.root}${status === "ready" ? ` ${styles.rootReady}` : ""}`}
       style={fadeVars}
       role="presentation"
       aria-label={status === "ready" ? "点击查看下一张" : undefined}
       onContextMenu={preventMenu}
       onClick={handleTap}
+      background={
+        <>
+          <AmbientLayer src={backdropA} shown={!backdropShowB} />
+          <AmbientLayer src={backdropB} shown={backdropShowB} />
+        </>
+      }
     >
-      <AmbientLayer src={backdropA} shown={!backdropShowB} />
-      <AmbientLayer src={backdropB} shown={backdropShowB} />
-
       <div className={styles.well}>
         <div className={styles.canvas} ref={canvasRef}>
           {art.width > 0 ? (
@@ -167,6 +179,6 @@ export const GalleryStage = () => {
           />
         </svg>
       </button>
-    </div>
+    </ChromeSwipeLayer>
   );
 };
