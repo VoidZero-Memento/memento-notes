@@ -9,7 +9,7 @@ import { useGalleryChrome } from "@/lib/gallery/use-gallery-chrome";
 import { useGalleryStage } from "@/lib/gallery/use-gallery-stage";
 import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
 
-import { ChromeSwipeLayer } from "@/components/theme/ChromeSwipeLayer";
+import { ImmersiveLayer } from "@/components/theme/ImmersiveLayer";
 
 import styles from "./GalleryStage.module.css";
 
@@ -124,7 +124,7 @@ export const GalleryStage = () => {
   const statusLabel = status === "error" ? (error ?? "UNABLE TO LOAD") : status === "loading" ? "LOADING" : null;
 
   return (
-    <ChromeSwipeLayer
+    <ImmersiveLayer
       enabled={isMobile && alive && status === "ready"}
       onClearTap={advance}
       className={`${styles.root}${status === "ready" ? ` ${styles.rootReady}` : ""}`}
@@ -179,6 +179,6 @@ export const GalleryStage = () => {
           />
         </svg>
       </button>
-    </ChromeSwipeLayer>
+    </ImmersiveLayer>
   );
 };

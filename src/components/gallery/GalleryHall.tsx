@@ -13,7 +13,7 @@ import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
 import { GalleryHallBackdrop } from "@/components/gallery/GalleryHallBackdrop";
 import { GalleryMasonry } from "@/components/gallery/GalleryMasonry";
 import { GalleryViewer } from "@/components/gallery/GalleryViewer";
-import { ChromeSwipeLayer } from "@/components/theme/ChromeSwipeLayer";
+import { ImmersiveLayer } from "@/components/theme/ImmersiveLayer";
 
 import styles from "./GalleryHall.module.css";
 
@@ -37,7 +37,8 @@ export const GalleryHall = () => {
   const isMobile = useMediaQuery(MOBILE_BG_MQ);
   const { error, photos, status } = useHallCatalog();
   const [selection, setSelection] = useState<HallSelection | null>(null);
-  const paused = !alive || selection !== null;
+  const [immersive, setImmersive] = useState(false);
+  const paused = !alive || selection !== null || immersive;
   const { height, onScroll, scrollerRef, visible } = useHallMasonry(photos, paused);
   const { slotA, slotB, advance } = useHallBackdrop(photos, !paused);
 
@@ -61,9 +62,9 @@ export const GalleryHall = () => {
   const statusLabel = status === "error" ? (error ?? "UNABLE TO LOAD") : status === "loading" ? "LOADING" : null;
 
   return (
-    <ChromeSwipeLayer
-      enabled={isMobile && alive && photos.length > 0}
-      blocked={selection !== null}
+    <ImmersiveLayer
+      enabled={isMobile && alive && photos.length > 0 && !selection}
+      onImmersiveChange={setImmersive}
       onClearTap={advance}
       className={styles.root}
       background={<GalleryHallBackdrop paused={paused} slotA={slotA} slotB={slotB} />}
@@ -104,6 +105,6 @@ export const GalleryHall = () => {
           />
         </svg>
       </button>
-    </ChromeSwipeLayer>
+    </ImmersiveLayer>
   );
 };

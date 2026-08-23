@@ -1053,6 +1053,10 @@
       max(12px, env(safe-area-inset-left, 0px));
   }
 
+  .root[data-immersive="true"] {
+    padding: 0;
+  }
+
   .backdrop {
     display: block;
     position: fixed;
@@ -1253,10 +1257,14 @@
 
   .mobileBarTitle {
     margin: 0;
+    min-width: 0;
+    overflow: hidden;
     color: var(--foreground);
     font-size: 15px;
     font-weight: 700;
     line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .mobileBarActions {

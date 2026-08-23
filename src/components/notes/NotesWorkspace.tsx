@@ -17,7 +17,7 @@ import { toast } from "@/lib/toast/toast";
 import { EmptyState } from "@/components/common/EmptyState";
 import { GalleryLink } from "@/components/gallery/GalleryLink";
 import { BgTransitionOverlay } from "@/components/theme/BgTransitionOverlay";
-import { ChromeSwipeLayer } from "@/components/theme/ChromeSwipeLayer";
+import { ImmersiveEnter, ImmersiveLayer } from "@/components/theme/ImmersiveLayer";
 import { SidebarBgToggle } from "@/components/theme/SidebarBgToggle";
 import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import { FileTree } from "./FileTree";
@@ -235,9 +235,9 @@ export const NotesWorkspace = ({
   const immersiveBgEmpty = mobileBgCarousel && !treeLoading && !selectedPath;
 
   return (
-    <ChromeSwipeLayer
+    <ImmersiveLayer
       enabled={mobileBgCarousel && alive}
-      blocked={mobileNavOpen || bgOverlayOpen}
+      showEnter={immersiveBgEmpty}
       onClearTap={() => bgCarouselRef.current?.advance()}
       className={[
         styles.root,
@@ -399,6 +399,7 @@ export const NotesWorkspace = ({
                 <button type="button" className={styles.mobileBarBtn} onClick={() => openMobileNav("outline")}>
                   大纲
                 </button>
+                <ImmersiveEnter className={styles.mobileBarBtn} />
               </div>
             </div>
           )}
@@ -480,6 +481,6 @@ export const NotesWorkspace = ({
           </button>
         </div>
       </main>
-    </ChromeSwipeLayer>
+    </ImmersiveLayer>
   );
 };

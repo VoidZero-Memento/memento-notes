@@ -1,0 +1,54 @@
+.surface {
+  position: relative;
+}
+
+.pane {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: inherit;
+  gap: inherit;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.surface[data-immersive="true"] .pane {
+  display: none;
+}
+
+.clearHit,
+.enter,
+.restore {
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.clearHit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: transparent;
+}
+
+.enter,
+.restore {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top, 0px));
+  right: max(12px, env(safe-area-inset-right, 0px));
+  z-index: 3;
+  border-radius: 10px;
+  background: rgba(6, 10, 20, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.14);
+  padding: 8px 14px;
+  min-height: 36px;
+  color: rgba(var(--fg-rgb), 0.88);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+}
