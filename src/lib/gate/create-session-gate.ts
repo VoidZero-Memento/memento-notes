@@ -11,7 +11,7 @@ export const createSessionGate = (storageKey: string, expectedDigest: () => stri
 
   const readStoredUnlock = () => {
     try {
-      return sessionStorage.getItem(storageKey) === expectedDigest();
+      return localStorage.getItem(storageKey) === expectedDigest();
     } catch {
       return false;
     }
@@ -29,7 +29,7 @@ export const createSessionGate = (storageKey: string, expectedDigest: () => stri
   const persistUnlock = () => {
     unlocked = true;
     try {
-      sessionStorage.setItem(storageKey, expectedDigest());
+      localStorage.setItem(storageKey, expectedDigest());
     } catch {
       /* 隐私模式等场景下写入可能失败，内存态仍可用 */
     }

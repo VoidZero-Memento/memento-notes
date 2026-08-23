@@ -23,13 +23,13 @@ export const STAGE_PATH = "/stage";
 
 export const GALLERY_PATH = "/gallery";
 
-/** 本会话已通过展台门禁（值为 peppered digest，改密钥后自动失效） */
+/** 本机已通过展台门禁（值为 peppered digest，改密钥后自动失效） */
 export const STAGE_GATE_SESSION_KEY = "memento-notes:stage-gate";
 
-/** 本会话已通过画廊门禁（值为 peppered digest，改密钥后自动失效） */
+/** 本机已通过画廊门禁（值为 peppered digest，改密钥后自动失效） */
 export const GALLERY_GATE_SESSION_KEY = "memento-notes:gallery-gate";
 
-/** 本会话已通过背景图门禁（独立会话，改密钥后自动失效） */
+/** 本机已通过背景图门禁（独立存储，改密钥后自动失效） */
 export const GALLERY_BG_GATE_SESSION_KEY = "memento-notes:gallery-bg-gate";
 
 export const HALL_COLUMNS = 2;
