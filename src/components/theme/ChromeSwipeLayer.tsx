@@ -32,7 +32,7 @@ const showHintOnce = () => {
   toast.info("轻触换图，右滑恢复");
 };
 
-/** 左滑收起 chrome、右滑恢复；可复用到其它页面 */
+/** 左滑收起 chrome、右滑恢复；清屏后轻触换图 */
 export const ChromeSwipeLayer = ({
   enabled,
   blocked = false,
@@ -76,6 +76,15 @@ export const ChromeSwipeLayer = ({
       onContextMenu={onContextMenu}
     >
       {background}
+      {cleared ? (
+        <button
+          type="button"
+          className={styles.clearHit}
+          data-chrome-clear-hit
+          aria-label="切换背景图"
+          onClick={() => onClearTap?.()}
+        />
+      ) : null}
       <div
         className={`${styles.pane}${moving ? ` ${styles.paneActive}` : ""}${gone ? ` ${styles.paneGone}` : ""}`}
         style={paneStyle}

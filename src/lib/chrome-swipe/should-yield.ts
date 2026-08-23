@@ -16,11 +16,18 @@ const fromHorizScroller = (start: Element, root: HTMLElement): boolean => {
   return false;
 };
 
+const eventTargetElement = (target: EventTarget | null): Element | null => {
+  if (target instanceof Element) return target;
+  if (target instanceof Node) return target.parentElement;
+  return null;
+};
+
 /** 按钮/链接或可横滚容器上的触摸让位，避免清屏抢走点击和内容滚动 */
 export const shouldYieldChromeSwipe = (target: EventTarget | null, root: HTMLElement): boolean => {
-  const start = target instanceof Element ? target : null;
+  const start = eventTargetElement(target);
   if (!start) return false;
   const interactive = start.closest(INTERACTIVE_SELECTOR);
+  if (interactive?.hasAttribute("data-chrome-clear-hit")) return false;
   if (interactive && root.contains(interactive)) return true;
   return fromHorizScroller(start, root);
 };

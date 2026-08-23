@@ -7,7 +7,6 @@ import {
   CHROME_SWIPE_MS,
   CHROME_SWIPE_RUBBER,
   CHROME_SWIPE_SETTLE,
-  CHROME_SWIPE_TAP_PX,
   CHROME_SWIPE_VELOCITY,
 } from "./constants";
 import { shouldYieldChromeSwipe } from "./should-yield";
@@ -55,12 +54,13 @@ export const useChromeSwipe = ({
   const settleTo = useCallback((target: 0 | 1) => {
     cancelAnim();
     const from = progressRef.current;
+    clearedRef.current = target === 1;
+    setCleared(target === 1);
     const snap = () => {
       progressRef.current = target;
       setProgress(target);
       setDragging(false);
       draggingRef.current = false;
-      setCleared(target === 1);
     };
 
     if (reduceMotion() || Math.abs(from - target) < 0.002) {
@@ -90,8 +90,16 @@ export const useChromeSwipe = ({
     setProgress(0);
     setDragging(false);
     draggingRef.current = false;
+    clearedRef.current = false;
     setCleared(false);
   }, [enabled]);
+
+  useEffect(() => {
+    if (!blocked) return;
+    if (clearedRef.current || draggingRef.current || progressRef.current > 0.001) {
+      settleTo(0);
+    }
+  }, [blocked, settleTo]);
 
   useEffect(() => {
     const el = surfaceRef.current;
@@ -123,10 +131,15 @@ export const useChromeSwipe = ({
     };
 
     const onPointerDown = (event: PointerEvent) => {
-      if (blockedRef.current || event.button !== 0) return;
-      if (event.clientX < CHROME_SWIPE_EDGE_PX) return;
-      if (shouldYieldChromeSwipe(event.target, el)) return;
+      if (event.button !== 0) return;
+      if (blockedRef.current && !clearedRef.current) return;
+      if (!clearedRef.current && event.clientX < CHROME_SWIPE_EDGE_PX) return;
+      if (!clearedRef.current && shouldYieldChromeSwipe(event.target, el)) return;
       cancelAnim();
+      if (clearedRef.current) {
+        progressRef.current = 1;
+        setProgress(1);
+      }
       tracking = true;
       axis = null;
       startX = event.clientX;
@@ -172,21 +185,16 @@ export const useChromeSwipe = ({
     };
 
     const onPointerEnd = (event: PointerEvent) => {
-      if (!tracking || event.pointerId !== pointerId) return;
+      if (pointerId < 0 || event.pointerId !== pointerId) return;
       const wasX = axis === "x";
-      const dx = event.clientX - startX;
-      const dy = event.clientY - startY;
       stopDrag();
 
-      if (!wasX) {
-        if (
-          clearedRef.current &&
-          Math.hypot(dx, dy) < CHROME_SWIPE_TAP_PX
-        ) {
-          onClearTapRef.current?.();
-        }
+      if (clearedRef.current && !wasX) {
+        onClearTapRef.current?.();
         return;
       }
+
+      if (!wasX) return;
 
       const current = progressRef.current;
       let target: 0 | 1 = current >= CHROME_SWIPE_SETTLE ? 1 : 0;
@@ -198,6 +206,7 @@ export const useChromeSwipe = ({
     const onClickCapture = (event: MouseEvent) => {
       if (!suppressClickRef.current) return;
       suppressClickRef.current = false;
+      if (shouldYieldChromeSwipe(event.target, el)) return;
       event.preventDefault();
       event.stopPropagation();
     };

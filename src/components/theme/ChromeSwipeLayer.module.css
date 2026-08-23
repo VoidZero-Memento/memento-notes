@@ -1,3 +1,7 @@
+.surface {
+  position: relative;
+}
+
 .surface[data-swipe="on"] {
   touch-action: pan-y;
   overscroll-behavior-x: none;
@@ -9,6 +13,17 @@
 
 .surface[data-cleared="true"] .pane {
   pointer-events: none;
+}
+
+.clearHit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .pane {

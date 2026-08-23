@@ -129,7 +129,7 @@ export const EmptyState = ({
       <p className={styles.title}>{title}</p>
       {description ? <p className={styles.description}>{description}</p> : null}
       {children}
-      {!isCompact && resolvedActions.length > 0 ? (
+      {resolvedActions.length > 0 ? (
         <div className={styles.actions}>
           {resolvedActions.map((item, index) => {
             const isSecondary = item.variant === "secondary" || (item.variant !== "primary" && index > 0);

@@ -34,12 +34,14 @@ type SidebarBgToggleProps = {
   /** 是否展示"循环播放"这一项；目前只对手机端轮播图有意义 */
   showLoopOption: boolean;
   borderFlowEnabled: boolean;
+  galleryLinkEnabled: boolean;
   disabled?: boolean;
   needsUnlock?: boolean;
   unlock?: (raw: string) => Promise<boolean>;
   onEnabledChange: (enabled: boolean) => void;
   onLoopingChange: (looping: boolean) => void;
   onBorderFlowChange: (enabled: boolean) => void;
+  onGalleryLinkChange: (enabled: boolean) => void;
 };
 
 export const SidebarBgToggle = ({
@@ -47,12 +49,14 @@ export const SidebarBgToggle = ({
   looping,
   showLoopOption,
   borderFlowEnabled,
+  galleryLinkEnabled,
   disabled = false,
   needsUnlock = false,
   unlock,
   onEnabledChange,
   onLoopingChange,
   onBorderFlowChange,
+  onGalleryLinkChange,
 }: SidebarBgToggleProps) => {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -118,6 +122,12 @@ export const SidebarBgToggle = ({
 
   const handleToggleBorderFlow = () => {
     onBorderFlowChange(!borderFlowEnabled);
+    setOpen(false);
+  };
+
+  const handleToggleGalleryLink = () => {
+    if (!enabled) return;
+    onGalleryLinkChange(!galleryLinkEnabled);
     setOpen(false);
   };
 
@@ -192,6 +202,20 @@ export const SidebarBgToggle = ({
             >
               <span className={styles.optionLabel}>边框流光</span>
               <span className={styles.optionState}>{borderFlowEnabled ? "开" : "关"}</span>
+            </button>
+          </li>
+          <li role="presentation">
+            <button
+              type="button"
+              role="menuitemcheckbox"
+              aria-checked={galleryLinkEnabled}
+              tabIndex={visible && enabled ? 0 : -1}
+              className={`${styles.option}${galleryLinkEnabled && enabled ? ` ${styles.optionSelected}` : ""}`}
+              disabled={!enabled}
+              onClick={handleToggleGalleryLink}
+            >
+              <span className={styles.optionLabel}>展台画廊</span>
+              <span className={styles.optionState}>{galleryLinkEnabled ? "开" : "关"}</span>
             </button>
           </li>
         </ul>

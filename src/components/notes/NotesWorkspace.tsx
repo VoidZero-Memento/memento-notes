@@ -10,6 +10,7 @@ import { parseOutline } from "@/lib/markdown/parse-outline";
 import { getNoteTitleFromPath, getRepoWorkspaceTitle } from "@/lib/note-title";
 import { useNoteContent } from "@/lib/notes/use-note-content";
 import { useBorderFlow } from "@/lib/prefs/useBorderFlow";
+import { useGalleryLink } from "@/lib/prefs/useGalleryLink";
 import { useSidebarBgLoop } from "@/lib/prefs/useSidebarBgLoop";
 import { useSidebarBgTransition } from "@/lib/prefs/useSidebarBgTransition";
 import { toast } from "@/lib/toast/toast";
@@ -81,6 +82,7 @@ export const NotesWorkspace = ({
   const { unlocked: galleryBgUnlocked, unlock: unlockGalleryBg } = useGalleryBgGate();
   const { looping: sidebarBgLooping, setLooping: setSidebarBgLooping } = useSidebarBgLoop();
   const { enabled: borderFlowEnabled, setEnabled: setBorderFlowEnabled } = useBorderFlow();
+  const { enabled: galleryLinkEnabled, setEnabled: setGalleryLinkEnabled } = useGalleryLink();
   const {
     enabled: sidebarBgEnabled,
     setBgEnabled: setSidebarBgEnabled,
@@ -359,6 +361,7 @@ export const NotesWorkspace = ({
                 looping={sidebarBgLooping}
                 showLoopOption={isMobile}
                 borderFlowEnabled={borderFlowEnabled}
+                galleryLinkEnabled={galleryLinkEnabled}
                 disabled={bgTransitionBusy}
                 needsUnlock={!galleryBgUnlocked}
                 unlock={unlockGalleryBg}
@@ -371,11 +374,15 @@ export const NotesWorkspace = ({
                   setBorderFlowEnabled(next);
                   toast.success(next ? "已开启边框流光" : "已关闭边框流光");
                 }}
+                onGalleryLinkChange={(next) => {
+                  setGalleryLinkEnabled(next);
+                  toast.success(next ? "已显示展台画廊" : "已隐藏展台画廊");
+                }}
               />
               <ThemeSwitcher />
             </div>
           </div>
-          {sidebarBgEnabled ? <GalleryLink /> : null}
+          {sidebarBgEnabled && galleryLinkEnabled ? <GalleryLink /> : null}
         </div>
       </aside>
       <BgTransitionOverlay open={bgOverlayOpen} crawlProgress={bgOverlayCrawl} />
