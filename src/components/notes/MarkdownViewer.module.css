@@ -199,6 +199,24 @@
   padding-left: 1.4em;
 }
 
+/* iOS Safari 会把 letter-spacing 算进 ol 序号，outside marker 溢出 */
+@supports (-webkit-touch-callout: none) {
+  @media (hover: none) and (pointer: coarse) {
+    .viewer :global(ol) {
+      letter-spacing: 0;
+      padding-left: 1.55em;
+    }
+
+    .viewer :global(ol > li) {
+      letter-spacing: 0.1em;
+    }
+
+    .viewer :global(ol > li::marker) {
+      letter-spacing: 0;
+    }
+  }
+}
+
 .viewer :global(li) {
   margin: 0.25em 0;
 }
