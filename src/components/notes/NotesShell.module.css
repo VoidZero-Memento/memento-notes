@@ -221,7 +221,7 @@
       rgba(4, 7, 14, 0.4) 45%,
       rgba(4, 7, 14, 0.58) 100%
     ),
-    url("https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/boots/003.png")
+    url("https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/boots/010.png")
       30% bottom / auto 102% no-repeat;
   filter: saturate(0.7) brightness(0.72);
 }
@@ -1250,8 +1250,8 @@
         rgba(4, 7, 14, 0.4) 45%,
         rgba(4, 7, 14, 0.58) 100%
       ),
-      url("https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/boots/003.png")
-        30% left / cover no-repeat;
+      url("https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/boots/010.png")
+        left / cover no-repeat;
   }
 
   .sidebarHidden {

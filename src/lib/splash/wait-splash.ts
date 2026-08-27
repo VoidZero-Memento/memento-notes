@@ -6,7 +6,7 @@ export const SPLASH_BANNER_TIMEOUT_MS = 10000;
 
 /** 与 index.html 首屏 banner 一致：手机 163 / PC 30 */
 const SPLASH_IMAGE_MOBILE =
-  "https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/003.png";
+  "https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/009.jpg";
 const SPLASH_IMAGE_PC =
   "https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/boots/018.png";
 
