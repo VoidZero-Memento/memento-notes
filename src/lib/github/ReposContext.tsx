@@ -56,7 +56,7 @@ export const ReposProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const value = useMemo<ReposContextValue>(() => {
-    const defaultRepoId = repos.find((repo) => repo.id === "python")?.id ?? repos[0]?.id;
+    const defaultRepoId = repos.find((repo) => repo.id === "ai")?.id ?? repos[0]?.id;
     return {
       repos,
       loading,

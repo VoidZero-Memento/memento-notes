@@ -6,9 +6,9 @@ export const SPLASH_BANNER_TIMEOUT_MS = 10000;
 
 /** 与 index.html 首屏 banner 一致：手机 163 / PC 30 */
 const SPLASH_IMAGE_MOBILE =
-  "https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner163.png";
+  "https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/003.png";
 const SPLASH_IMAGE_PC =
-  "https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner30.png";
+  "https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/boots/018.png";
 
 export const SPLASH_IMAGE_URL = () =>
   window.matchMedia("(min-width: 861px)").matches

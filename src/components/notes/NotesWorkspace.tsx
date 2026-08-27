@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useId, useRef, useState } from "react";
 
 import { MOBILE_BG_MQ } from "@/lib/bg-photos/constants";
 import { useMediaQuery } from "@/lib/dom/use-media-query";
@@ -68,6 +68,27 @@ const SidebarEdgeChevron = ({ direction }: { direction: "left" | "right" }) => (
   </svg>
 );
 
+const SidebarFooterChevron = () => (
+  <svg className={styles.sidebarFooterChevron} viewBox="0 0 24 16" aria-hidden>
+    <path
+      d="M5 8.2 12 2.4 19 8.2"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M5 13.6 12 7.8 19 13.6"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export const NotesWorkspace = ({
   config,
   tree,
@@ -105,6 +126,8 @@ export const NotesWorkspace = ({
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [scrollAtTop, setScrollAtTop] = useState(true);
   const [scrollAtBottom, setScrollAtBottom] = useState(true);
+  const [footerOpen, setFooterOpen] = useState(false);
+  const footerPanelId = useId();
   const sidebarFxTimerRef = useRef<number | null>(null);
 
   const clearSidebarFxTimer = () => {
@@ -318,7 +341,12 @@ export const NotesWorkspace = ({
             </button>
           </div>
         </div>
-        <div className={styles.treePanel}>
+        <div
+          className={styles.treePanel}
+          onClick={() => {
+            if (footerOpen) setFooterOpen(false);
+          }}
+        >
           <div hidden={sidebarMode !== "files"}>
             {treeLoading ? <LoadingState label="加载文件树" /> : null}
             {!treeLoading && treeError ? <p className={styles.error}>{treeError}</p> : null}
@@ -353,36 +381,56 @@ export const NotesWorkspace = ({
           <SidebarEdgeChevron direction="left" />
         </button>
         <div className={styles.sidebarFooter}>
-          <div className={styles.ownerFooter}>
-            <OwnerFooter login={config.owner} avatarUrl={config.ownerAvatarUrl} />
-            <div className={styles.ownerFooterActions}>
-              <SidebarBgToggle
-                enabled={sidebarBgEnabled}
-                looping={sidebarBgLooping}
-                showLoopOption={isMobile}
-                borderFlowEnabled={borderFlowEnabled}
-                galleryLinkEnabled={galleryLinkEnabled}
-                disabled={bgTransitionBusy}
-                needsUnlock={!galleryBgUnlocked}
-                unlock={unlockGalleryBg}
-                onEnabledChange={setSidebarBgEnabled}
-                onLoopingChange={(next) => {
-                  setSidebarBgLooping(next);
-                  toast.success(next ? "已开启循环播放" : "已固定当前背景");
-                }}
-                onBorderFlowChange={(next) => {
-                  setBorderFlowEnabled(next);
-                  toast.success(next ? "已开启边框流光" : "已关闭边框流光");
-                }}
-                onGalleryLinkChange={(next) => {
-                  setGalleryLinkEnabled(next);
-                  toast.success(next ? "已显示展台画廊" : "已隐藏展台画廊");
-                }}
-              />
-              <ThemeSwitcher />
+          <button
+            type="button"
+            className={`${styles.sidebarFooterToggle}${footerOpen ? ` ${styles.sidebarFooterToggleOpen}` : ""}`}
+            aria-expanded={footerOpen}
+            aria-controls={footerPanelId}
+            aria-label={footerOpen ? "收起账户栏" : "展开账户栏"}
+            onClick={() => setFooterOpen((open) => !open)}
+          >
+            <span className={styles.sidebarFooterChevronWrap}>
+              <SidebarFooterChevron />
+            </span>
+          </button>
+          <div
+            id={footerPanelId}
+            className={`${styles.sidebarFooterPanel}${footerOpen ? ` ${styles.sidebarFooterPanelOpen}` : ""}`}
+            inert={!footerOpen}
+          >
+            <div className={styles.sidebarFooterPanelInner}>
+              <div className={styles.ownerFooter}>
+                <OwnerFooter login={config.owner} avatarUrl={config.ownerAvatarUrl} />
+                <div className={styles.ownerFooterActions}>
+                  <SidebarBgToggle
+                    enabled={sidebarBgEnabled}
+                    looping={sidebarBgLooping}
+                    showLoopOption={isMobile}
+                    borderFlowEnabled={borderFlowEnabled}
+                    galleryLinkEnabled={galleryLinkEnabled}
+                    disabled={bgTransitionBusy}
+                    needsUnlock={!galleryBgUnlocked}
+                    unlock={unlockGalleryBg}
+                    onEnabledChange={setSidebarBgEnabled}
+                    onLoopingChange={(next) => {
+                      setSidebarBgLooping(next);
+                      toast.success(next ? "已开启循环播放" : "已固定当前背景");
+                    }}
+                    onBorderFlowChange={(next) => {
+                      setBorderFlowEnabled(next);
+                      toast.success(next ? "已开启边框流光" : "已关闭边框流光");
+                    }}
+                    onGalleryLinkChange={(next) => {
+                      setGalleryLinkEnabled(next);
+                      toast.success(next ? "已显示展台画廊" : "已隐藏展台画廊");
+                    }}
+                  />
+                  <ThemeSwitcher />
+                </div>
+              </div>
+              {sidebarBgEnabled && galleryLinkEnabled ? <GalleryLink /> : null}
             </div>
           </div>
-          {sidebarBgEnabled && galleryLinkEnabled ? <GalleryLink /> : null}
         </div>
       </aside>
       <BgTransitionOverlay open={bgOverlayOpen} crawlProgress={bgOverlayCrawl} />

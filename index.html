@@ -17,8 +17,8 @@
           link.rel = "preload";
           link.as = "image";
           link.href = pc
-            ? "https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner30.png"
-            : "https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner163.png";
+            ? "https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/boots/018.png"
+            : "https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/003.png";
           document.head.appendChild(link);
         }
       })();
@@ -147,15 +147,17 @@
           #00f0ff
         );
         box-shadow: 0 0 10px rgba(124, 92, 255, 0.55);
+        -webkit-mask: radial-gradient(
+          farthest-side,
+          transparent calc(100% - 3.5px),
+          #000 calc(100% - 3px)
+        );
+        mask: radial-gradient(
+          farthest-side,
+          transparent calc(100% - 3.5px),
+          #000 calc(100% - 3px)
+        );
         animation: splashSpin 2.6s linear infinite;
-      }
-
-      #app-splash .splash-mark::after {
-        content: "";
-        position: absolute;
-        inset: 3px;
-        border-radius: 50%;
-        background: #0b0a12;
       }
 
       #app-splash .splash-brand {
@@ -371,7 +373,7 @@
 
       @media (min-width: 861px) {
         #app-splash .splash-banner {
-          object-position: center 50%;
+          object-position: center 78%;
         }
       }
 
@@ -421,12 +423,12 @@
             <source
               media="(min-width: 861px)"
               srcset="
-                https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner30.png
+                https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/boots/018.png
               "
             />
             <img
               class="splash-banner"
-              src="https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner163.png"
+              src="https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/003.png"
               alt=""
               decoding="async"
               fetchpriority="high"
