@@ -44,6 +44,7 @@ export type HallSelection = {
 
 export type HallBackdropSlot = {
   desktopUrl: string;
+  originUrl: string;
   shown: boolean;
   url: string;
 };

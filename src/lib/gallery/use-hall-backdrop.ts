@@ -7,11 +7,12 @@ import { useHallDesktop } from "@/lib/gallery/use-hall-desktop";
 
 import type { HallBackdropSlot, HallPhoto } from "@/lib/gallery/hall.types";
 
-const emptySlot = (): HallBackdropSlot => ({ desktopUrl: "", shown: false, url: "" });
+const emptySlot = (): HallBackdropSlot => ({ desktopUrl: "", originUrl: "", shown: false, url: "" });
 const REDUCED_QUERY = "(prefers-reduced-motion: reduce)";
 
 const toSlot = (photo: HallPhoto, shown: boolean): HallBackdropSlot => ({
   desktopUrl: photo.desktopBackdropUrl,
+  originUrl: photo.url,
   shown,
   url: photo.backdropUrl,
 });

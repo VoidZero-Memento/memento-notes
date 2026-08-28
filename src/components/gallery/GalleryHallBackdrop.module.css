@@ -33,24 +33,51 @@
   filter: saturate(0.8) brightness(0.72);
   transform: scale(1);
   animation: hall-ken 9s ease-in-out infinite alternate;
+  transition: filter var(--immersive-ms, 640ms) ease;
 }
 
 .paused .img {
   animation-play-state: paused;
 }
 
+.imgSharp {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  animation: none;
+  filter: none;
+  opacity: 0;
+  transition: opacity var(--immersive-ms, 640ms) ease;
+}
+
+.immersive .img {
+  filter: none;
+}
+
+.immersive .imgSharp {
+  opacity: 1;
+}
+
+.immersive .veil,
+.immersive .frost {
+  opacity: 0;
+}
+
 .frost {
   display: none;
-  opacity: calc(1 - var(--immersive, 0));
+  opacity: 1;
+  transition: opacity var(--immersive-ms, 640ms) ease;
 }
 
 .veil {
   position: absolute;
   inset: 0;
-  opacity: calc(1 - var(--immersive, 0));
+  z-index: 1;
+  opacity: 1;
   background:
     radial-gradient(ellipse 78% 68% at 50% 42%, transparent 0%, rgba(0, 0, 0, 0.32) 100%),
     rgba(0, 0, 0, 0.2);
+  transition: opacity var(--immersive-ms, 640ms) cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @media (min-width: 861px) {
@@ -99,11 +126,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .img {
+  .img,
+  .imgSharp,
+  .immersive .imgSharp {
     animation: none;
+    transition: none;
   }
 
-  .slot {
+  .slot,
+  .veil,
+  .frost {
     transition: none;
   }
 }

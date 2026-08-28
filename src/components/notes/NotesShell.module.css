@@ -10,7 +10,9 @@
   gap: 16px;
   padding: 16px;
   overflow: hidden;
-  transition: gap 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    gap 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.48s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .rootSidebarHidden {
@@ -1060,6 +1062,12 @@
 
   .root[data-immersive="true"] {
     padding: 0;
+  }
+
+  .root[data-immersive="true"].rootBgEnabled::before {
+    filter: none;
+    background: url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner8.png")
+      center / cover no-repeat;
   }
 
   .backdrop {

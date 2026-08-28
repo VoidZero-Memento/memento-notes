@@ -1,5 +1,6 @@
 const OSS_HOST_RE = /\.aliyuncs\.com/i;
 const OSS_BG_PROCESS = "x-oss-process=image/resize,w_720/quality,q_55";
+const OSS_IMMERSE_PROCESS = "x-oss-process=image/resize,l_2560/quality,q_90/format,webp";
 const OSS_GALLERY_PROCESS = "x-oss-process=image/resize,w_1440/quality,q_78/format,webp";
 const OSS_SAT_PROCESS = "x-oss-process=image/resize,w_320/quality,q_58/format,webp";
 const OSS_BACKDROP_PROCESS = "x-oss-process=image/resize,w_64/blur,r_30,s_30/quality,q_40/format,webp";
@@ -14,8 +15,21 @@ const withOssProcess = (url: string, process: string): string => {
   return `${url}${sep}${process}`;
 };
 
+const stripOssProcess = (url: string): string => {
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.delete("x-oss-process");
+    return parsed.toString();
+  } catch {
+    return url.replace(/[?&]x-oss-process=[^&]*/g, "").replace(/[?&]$/, "");
+  }
+};
+
 /** 背景轮播用低清 OSS 参数，非 OSS 原样返回 */
 export const toBgPhotoUrl = (url: string): string => withOssProcess(url, OSS_BG_PROCESS);
+
+/** 手机沉浸看图：去掉背景用的低清/模糊参数，按长边 2560 接近原图 */
+export const toImmersiveBgUrl = (url: string): string => withOssProcess(stripOssProcess(url), OSS_IMMERSE_PROCESS);
 
 /** 展台主图：webp + 中等边长，切图时少解码 */
 export const toGalleryPhotoUrl = (url: string): string => withOssProcess(url, OSS_GALLERY_PROCESS);
