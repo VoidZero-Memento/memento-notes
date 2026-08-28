@@ -1,7 +1,8 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { MOBILE_BG_MQ } from "@/lib/bg-photos/constants";
+import { useOssFolder } from "@/lib/bg-photos/useOssFolder";
 import { useMediaQuery } from "@/lib/dom/use-media-query";
 import { HALL_DESKTOP_FRAME_PAD, HALL_PAD } from "@/lib/gallery/constants";
 import { readOriginRect } from "@/lib/gallery/hall-photo";
@@ -35,9 +36,14 @@ export const GalleryHall = () => {
   const location = useLocation();
   const alive = useKeepAliveActive();
   const isMobile = useMediaQuery(MOBILE_BG_MQ);
+  const { folder } = useOssFolder();
   const { error, photos, status } = useHallCatalog();
   const [selection, setSelection] = useState<HallSelection | null>(null);
   const [immersive, setImmersive] = useState(false);
+
+  useEffect(() => {
+    setSelection(null);
+  }, [folder]);
   const paused = !alive || selection !== null || immersive;
   const { height, onScroll, scrollerRef, visible } = useHallMasonry(photos, paused);
   const { slotA, slotB, advance } = useHallBackdrop(photos, !paused);

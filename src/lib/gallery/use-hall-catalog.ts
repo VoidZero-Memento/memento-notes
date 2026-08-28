@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { fetchAllOssImages } from "@/lib/bg-photos/images";
+import { useOssFolder } from "@/lib/bg-photos/useOssFolder";
 import { HALL_PROBE_CONCURRENCY } from "@/lib/gallery/constants";
 import { hallSizeCacheKey, toHallPhoto } from "@/lib/gallery/hall-photo";
 import { peekHallSize, probeHallSize, rememberHallSize } from "@/lib/gallery/probe-hall-size";
@@ -33,9 +34,11 @@ const publishReady = (
 };
 
 export const useHallCatalog = () => {
+  const { folder } = useOssFolder();
   const [state, setState] = useState<HallCatalogState>(empty);
 
   useEffect(() => {
+    setState(empty);
     const abort = new AbortController();
     let cancelled = false;
     let frame = 0;
@@ -112,7 +115,7 @@ export const useHallCatalog = () => {
       abort.abort();
       window.cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [folder]);
 
   return state;
 };

@@ -82,3 +82,28 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+@media (max-width: 860px) {
+  .tree {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .row {
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    touch-action: manipulation;
+  }
+
+  .row:hover,
+  .row:focus,
+  .row:active {
+    background: transparent;
+    color: rgba(var(--fg-rgb), 0.78);
+    box-shadow: none;
+  }
+}

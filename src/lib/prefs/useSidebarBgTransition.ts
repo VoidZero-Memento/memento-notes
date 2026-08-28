@@ -5,7 +5,7 @@ import { useSidebarBg } from "@/lib/prefs/useSidebarBg";
 import { toast } from "@/lib/toast/toast";
 
 type UseSidebarBgTransitionOptions = {
-  /** 仅手机开启时走 images.json + 首图真实等待 */
+  /** 仅手机开启时走当前图集清单 + 首图真实等待 */
   isMobile: boolean;
 };
 
@@ -52,7 +52,7 @@ export const useSidebarBgTransition = ({ isMobile }: UseSidebarBgTransitionOptio
         const abort = new AbortController();
         abortRef.current = abort;
 
-        // 动态加载，避免 PC 主路径带上 images.json / 预加载逻辑
+        // 动态加载，避免 PC 主路径带上图集清单 / 预加载逻辑
         void import("@/lib/bg-photos/prepare-mobile-bg")
           .then(({ prepareMobileBgTransition }) => prepareMobileBgTransition(abort.signal))
           .then(() => {

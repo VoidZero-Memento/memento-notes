@@ -166,7 +166,34 @@
 }
 
 @media (max-width: 860px) {
+  .treeWrap {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
   .row {
     font-size: 14px;
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    touch-action: manipulation;
+  }
+
+  .row:hover,
+  .row:focus,
+  .row:active {
+    background: transparent;
+    color: rgba(var(--fg-rgb), 0.78);
+  }
+
+  .rowSelected,
+  .rowSelected:hover,
+  .rowSelected:focus,
+  .rowSelected:active {
+    background: transparent;
+    color: var(--foreground);
   }
 }

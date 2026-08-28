@@ -188,9 +188,14 @@
       rgba(4, 7, 14, 0.26) 42%,
       rgba(4, 7, 14, 0.42) 100%
     ),
-    url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner44.png") 50% 72% /
-      cover no-repeat;
+    url("https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/009.jpg")
+      50% 72% / cover no-repeat;
   filter: saturate(0.8) brightness(0.82);
+}
+
+/* 轮播层接管正文底图；侧栏 ::before 仍保留 */
+.rootBgEnabled.rootBgCarousel::before {
+  content: none;
 }
 
 .rootBgEnabled .sidebar {
@@ -374,15 +379,6 @@
 
   .sidebarCollapse,
   .sidebarExpand {
-    transition: none;
-  }
-
-  .sidebarFooterChevron {
-    animation: none;
-  }
-
-  .sidebarFooterChevronWrap,
-  .sidebarFooterPanel {
     transition: none;
   }
 }
@@ -631,105 +627,11 @@
 }
 
 .sidebarFooter {
-  position: relative;
   display: flex;
   flex-shrink: 0;
-  flex-direction: column;
-  gap: 0;
-  margin-top: auto;
-}
-
-.sidebarFooterToggle {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  border: none;
-  border-top: 1px solid rgba(var(--accent-rgb), 0.12);
-  background: transparent;
-  padding: 16px 0 0;
-  color: rgba(var(--accent-rgb), 0.48);
-  line-height: 0;
-  cursor: pointer;
-  transition: color 0.15s ease;
-}
-
-.sidebarFooterToggleOpen {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 2;
-  height: 12px;
-  padding: 0;
-  border: none;
-}
-
-.sidebarFooterToggle:hover,
-.sidebarFooterToggle:focus-visible {
-  color: rgba(var(--accent-rgb), 0.92);
-}
-
-.sidebarFooterToggleOpen:hover + .sidebarFooterPanel .ownerFooter,
-.sidebarFooterToggleOpen:focus-visible + .sidebarFooterPanel .ownerFooter {
-  border-top-color: rgba(var(--accent-rgb), 0.28);
-}
-
-.sidebarFooterChevronWrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.sidebarFooterToggleOpen .sidebarFooterChevronWrap {
-  display: none;
-}
-
-.sidebarFooterChevron {
-  display: block;
-  width: 22px;
-  height: 14px;
-  filter: drop-shadow(0 0 5px rgba(var(--accent-rgb), 0.4));
-  animation: sidebarFooterChevronFloat 3.2s ease-in-out infinite;
-}
-
-@keyframes sidebarFooterChevronFloat {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-2px);
-  }
-}
-
-.sidebarFooterPanel {
-  display: grid;
-  grid-template-rows: 0fr;
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    grid-template-rows 0.22s ease,
-    opacity 0.18s ease;
-}
-
-.sidebarFooterPanelOpen {
-  grid-template-rows: 1fr;
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.sidebarFooterPanelInner {
-  display: flex;
   flex-direction: column;
   gap: 8px;
-  overflow: hidden;
-  min-height: 0;
-}
-
-.sidebarFooterPanelOpen .sidebarFooterPanelInner {
-  overflow: visible;
+  margin-top: auto;
 }
 
 .ownerFooter {
@@ -738,10 +640,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding-top: 4px;
-}
-
-.sidebarFooterPanelOpen .ownerFooter {
   border-top: 1px solid rgba(var(--accent-rgb), 0.1);
   padding-top: 12px;
 }
@@ -1230,6 +1128,19 @@
       0 10px 36px rgba(0, 0, 0, 0.4),
       inset 0 1px 0 rgba(var(--accent-rgb), 0.08);
     transition: transform 0.22s ease;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .sidebar button,
+  .sidebar a {
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    outline: none;
   }
 
   /* 手机抽屉沿用独立背景图，叠在变暗遮罩上，透明度与 PC 不同 */

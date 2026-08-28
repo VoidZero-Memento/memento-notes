@@ -1,7 +1,11 @@
 import { useEffect, useId, useRef, useState } from "react";
 
+import { OSS_FOLDER_LABELS } from "@/lib/bg-photos/oss-folder";
+import { useOssFolder } from "@/lib/bg-photos/useOssFolder";
+import { blurActiveInside } from "@/lib/dom/blur-active-inside";
 import { useAnimatedOpen } from "@/lib/dom/use-animated-open";
 import { GalleryGateField } from "@/components/gallery/GalleryGateField";
+import { OssFolderPanel } from "@/components/theme/OssFolderPanel";
 
 import styles from "./SidebarBgToggle.module.css";
 
@@ -31,8 +35,10 @@ const ImageIcon = () => (
 type SidebarBgToggleProps = {
   enabled: boolean;
   looping: boolean;
-  /** 是否展示"循环播放"这一项；目前只对手机端轮播图有意义 */
+  /** 循环播放：PC 写死双图、手机图集轮播都用 */
   showLoopOption: boolean;
+  /** 图集切换仅手机 */
+  showFolderOption?: boolean;
   borderFlowEnabled: boolean;
   galleryLinkEnabled: boolean;
   disabled?: boolean;
@@ -48,6 +54,7 @@ export const SidebarBgToggle = ({
   enabled,
   looping,
   showLoopOption,
+  showFolderOption = false,
   borderFlowEnabled,
   galleryLinkEnabled,
   disabled = false,
@@ -58,27 +65,48 @@ export const SidebarBgToggle = ({
   onBorderFlowChange,
   onGalleryLinkChange,
 }: SidebarBgToggleProps) => {
+  const { folder } = useOssFolder();
   const listId = useId();
+  const folderPanelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
+  const folderPanelRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLUListElement>(null);
   const [open, setOpen] = useState(false);
+  const [folderOpen, setFolderOpen] = useState(false);
   const [prompting, setPrompting] = useState(false);
-  const { mounted, visible } = useAnimatedOpen(open);
+  const menuOpen = open && !folderOpen && !prompting;
+  const { mounted, visible } = useAnimatedOpen(menuOpen);
+  const { mounted: folderMounted, visible: folderVisible } = useAnimatedOpen(folderOpen);
 
   useEffect(() => {
-    if (!open && !prompting) return;
+    if (!showFolderOption) setFolderOpen(false);
+  }, [showFolderOption]);
+
+  useEffect(() => {
+    if (!open && !folderOpen && !prompting) return;
 
     const handlePointerDown = (event: MouseEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-        setPrompting(false);
-      }
+      const target = event.target as Node;
+      if (rootRef.current?.contains(target) || folderPanelRef.current?.contains(target)) return;
+      blurActiveInside(menuRef.current);
+      blurActiveInside(folderPanelRef.current);
+      setOpen(false);
+      setFolderOpen(false);
+      setPrompting(false);
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-        setPrompting(false);
+      if (event.key !== "Escape") return;
+      if (folderOpen) {
+        blurActiveInside(folderPanelRef.current);
+        setFolderOpen(false);
+        setOpen(true);
+        return;
       }
+      blurActiveInside(menuRef.current);
+      setOpen(false);
+      setFolderOpen(false);
+      setPrompting(false);
     };
 
     document.addEventListener("mousedown", handlePointerDown);
@@ -87,11 +115,13 @@ export const SidebarBgToggle = ({
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open, prompting]);
+  }, [folderOpen, open, prompting]);
 
   const requestEnable = () => {
     if (needsUnlock && unlock) {
+      blurActiveInside(menuRef.current);
       setOpen(false);
+      setFolderOpen(false);
       setPrompting(true);
       return;
     }
@@ -101,6 +131,13 @@ export const SidebarBgToggle = ({
   const handleTriggerClick = () => {
     if (disabled) return;
     setPrompting(false);
+    if (folderOpen) {
+      blurActiveInside(folderPanelRef.current);
+      setFolderOpen(false);
+      setOpen(false);
+      return;
+    }
+    if (open) blurActiveInside(menuRef.current);
     setOpen((prev) => !prev);
   };
 
@@ -108,6 +145,7 @@ export const SidebarBgToggle = ({
     if (disabled) return;
     if (enabled) {
       onEnabledChange(false);
+      blurActiveInside(menuRef.current);
       setOpen(false);
       return;
     }
@@ -117,17 +155,20 @@ export const SidebarBgToggle = ({
   const handleToggleLooping = () => {
     if (disabled || !enabled) return;
     onLoopingChange(!looping);
+    blurActiveInside(menuRef.current);
     setOpen(false);
   };
 
   const handleToggleBorderFlow = () => {
     onBorderFlowChange(!borderFlowEnabled);
+    blurActiveInside(menuRef.current);
     setOpen(false);
   };
 
   const handleToggleGalleryLink = () => {
     if (!enabled) return;
     onGalleryLinkChange(!galleryLinkEnabled);
+    blurActiveInside(menuRef.current);
     setOpen(false);
   };
 
@@ -136,16 +177,23 @@ export const SidebarBgToggle = ({
     onEnabledChange(true);
   };
 
+  const handleOpenFolders = () => {
+    if (disabled || !enabled) return;
+    blurActiveInside(menuRef.current);
+    setOpen(false);
+    setFolderOpen(true);
+  };
+
   return (
     <div className={styles.root} ref={rootRef}>
       <button
         type="button"
-        className={`${styles.trigger}${enabled ? ` ${styles.triggerOn}` : ""}${open ? ` ${styles.triggerOpen}` : ""}`}
+        className={`${styles.trigger}${enabled ? ` ${styles.triggerOn}` : ""}${open || folderOpen ? ` ${styles.triggerOpen}` : ""}`}
         aria-busy={disabled || undefined}
         aria-label="外观设置"
         aria-haspopup="menu"
-        aria-expanded={open}
-        aria-controls={listId}
+        aria-expanded={open || folderOpen}
+        aria-controls={folderOpen ? folderPanelId : listId}
         title={disabled ? "背景切换中" : "外观设置"}
         disabled={disabled}
         onClick={handleTriggerClick}
@@ -155,12 +203,27 @@ export const SidebarBgToggle = ({
 
       {mounted ? (
         <ul
+          ref={menuRef}
           id={listId}
           className={`${styles.menu}${visible ? ` ${styles.menuVisible}` : ""}`}
           role="menu"
           aria-label="背景图设置"
           aria-hidden={!visible}
+          inert={!visible || undefined}
         >
+          <li role="presentation">
+            <button
+              type="button"
+              role="menuitemcheckbox"
+              aria-checked={borderFlowEnabled}
+              tabIndex={visible ? 0 : -1}
+              className={`${styles.option}${borderFlowEnabled ? ` ${styles.optionSelected}` : ""}`}
+              onClick={handleToggleBorderFlow}
+            >
+              <span className={styles.optionLabel}>边框流光</span>
+              <span className={styles.optionState}>{borderFlowEnabled ? "开" : "关"}</span>
+            </button>
+          </li>
           <li role="presentation">
             <button
               type="button"
@@ -195,19 +258,6 @@ export const SidebarBgToggle = ({
             <button
               type="button"
               role="menuitemcheckbox"
-              aria-checked={borderFlowEnabled}
-              tabIndex={visible ? 0 : -1}
-              className={`${styles.option}${borderFlowEnabled ? ` ${styles.optionSelected}` : ""}`}
-              onClick={handleToggleBorderFlow}
-            >
-              <span className={styles.optionLabel}>边框流光</span>
-              <span className={styles.optionState}>{borderFlowEnabled ? "开" : "关"}</span>
-            </button>
-          </li>
-          <li role="presentation">
-            <button
-              type="button"
-              role="menuitemcheckbox"
               aria-checked={galleryLinkEnabled}
               tabIndex={visible && enabled ? 0 : -1}
               className={`${styles.option}${galleryLinkEnabled && enabled ? ` ${styles.optionSelected}` : ""}`}
@@ -218,7 +268,33 @@ export const SidebarBgToggle = ({
               <span className={styles.optionState}>{galleryLinkEnabled ? "开" : "关"}</span>
             </button>
           </li>
+          {showFolderOption ? (
+            <li role="presentation">
+              <button
+                type="button"
+                role="menuitem"
+                tabIndex={visible && enabled ? 0 : -1}
+                className={styles.option}
+                disabled={disabled || !enabled}
+                onClick={handleOpenFolders}
+              >
+                <span className={styles.optionLabel}>图集</span>
+                <span className={styles.optionState}>{OSS_FOLDER_LABELS[folder]}</span>
+              </button>
+            </li>
+          ) : null}
         </ul>
+      ) : null}
+
+      {showFolderOption && folderMounted ? (
+        <OssFolderPanel
+          id={folderPanelId}
+          visible={folderVisible}
+          disabled={disabled}
+          anchorRef={rootRef}
+          panelRef={folderPanelRef}
+          onPicked={() => setFolderOpen(false)}
+        />
       ) : null}
 
       {prompting && unlock ? (

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { pickNextPhotoIndex, preloadPhoto, sleep } from "@/lib/bg-photos/photo-utils";
+import { useOssFolder } from "@/lib/bg-photos/useOssFolder";
 import { HALL_BG_FADE_MS, HALL_BG_HOLD_MS } from "@/lib/gallery/constants";
 import { useHallDesktop } from "@/lib/gallery/use-hall-desktop";
 
@@ -16,6 +17,7 @@ const toSlot = (photo: HallPhoto, shown: boolean): HallBackdropSlot => ({
 });
 
 export const useHallBackdrop = (photos: HallPhoto[], playing: boolean) => {
+  const { folder } = useOssFolder();
   const desktop = useHallDesktop();
   const [slotA, setSlotA] = useState<HallBackdropSlot>(emptySlot);
   const [slotB, setSlotB] = useState<HallBackdropSlot>(emptySlot);
@@ -32,6 +34,13 @@ export const useHallBackdrop = (photos: HallPhoto[], playing: boolean) => {
   playingRef.current = playing;
   photosRef.current = photos;
   desktopRef.current = desktop;
+
+  useEffect(() => {
+    seededRef.current = false;
+    lastIndexRef.current = -1;
+    setSlotA(emptySlot());
+    setSlotB(emptySlot());
+  }, [folder]);
 
   const runCrossfade = useCallback(async (requirePlaying: boolean) => {
     if (busyRef.current) return false;

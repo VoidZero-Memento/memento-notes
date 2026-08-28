@@ -5,6 +5,7 @@ import { fetchGalleryBannerUrls, getCachedGalleryBannerUrls } from "@/lib/bg-pho
 import { pickNextPhotoIndex, toBgPhotoUrl } from "@/lib/bg-photos/photo-utils";
 import { takePreparedMobileBg } from "@/lib/bg-photos/prepare-mobile-bg";
 import { runBgCrossfade } from "@/lib/bg-photos/run-bg-crossfade";
+import { useOssFolder } from "@/lib/bg-photos/useOssFolder";
 
 import type { BgPhotoSlot } from "@/lib/bg-photos/bg-photos.types";
 import type { BgCrossfadeRefs } from "@/lib/bg-photos/run-bg-crossfade";
@@ -22,6 +23,7 @@ type UseMobileBgCarouselOptions = {
  * 仅应在手机端且背景开启时挂载本 hook（由父组件条件渲染保证）。
  */
 export const useMobileBgCarousel = ({ looping }: UseMobileBgCarouselOptions) => {
+  const { folder } = useOssFolder();
   const preparedRef = useRef<ReturnType<typeof takePreparedMobileBg> | undefined>(undefined);
   if (preparedRef.current === undefined) {
     preparedRef.current = takePreparedMobileBg();
@@ -42,6 +44,7 @@ export const useMobileBgCarousel = ({ looping }: UseMobileBgCarouselOptions) => 
   const intervalRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
   const hadPreparedRef = useRef(!!prepared);
+  const folderRef = useRef(folder);
   const reducedRef = useRef(false);
 
   loopingRef.current = looping;
@@ -103,7 +106,9 @@ export const useMobileBgCarousel = ({ looping }: UseMobileBgCarouselOptions) => 
       armInterval();
     };
 
-    const forceNew = !hadPreparedRef.current;
+    const folderChanged = folderRef.current !== folder;
+    folderRef.current = folder;
+    const forceNew = folderChanged || !hadPreparedRef.current;
     const cached = getCachedGalleryBannerUrls();
     if (cached?.length) {
       startCarousel(cached.map(toBgPhotoUrl), forceNew);
@@ -123,7 +128,7 @@ export const useMobileBgCarousel = ({ looping }: UseMobileBgCarouselOptions) => 
       clearCarousel();
       abort.abort();
     };
-  }, [armInterval]);
+  }, [armInterval, folder]);
 
   useEffect(() => {
     if (!looping) {

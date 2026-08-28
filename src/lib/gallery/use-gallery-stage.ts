@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { fetchAllOssImages, getCachedAllOssImages } from "@/lib/bg-photos/images";
 import { pickNextPhotoIndex } from "@/lib/bg-photos/photo-utils";
+import { useOssFolder } from "@/lib/bg-photos/useOssFolder";
 import { GALLERY_AUTO_INTERVAL_MS, GALLERY_FADE_MS } from "@/lib/gallery/constants";
 import { emptySize, emptySlot, loadShot } from "@/lib/gallery/load-shot";
 import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
@@ -18,6 +19,7 @@ const nextIndex = (current: number, length: number) => {
 
 export const useGalleryStage = () => {
   const alive = useKeepAliveActive();
+  const { folder } = useOssFolder();
   const { looping } = useSidebarBgLoop();
   const [status, setStatus] = useState<GalleryStageStatus>("loading");
   const [error, setError] = useState<string | null>(null);
@@ -203,7 +205,7 @@ export const useGalleryStage = () => {
         setStatus("error");
         setError(err instanceof Error ? err.message : "展台加载失败");
       });
-  }, [commitIndex, queueNext]);
+  }, [commitIndex, folder, queueNext]);
 
   useEffect(() => {
     const abort = new AbortController();
