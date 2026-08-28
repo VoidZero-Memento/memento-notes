@@ -22,6 +22,17 @@
   src: url("/fonts/GeistMono-Variable.woff2") format("woff2");
 }
 
+/* iOS 代码块西文：放大 GeistMono 以贴齐霞鹜文楷等宽，仅 --font-code 引用 */
+@font-face {
+  font-family: "CodeLatin";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/GeistMono-Variable.woff2") format("woff2");
+  size-adjust: 114%;
+  unicode-range: U+0000-00FF;
+}
+
 /*
  * LXGWWenKai / LXGWWenKaiMono 由 index.html 引入分段 CSS：
  *   /fonts/lxgw/result.css

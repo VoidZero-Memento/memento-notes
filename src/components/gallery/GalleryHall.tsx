@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { MOBILE_BG_MQ } from "@/lib/bg-photos/constants";
 import { useOssFolder } from "@/lib/bg-photos/useOssFolder";
-import { useMediaQuery } from "@/lib/dom/use-media-query";
 import { HALL_DESKTOP_FRAME_PAD, HALL_PAD } from "@/lib/gallery/constants";
 import { readOriginRect } from "@/lib/gallery/hall-photo";
 import { useHallBackdrop } from "@/lib/gallery/use-hall-backdrop";
@@ -35,18 +33,16 @@ export const GalleryHall = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const alive = useKeepAliveActive();
-  const isMobile = useMediaQuery(MOBILE_BG_MQ);
   const { folder } = useOssFolder();
   const { error, photos, status } = useHallCatalog();
   const [selection, setSelection] = useState<HallSelection | null>(null);
-  const [immersive, setImmersive] = useState(false);
 
   useEffect(() => {
     setSelection(null);
   }, [folder]);
-  const paused = !alive || selection !== null || immersive;
+  const paused = !alive || selection !== null;
   const { height, onScroll, scrollerRef, visible } = useHallMasonry(photos, paused);
-  const { slotA, slotB, advance } = useHallBackdrop(photos, !paused);
+  const { slotA, slotB } = useHallBackdrop(photos, !paused);
 
   const handleBack = useCallback(() => {
     if (selection) {
@@ -69,9 +65,7 @@ export const GalleryHall = () => {
 
   return (
     <ImmersiveLayer
-      enabled={isMobile && alive && photos.length > 0 && !selection}
-      onImmersiveChange={setImmersive}
-      onClearTap={advance}
+      enabled={false}
       className={styles.root}
       background={<GalleryHallBackdrop paused={paused} slotA={slotA} slotB={slotB} />}
     >

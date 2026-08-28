@@ -4,6 +4,15 @@
 :root {
   --font-geist-sans: "Geist", "LXGWWenKai", Arial, Helvetica, sans-serif;
   --font-geist-mono: "GeistMono", "LXGWWenKaiMono", ui-monospace, monospace;
+  --font-code: var(--font-geist-mono);
+}
+
+@supports (-webkit-touch-callout: none) {
+  @media (hover: none) and (pointer: coarse) {
+    :root {
+      --font-code: "CodeLatin", var(--font-geist-mono);
+    }
+  }
 }
 
 html {

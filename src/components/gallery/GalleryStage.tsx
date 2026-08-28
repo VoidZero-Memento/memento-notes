@@ -1,13 +1,10 @@
 import { useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { MOBILE_BG_MQ } from "@/lib/bg-photos/constants";
-import { useMediaQuery } from "@/lib/dom/use-media-query";
 import { GALLERY_BACKDROP_MS, GALLERY_FADE_MS, GALLERY_MAT_GAP } from "@/lib/gallery/constants";
 import { useGalleryArtBox } from "@/lib/gallery/use-gallery-art-box";
 import { useGalleryChrome } from "@/lib/gallery/use-gallery-chrome";
 import { useGalleryStage } from "@/lib/gallery/use-gallery-stage";
-import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
 
 import { ImmersiveLayer } from "@/components/theme/ImmersiveLayer";
 
@@ -64,8 +61,6 @@ const AmbientLayer = ({ src, shown }: AmbientLayerProps) => (
 export const GalleryStage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const alive = useKeepAliveActive();
-  const isMobile = useMediaQuery(MOBILE_BG_MQ);
   const {
     status,
     error,
@@ -125,8 +120,7 @@ export const GalleryStage = () => {
 
   return (
     <ImmersiveLayer
-      enabled={isMobile && alive && status === "ready"}
-      onClearTap={advance}
+      enabled={false}
       className={`${styles.root}${status === "ready" ? ` ${styles.rootReady}` : ""}`}
       style={fadeVars}
       role="presentation"

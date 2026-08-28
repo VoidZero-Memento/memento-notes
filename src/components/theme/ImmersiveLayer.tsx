@@ -18,7 +18,7 @@ type ImmersiveApi = {
 
 type ImmersiveLayerProps = {
   enabled: boolean;
-  /** 默认在右上角放「背景」入口；笔记有顶栏时关掉，改用 ImmersiveEnter */
+  /** 右上角「背景」入口；仅笔记空态需要，展台/画廊关掉 */
   showEnter?: boolean;
   onImmersiveChange?: (immersive: boolean) => void;
   onClearTap?: () => void;
@@ -74,7 +74,7 @@ export const ImmersiveEnter = ({ className, children = "背景" }: ImmersiveEnte
 /** 手机沉浸看背景：点「背景」隐藏界面，轻触换图，点「返回」还原 */
 export const ImmersiveLayer = ({
   enabled,
-  showEnter = true,
+  showEnter = false,
   onImmersiveChange,
   onClearTap,
   className,
