@@ -11,7 +11,7 @@ export const MOBILE_BG_INTERVAL_MS = 10_000;
 
 /** PC 正文底写死两张图 */
 export const PC_BG_URLS = [
-  "https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/009.jpg",
+  "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background1.png",
   "https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/001.png",
 ] as const;
 
