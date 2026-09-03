@@ -64,6 +64,13 @@ export const pickNextPhotoIndex = (length: number, lastIndex: number): number =>
   return idx;
 };
 
+/** 轻触换图：按清单顺序下一张，避免随机乱跳 */
+export const nextPhotoIndex = (length: number, lastIndex: number): number => {
+  if (length <= 0) return -1;
+  if (length === 1) return 0;
+  return (lastIndex + 1 + length) % length;
+};
+
 export const preloadPhoto = (url: string, signal?: AbortSignal): Promise<{ width: number; height: number }> =>
   new Promise((resolve) => {
     if (signal?.aborted) {
@@ -78,7 +85,14 @@ export const preloadPhoto = (url: string, signal?: AbortSignal): Promise<{ width
       resolve({ width: img.naturalWidth, height: img.naturalHeight });
     };
     const onAbort = () => finish();
-    img.onload = finish;
+    const onReady = () => {
+      if (typeof img.decode === "function") {
+        void img.decode().then(finish, finish);
+        return;
+      }
+      finish();
+    };
+    img.onload = onReady;
     img.onerror = finish;
     signal?.addEventListener("abort", onAbort, { once: true });
     img.src = url;

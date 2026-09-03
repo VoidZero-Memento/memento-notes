@@ -176,7 +176,7 @@
     visibility 0s linear 0s;
 }
 
-/* 桌面：整页正文底图（右下锚定人物）；侧栏另铺独立背景图 */
+/* 桌面：整页正文底图（滑板人物略偏左下）；侧栏另铺独立背景图 */
 .rootBgEnabled::before {
   content: "";
   position: absolute;
@@ -190,8 +190,8 @@
       rgba(4, 7, 14, 0.26) 42%,
       rgba(4, 7, 14, 0.42) 100%
     ),
-    url("https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/009.jpg")
-      50% 72% / cover no-repeat;
+    url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background1.png")
+      40% 70% / cover no-repeat;
   filter: saturate(0.8) brightness(0.82);
 }
 
@@ -1033,7 +1033,7 @@
   padding: 24px;
 }
 @media (max-width: 860px) {
-  /* 手机继续用原 OSS 底图（轮播未挂载时的回退） */
+  /* 手机轮播未出图前用纯色，避免默认底图闪一下 */
   .rootBgEnabled::before {
     background:
       linear-gradient(
@@ -1042,8 +1042,7 @@
         rgba(4, 7, 14, 0.26) 42%,
         rgba(4, 7, 14, 0.42) 100%
       ),
-      url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner8.png") center /
-        cover no-repeat;
+      #04070e;
   }
 
   /* 轮播层接管正文底图时关掉 ::before，避免双图层与额外解码 */
@@ -1066,8 +1065,7 @@
 
   .root[data-immersive="true"].rootBgEnabled::before {
     filter: none;
-    background: url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner8.png")
-      center / cover no-repeat;
+    background: #04070e;
   }
 
   .backdrop {

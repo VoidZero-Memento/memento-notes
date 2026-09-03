@@ -27,6 +27,6 @@ export const MOBILE_BG_TRANSITION_MIN_MS = 3_000;
 /** 清单 + 首图等待上限 */
 export const MOBILE_BG_PREPARE_TIMEOUT_MS = 10_000;
 
-/** 手机 CSS 默认底图（清单失败时回退） */
+/** 清单失败时回退 */
 export const MOBILE_BG_FALLBACK_URL =
-  "https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner8.png";
+  "https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/005.png";

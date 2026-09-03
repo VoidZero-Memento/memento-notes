@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 
-/** 订阅 matchMedia；SSR/首帧用 false，避免 PC 误跑移动逻辑 */
+const readMatches = (query: string): boolean =>
+  typeof window !== "undefined" ? window.matchMedia(query).matches : false;
+
+/** 订阅 matchMedia；首帧同步读取，避免手机先误挂 PC 背景 */
 export const useMediaQuery = (query: string): boolean => {
-  const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState(() => readMatches(query));
 
   useEffect(() => {
     const mql = window.matchMedia(query);

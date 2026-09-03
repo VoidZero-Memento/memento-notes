@@ -97,6 +97,9 @@ export const NotesWorkspace = ({
   const mobileBgCarousel = isMobile && sidebarBgEnabled;
   const pcBgCarousel = !isMobile && sidebarBgEnabled;
   const pageBgCarousel = mobileBgCarousel || pcBgCarousel;
+  const [bgImmersive, setBgImmersive] = useState(false);
+  const [mobileBgReady, setMobileBgReady] = useState(false);
+  const mobileBgCovering = mobileBgCarousel && !mobileBgReady;
   const viewerBodyRef = useRef<HTMLDivElement>(null);
   const bgCarouselRef = useRef<MobileBgCarouselHandle>(null);
   const { content, loading, pending, error, selectNote, retry } = useNoteContent(
@@ -243,6 +246,7 @@ export const NotesWorkspace = ({
     <ImmersiveLayer
       enabled={mobileBgCarousel && alive}
       showEnter={immersiveBgEmpty}
+      onImmersiveChange={setBgImmersive}
       onClearTap={() => bgCarouselRef.current?.advance()}
       className={[
         styles.root,
@@ -260,7 +264,11 @@ export const NotesWorkspace = ({
       background={
         mobileBgCarousel ? (
           <Suspense fallback={null}>
-            <MobileBgCarousel ref={bgCarouselRef} looping={sidebarBgLooping && alive} />
+            <MobileBgCarousel
+              ref={bgCarouselRef}
+              looping={sidebarBgLooping && alive && !bgImmersive}
+              onReady={() => setMobileBgReady(true)}
+            />
           </Suspense>
         ) : pcBgCarousel ? (
           <Suspense fallback={null}>
@@ -395,7 +403,7 @@ export const NotesWorkspace = ({
           {sidebarBgEnabled && galleryLinkEnabled ? <GalleryLink /> : null}
         </div>
       </aside>
-      <BgTransitionOverlay open={bgOverlayOpen} crawlProgress={bgOverlayCrawl} />
+      <BgTransitionOverlay open={bgOverlayOpen || mobileBgCovering} crawlProgress={bgOverlayCrawl} />
       <main className={styles.viewer}>
         {showViewerGlass ? <div className={styles.viewerGlass} aria-hidden /> : null}
         <div className={styles.viewerContent}>

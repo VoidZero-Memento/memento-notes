@@ -1,4 +1,4 @@
-import { pickNextPhotoIndex, preloadPhoto } from "@/lib/bg-photos/photo-utils";
+import { nextPhotoIndex, pickNextPhotoIndex, preloadPhoto, sleep } from "@/lib/bg-photos/photo-utils";
 
 import type { BgPhotoSlot } from "@/lib/bg-photos/bg-photos.types";
 import type { Dispatch, RefObject, SetStateAction } from "react";
@@ -14,23 +14,40 @@ export type BgCrossfadeRefs = {
   setSlotB: Dispatch<SetStateAction<BgPhotoSlot>>;
 };
 
+export type RunBgCrossfadeOptions = {
+  /** 允许清单仅 1 张时仍溶解（刷新首图） */
+  allowSingle?: boolean;
+  /** 轻触换图按顺序，避免随机叠切 */
+  sequential?: boolean;
+  extraPreload?: (url: string) => string | undefined;
+  /** 溶解未结束前保持 busy，防止连点叠动画 */
+  fadeMs?: number;
+};
+
 export const runBgCrossfade = async (
   refs: BgCrossfadeRefs,
   requireLooping: boolean,
   signal?: AbortSignal,
+  options?: RunBgCrossfadeOptions,
 ): Promise<boolean> => {
   if (refs.busyRef.current) return false;
   const urls = refs.urlsRef.current;
-  if (!urls || urls.length <= 1) return false;
+  if (!urls?.length) return false;
+  if (urls.length <= 1 && (requireLooping || !options?.allowSingle)) return false;
   if (requireLooping && !refs.loopingRef.current) return false;
 
-  const idx = pickNextPhotoIndex(urls.length, refs.lastIndexRef.current);
+  const idx = options?.sequential
+    ? nextPhotoIndex(urls.length, refs.lastIndexRef.current)
+    : pickNextPhotoIndex(urls.length, refs.lastIndexRef.current);
   const nextUrl = urls[idx];
   if (!nextUrl) return false;
 
   refs.busyRef.current = true;
   const runGen = refs.generationRef.current;
-  await preloadPhoto(nextUrl, signal);
+  const extraUrl = options?.extraPreload?.(nextUrl);
+  await Promise.all(
+    extraUrl ? [preloadPhoto(nextUrl, signal), preloadPhoto(extraUrl, signal)] : [preloadPhoto(nextUrl, signal)],
+  );
 
   const stale = signal?.aborted || runGen !== refs.generationRef.current;
   if (stale || (requireLooping && !refs.loopingRef.current)) {
@@ -40,11 +57,10 @@ export const runBgCrossfade = async (
 
   refs.lastIndexRef.current = idx;
 
-  await new Promise<void>((resolve) => {
+  const swapped = await new Promise<boolean>((resolve) => {
     const apply = () => {
       if (signal?.aborted || runGen !== refs.generationRef.current) {
-        refs.busyRef.current = false;
-        resolve();
+        resolve(false);
         return;
       }
       if (refs.activeIsARef.current) {
@@ -56,8 +72,7 @@ export const runBgCrossfade = async (
         refs.setSlotA({ url: nextUrl, visible: true });
         refs.activeIsARef.current = true;
       }
-      refs.busyRef.current = false;
-      resolve();
+      resolve(true);
     };
 
     if (refs.activeIsARef.current) {
@@ -65,8 +80,16 @@ export const runBgCrossfade = async (
     } else {
       refs.setSlotA({ url: nextUrl, visible: false });
     }
-    requestAnimationFrame(apply);
+    requestAnimationFrame(() => requestAnimationFrame(apply));
   });
 
+  if (!swapped) {
+    refs.busyRef.current = false;
+    return false;
+  }
+
+  const fadeMs = options?.fadeMs ?? 0;
+  if (fadeMs > 0) await sleep(fadeMs, signal);
+  refs.busyRef.current = false;
   return true;
 };

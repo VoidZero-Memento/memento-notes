@@ -22,8 +22,8 @@
       rgba(4, 7, 14, 0.26) 42%,
       rgba(4, 7, 14, 0.42) 100%
     ),
-    url("https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/009.jpg")
-      50% 72% / cover no-repeat;
+    url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background1.png")
+      40% 70% / cover no-repeat;
   filter: saturate(0.8) brightness(0.82);
 }
 
@@ -56,7 +56,7 @@
         rgba(4, 7, 14, 0.26) 42%,
         rgba(4, 7, 14, 0.42) 100%
       ),
-      url("https://my-ledger.oss-cn-shenzhen.aliyuncs.com/banner8.png") center /
-        cover no-repeat;
+      url("https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/005.png")
+        center / cover no-repeat;
   }
 }

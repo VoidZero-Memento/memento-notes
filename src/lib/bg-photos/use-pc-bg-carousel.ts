@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { PC_BG_INTERVAL_MS, PC_BG_URLS } from "@/lib/bg-photos/constants";
+import { MOBILE_BG_FADE_MS, PC_BG_INTERVAL_MS, PC_BG_URLS } from "@/lib/bg-photos/constants";
 import { runBgCrossfade } from "@/lib/bg-photos/run-bg-crossfade";
 
 import type { BgPhotoSlot } from "@/lib/bg-photos/bg-photos.types";
@@ -52,7 +52,9 @@ export const usePcBgCarousel = ({ looping }: UsePcBgCarouselOptions) => {
     intervalRef.current = 0;
     if (reducedRef.current || !loopingRef.current) return;
     intervalRef.current = window.setInterval(() => {
-      void runBgCrossfade(fadeRefsRef.current, true, abortRef.current?.signal);
+      void runBgCrossfade(fadeRefsRef.current, true, abortRef.current?.signal, {
+        fadeMs: reducedRef.current ? 0 : MOBILE_BG_FADE_MS,
+      });
     }, PC_BG_INTERVAL_MS);
   }, []);
 
