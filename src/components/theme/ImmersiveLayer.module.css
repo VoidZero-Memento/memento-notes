@@ -92,9 +92,29 @@
   pointer-events: auto;
 }
 
+@media (min-width: 861px) {
+  .surface[data-immersive="true"] .pane {
+    display: flex;
+    pointer-events: none;
+  }
+
+  .restore {
+    transition:
+      opacity 180ms ease,
+      color 0.15s ease;
+  }
+
+  .restoreOn {
+    transition:
+      opacity var(--immersive-ms) ease 100ms,
+      color 0.15s ease;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .enter,
-  .restore {
+  .restore,
+  .restoreOn {
     transition: none;
   }
 }
