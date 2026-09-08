@@ -346,6 +346,18 @@
         }
       }
 
+      @keyframes splashDriftPc {
+        0% {
+          transform: scale(1.42) translateY(-12%);
+        }
+        50% {
+          transform: scale(1.45) translate(-0.2%, -13%);
+        }
+        100% {
+          transform: scale(1.48) translate(0.2%, -14%);
+        }
+      }
+
       @keyframes splashSpin {
         to {
           transform: rotate(360deg);
@@ -373,7 +385,9 @@
 
       @media (min-width: 861px) {
         #app-splash .splash-banner {
-          object-position: center 78%;
+          object-position: center 90%;
+          transform-origin: 50% 50%;
+          animation-name: splashDriftPc;
         }
       }
 
@@ -415,6 +429,12 @@
 
         #app-splash .splash-banner {
           transform: none;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) and (min-width: 861px) {
+        #app-splash .splash-banner {
+          transform: scale(1.44) translateY(-13%);
         }
       }
     </style>

@@ -30,6 +30,7 @@ import { RepoSelect } from "./RepoSelect";
 import styles from "./NotesShell.module.css";
 
 import type { MobileBgCarouselHandle } from "@/components/theme/MobileBgCarousel";
+import type { PcBgCarouselHandle } from "@/components/theme/PcBgCarousel";
 import type { GithubRepoConfig } from "@/config/github.types";
 import type { GithubFileTreeNode } from "@/lib/github/github.types";
 
@@ -102,6 +103,7 @@ export const NotesWorkspace = ({
   const mobileBgCovering = mobileBgCarousel && !mobileBgReady;
   const viewerBodyRef = useRef<HTMLDivElement>(null);
   const bgCarouselRef = useRef<MobileBgCarouselHandle>(null);
+  const pcBgCarouselRef = useRef<PcBgCarouselHandle>(null);
   const { content, loading, pending, error, selectNote, retry } = useNoteContent(
     config,
     selectedPath,
@@ -244,10 +246,13 @@ export const NotesWorkspace = ({
 
   return (
     <ImmersiveLayer
-      enabled={mobileBgCarousel && alive}
+      enabled={pageBgCarousel && alive}
       showEnter={immersiveBgEmpty}
       onImmersiveChange={setBgImmersive}
-      onClearTap={() => bgCarouselRef.current?.advance()}
+      onClearTap={() => {
+        bgCarouselRef.current?.advance();
+        pcBgCarouselRef.current?.advance();
+      }}
       className={[
         styles.root,
         sidebarHidden ? styles.rootSidebarHidden : "",
@@ -272,7 +277,10 @@ export const NotesWorkspace = ({
           </Suspense>
         ) : pcBgCarousel ? (
           <Suspense fallback={null}>
-            <PcBgCarousel looping={sidebarBgLooping && alive} />
+            <PcBgCarousel
+              ref={pcBgCarouselRef}
+              looping={sidebarBgLooping && alive && !bgImmersive}
+            />
           </Suspense>
         ) : null
       }
@@ -300,6 +308,11 @@ export const NotesWorkspace = ({
         <div className={styles.sidebarHeader}>
           <div className={styles.sidebarTitleRow}>
             <h2 className={styles.sidebarTitle}>{workspaceTitle}</h2>
+            {pcBgCarousel ? (
+              <div className={styles.sidebarTitleActions}>
+                <ImmersiveEnter className={styles.sidebarClearBtn}>清屏</ImmersiveEnter>
+              </div>
+            ) : null}
             <button
               type="button"
               className={styles.mobileClose}

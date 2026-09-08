@@ -46,7 +46,9 @@ const showHintOnce = () => {
   } catch {
     /* private mode */
   }
-  toast.info("轻触换图，点返回还原");
+  toast.info(
+    window.matchMedia("(pointer: coarse)").matches ? "轻触换图，点返回还原" : "点击空白换图，点返回还原",
+  );
 };
 
 const stopAnd = (event: MouseEvent<HTMLButtonElement>, fn: () => void) => {
@@ -71,7 +73,7 @@ export const ImmersiveEnter = ({ className, children = "背景" }: ImmersiveEnte
   );
 };
 
-/** 手机沉浸看背景：点「背景」隐藏界面，轻触换图，点「返回」还原 */
+/** 沉浸看背景：隐藏界面，点击空白换图，点「返回」还原 */
 export const ImmersiveLayer = ({
   enabled,
   showEnter = false,

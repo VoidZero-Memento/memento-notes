@@ -71,6 +71,15 @@ export const usePcBgCarousel = ({ looping }: UsePcBgCarouselOptions) => {
     };
   }, [armInterval]);
 
+  const advance = useCallback(() => {
+    void runBgCrossfade(fadeRefsRef.current, false, abortRef.current?.signal, {
+      sequential: true,
+      fadeMs: reducedRef.current ? 0 : MOBILE_BG_FADE_MS,
+    }).then((ok) => {
+      if (ok && loopingRef.current) armInterval();
+    });
+  }, [armInterval]);
+
   useEffect(() => {
     if (!looping) {
       clearCarousel();
@@ -80,5 +89,5 @@ export const usePcBgCarousel = ({ looping }: UsePcBgCarouselOptions) => {
     return clearCarousel;
   }, [looping, armInterval]);
 
-  return { slotA, slotB };
+  return { slotA, slotB, advance };
 };
