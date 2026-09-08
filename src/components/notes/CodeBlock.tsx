@@ -14,7 +14,8 @@ type CodeBlockProps = {
 const extractText = (node: unknown): string => {
   if (typeof node === "string" || typeof node === "number") return String(node);
   if (Array.isArray(node)) return node.map(extractText).join("");
-  if (isValidElement<{ children?: unknown }>(node)) return extractText(node.props.children);
+  if (isValidElement<{ children?: unknown }>(node))
+    return extractText(node.props.children);
   return "";
 };
 
@@ -69,7 +70,11 @@ export const CodeBlock = ({ children, className }: CodeBlockProps) => {
           <span className={`${styles.dot} ${styles.dotYellow}`} />
           <span className={`${styles.dot} ${styles.dotGreen}`} />
         </div>
-        <button type="button" className={styles.copyBtn} onClick={() => void handleCopy()}>
+        <button
+          type="button"
+          className={styles.copyBtn}
+          onClick={() => void handleCopy()}
+        >
           {copied ? "已复制" : "复制代码"}
         </button>
       </div>

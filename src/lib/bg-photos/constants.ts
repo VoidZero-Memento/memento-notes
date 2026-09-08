@@ -12,7 +12,7 @@ export const MOBILE_BG_INTERVAL_MS = 10_000;
 /** PC 正文底写死两张图 */
 export const PC_BG_URLS = [
   "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background1.png",
-  "https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/001.png",
+  "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background3.png",
 ] as const;
 
 /** PC 正文底轮播间隔 */
@@ -29,4 +29,4 @@ export const MOBILE_BG_PREPARE_TIMEOUT_MS = 10_000;
 
 /** 清单失败时回退 */
 export const MOBILE_BG_FALLBACK_URL =
-  "https://my-aesthetic-gallery.oss-cn-shenzhen.aliyuncs.com/fav/005.png";
+  "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-mobile-background1.png";
