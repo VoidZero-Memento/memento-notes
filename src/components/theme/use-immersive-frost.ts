@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 
-import { IMMERSIVE_MS, useImmersive } from "@/components/theme/ImmersiveLayer";
+import { useImmersive } from "@/components/theme/ImmersiveLayer";
 
 const REDUCED_MQ = "(prefers-reduced-motion: reduce)";
 
-/** 高清层晚一帧挂上、退出后再留一拍，让清晰↔磨砂走 opacity/filter 过渡 */
-export const useImmersiveFrost = () => {
-  const immersive = useImmersive();
+/** 高清层晚一帧挂上再开过渡；退出只关 class，图层由轮播槽自己按 url 留着淡出 */
+export const useImmersiveFrost = (immersiveSource?: boolean) => {
+  const layerImmersive = useImmersive();
+  const immersive = immersiveSource ?? layerImmersive;
   const [frostOff, setFrostOff] = useState(false);
   const [sharpOn, setSharpOn] = useState(false);
 
@@ -35,8 +36,7 @@ export const useImmersiveFrost = () => {
     }
 
     setFrostOff(false);
-    const timeout = window.setTimeout(() => setSharpOn(false), IMMERSIVE_MS);
-    return () => window.clearTimeout(timeout);
+    setSharpOn(false);
   }, [immersive]);
 
   return { frostOff, sharpOn };

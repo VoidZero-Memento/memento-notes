@@ -188,13 +188,13 @@
   background:
     linear-gradient(
       180deg,
-      rgba(4, 7, 14, 0.36) 0%,
-      rgba(4, 7, 14, 0.26) 42%,
-      rgba(4, 7, 14, 0.42) 100%
+      rgba(4, 7, 14, 0.12) 0%,
+      rgba(4, 7, 14, 0.08) 42%,
+      rgba(4, 7, 14, 0.16) 100%
     ),
     url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background1.png")
       40% 70% / cover no-repeat;
-  filter: saturate(0.8) brightness(0.82);
+  filter: saturate(1) brightness(0.96);
 }
 
 /* 轮播层接管正文底图；侧栏 ::before 仍保留 */
@@ -208,10 +208,48 @@
   -webkit-backdrop-filter: blur(12px) saturate(135%);
 }
 
+@media (min-width: 861px) {
+  .rootBgEnabled .sidebar {
+    background: rgba(4, 7, 14, 0.14);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.8),
+      0 0 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .rootBgEnabled .sidebarBgEnabled::before {
+    content: none;
+  }
+
+  .rootBgEnabled .ownerName {
+    text-shadow: none;
+  }
+}
+
 .rootBgEnabled .viewerGlass {
-  background: rgba(6, 10, 20, 0.2);
-  backdrop-filter: blur(12px) saturate(135%);
-  -webkit-backdrop-filter: blur(12px) saturate(135%);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.rootBgEnabled .readerColumn {
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 14px rgba(0, 0, 0, 0.42);
+}
+
+.rootBgEnabled .viewerBody,
+.rootBgEnabled .viewerPath {
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.78),
+    0 0 12px rgba(0, 0, 0, 0.4);
+}
+
+.rootBgEnabled .mobileBarTitle {
+  text-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.5),
+    0 0 6px rgba(0, 0, 0, 0.25);
 }
 
 /* PC 左侧栏独立背景，与手机抽屉同图；盖住整页底图避免两图叠色 */
@@ -636,20 +674,23 @@
   transition: color 0.2s ease;
 }
 
-.sidebarTab:hover {
-  color: rgba(var(--fg-rgb), 0.88);
+@media (hover: hover) and (pointer: fine) {
+  .sidebarTab:hover {
+    color: rgba(var(--fg-rgb), 0.88);
+  }
+
+  .sidebarTabActive:hover {
+    color: var(--foreground);
+  }
 }
 
 .sidebarTabActive {
   color: var(--foreground);
 }
 
-.sidebarTabActive:hover {
-  color: var(--foreground);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .sidebarTabsThumb {
+  .sidebarTabsThumb,
+  .sidebarTab {
     transition: none;
   }
 }
@@ -1153,9 +1194,9 @@
     background:
       linear-gradient(
         180deg,
-        rgba(4, 7, 14, 0.36) 0%,
-        rgba(4, 7, 14, 0.26) 42%,
-        rgba(4, 7, 14, 0.42) 100%
+      rgba(4, 7, 14, 0.12) 0%,
+      rgba(4, 7, 14, 0.08) 42%,
+      rgba(4, 7, 14, 0.16) 100%
       ),
       #04070e;
   }
@@ -1172,10 +1213,6 @@
       max(12px, env(safe-area-inset-right, 0px))
       max(12px, env(safe-area-inset-bottom, 0px))
       max(12px, env(safe-area-inset-left, 0px));
-  }
-
-  .root[data-immersive="true"] {
-    padding: 0;
   }
 
   .root[data-immersive="true"].rootBgEnabled::before {
@@ -1366,6 +1403,31 @@
   .sidebarTab {
     padding: 10px 12px;
     font-size: 13px;
+    color: var(--foreground);
+    -webkit-text-fill-color: var(--foreground);
+    opacity: 0.48;
+    transition: opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .sidebarTabs .sidebarTab:hover,
+  .sidebarTabs .sidebarTab:active,
+  .sidebarTabs .sidebarTab:focus,
+  .sidebarTabs .sidebarTab:focus-visible {
+    background: transparent;
+    color: var(--foreground);
+    -webkit-text-fill-color: var(--foreground);
+    opacity: 0.48;
+  }
+
+  .sidebarTabs .sidebarTab[aria-selected="true"],
+  .sidebarTabs .sidebarTab[aria-selected="true"]:hover,
+  .sidebarTabs .sidebarTab[aria-selected="true"]:active,
+  .sidebarTabs .sidebarTab[aria-selected="true"]:focus,
+  .sidebarTabs .sidebarTab[aria-selected="true"]:focus-visible {
+    background: transparent;
+    color: var(--foreground);
+    -webkit-text-fill-color: var(--foreground);
+    opacity: 1;
   }
 
   .viewer {
@@ -1418,6 +1480,10 @@
   }
 
   .mobileBarBtn {
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
     border: none;
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.05);
@@ -1431,16 +1497,17 @@
     line-height: 1.2;
     cursor: pointer;
     transition:
-      background 0.15s ease,
       color 0.15s ease,
       box-shadow 0.15s ease;
   }
 
-  .mobileBarBtn:hover {
-    background: var(--accent-magenta-dim);
+  .mobileBarBtn:hover,
+  .mobileBarBtn:active,
+  .mobileBarBtn:focus-visible {
+    background: rgba(255, 255, 255, 0.05);
     box-shadow:
-      inset 0 0 0 1px rgba(var(--accent-2-rgb), 0.35),
-      0 0 12px rgba(var(--accent-2-rgb), 0.25);
+      inset 0 0 0 1px rgba(var(--accent-2-rgb), 0.55),
+      0 0 10px rgba(var(--accent-2-rgb), 0.2);
     color: var(--foreground);
   }
 

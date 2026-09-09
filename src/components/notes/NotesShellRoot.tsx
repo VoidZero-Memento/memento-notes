@@ -15,7 +15,12 @@ export const NotesShellRoot = ({ children, className }: NotesShellRootProps) => 
 
   return (
     <div
-      className={[styles.root, enabled ? styles.rootBgEnabled : "", className]
+      className={[
+        styles.root,
+        enabled ? styles.rootBgEnabled : "",
+        enabled ? styles.rootBgCarousel : "",
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
     >

@@ -27,13 +27,13 @@
   background:
     linear-gradient(
       180deg,
-      rgba(4, 7, 14, 0.36) 0%,
-      rgba(4, 7, 14, 0.26) 42%,
-      rgba(4, 7, 14, 0.42) 100%
+      rgba(4, 7, 14, 0.12) 0%,
+      rgba(4, 7, 14, 0.08) 42%,
+      rgba(4, 7, 14, 0.16) 100%
     ),
     url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background1.png")
       40% 70% / cover no-repeat;
-  filter: saturate(0.8) brightness(0.82);
+  filter: saturate(1) brightness(0.96);
   transform: scale(1);
   transform-origin: 40% 70%;
   will-change: transform, filter;
@@ -190,7 +190,7 @@
 
   to {
     transform: scale(1);
-    filter: saturate(0.8) brightness(0.82);
+    filter: saturate(1) brightness(0.96);
   }
 }
 
@@ -268,9 +268,9 @@
     background:
       linear-gradient(
         180deg,
-        rgba(4, 7, 14, 0.36) 0%,
-        rgba(4, 7, 14, 0.26) 42%,
-        rgba(4, 7, 14, 0.42) 100%
+        rgba(4, 7, 14, 0.12) 0%,
+        rgba(4, 7, 14, 0.08) 42%,
+        rgba(4, 7, 14, 0.16) 100%
       ),
       url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-mobile-background3.png")
         center / cover no-repeat;

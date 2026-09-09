@@ -12,7 +12,6 @@ export const IMMERSIVE_MS = 640;
 const PC_IMMERSIVE_MS = 420;
 
 const HINT_KEY = "memento.immersive-hint";
-const REDUCED_MQ = "(prefers-reduced-motion: reduce)";
 
 type ImmersiveApi = {
   enabled: boolean;
@@ -64,13 +63,21 @@ export const useImmersive = (): boolean => useContext(ImmersiveContext)?.immersi
 
 export const ImmersiveEnter = ({ className, children = "背景" }: ImmersiveEnterProps) => {
   const api = useContext(ImmersiveContext);
-  if (!api?.enabled || api.immersive) return null;
+  if (!api?.enabled) return null;
   return (
     <button
       type="button"
       className={className}
       aria-label="沉浸看背景"
-      onClick={(event) => stopAnd(event, api.enter)}
+      tabIndex={api.immersive ? -1 : 0}
+      aria-hidden={api.immersive}
+      onClick={(event) => {
+        if (api.immersive) {
+          event.stopPropagation();
+          return;
+        }
+        stopAnd(event, api.enter);
+      }}
     >
       {children}
     </button>
@@ -95,18 +102,11 @@ export const ImmersiveLayer = ({
   const isMobile = useMediaQuery(MOBILE_BG_MQ);
   const durationMs = isMobile ? IMMERSIVE_MS : PC_IMMERSIVE_MS;
   const [immersive, setImmersive] = useState(false);
-  const [leaving, setLeaving] = useState(false);
-  const leaveTimer = useRef(0);
   const onImmersiveChangeRef = useRef(onImmersiveChange);
   onImmersiveChangeRef.current = onImmersiveChange;
-  const chromeOff = immersive || leaving;
-  /** 手机仍等退场拍结束再亮界面；PC 立刻切 data-immersive，让界面与背景同一镜 */
-  const hideChrome = isMobile ? chromeOff : immersive;
 
   const enter = useCallback(() => {
     if (!enabled) return;
-    window.clearTimeout(leaveTimer.current);
-    setLeaving(false);
     setImmersive(true);
     onImmersiveChangeRef.current?.(true);
     showHintOnce();
@@ -115,22 +115,14 @@ export const ImmersiveLayer = ({
   const exit = useCallback(() => {
     if (!immersive) return;
     setImmersive(false);
-    setLeaving(true);
     onImmersiveChangeRef.current?.(false);
-    window.clearTimeout(leaveTimer.current);
-    const reduced = window.matchMedia(REDUCED_MQ).matches;
-    leaveTimer.current = window.setTimeout(() => setLeaving(false), reduced ? 0 : durationMs);
-  }, [durationMs, immersive]);
+  }, [immersive]);
 
   useEffect(() => {
     if (enabled) return;
-    window.clearTimeout(leaveTimer.current);
     setImmersive(false);
-    setLeaving(false);
     onImmersiveChangeRef.current?.(false);
   }, [enabled]);
-
-  useEffect(() => () => window.clearTimeout(leaveTimer.current), []);
 
   useEffect(() => {
     if (!enabled || !immersive || isMobile) return;
@@ -148,7 +140,7 @@ export const ImmersiveLayer = ({
       <div
         className={[styles.surface, className].filter(Boolean).join(" ")}
         style={{ ...style, "--immersive": immersive ? "1" : "0", "--immersive-ms": `${durationMs}ms` } as CSSProperties}
-        data-immersive={hideChrome ? "true" : undefined}
+        data-immersive={immersive ? "true" : undefined}
         role={role}
         aria-label={ariaLabel}
         onClick={onClick}
@@ -188,7 +180,7 @@ export const ImmersiveLayer = ({
             背景
           </button>
         ) : null}
-        <div className={styles.pane} aria-hidden={chromeOff} {...(chromeOff ? { inert: true } : {})}>
+        <div className={styles.pane} aria-hidden={immersive} {...(immersive ? { inert: true } : {})}>
           {children}
         </div>
       </div>

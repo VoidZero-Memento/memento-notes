@@ -40,6 +40,7 @@ export const NoteEnter = ({ children }: NoteEnterProps) => {
 
   const className = [
     styles.noteEnter,
+    styles.readerColumn,
     active ? styles.noteEnterActive : "",
     settled ? styles.noteEnterSettled : "",
   ]

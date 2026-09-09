@@ -2,6 +2,10 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,viewport-fit=cover"
+    />
     <script>
       (function () {
         try {
@@ -11,16 +15,36 @@
         } catch (e) {
           document.documentElement.dataset.splash = "1";
         }
-        if (document.documentElement.dataset.splash === "1") {
-          var pc = window.matchMedia("(min-width: 861px)").matches;
+        if (document.documentElement.dataset.splash !== "1") return;
+        var pc = window.matchMedia("(min-width: 861px)").matches;
+        var urls = pc
+          ? [
+              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background2.png",
+              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background1.png",
+            ]
+          : [
+              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background1.png",
+              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background2.png",
+              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background3.png",
+              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background4.png",
+              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background5.png",
+              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background6.png",
+              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background7.png",
+              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background8.png",
+              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background9.png",
+              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background10.png",
+            ];
+        var index = Math.floor(Math.random() * urls.length);
+        window.__MEMENTO_SPLASH__ = { urls: urls, index: index };
+        var preload = function (href) {
           var link = document.createElement("link");
           link.rel = "preload";
           link.as = "image";
-          link.href = pc
-            ? "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background2.png"
-            : "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-mobile-background2.png";
+          link.href = href;
           document.head.appendChild(link);
-        }
+        };
+        preload(urls[index]);
+        if (urls.length > 1) preload(urls[(index + 1) % urls.length]);
       })();
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.png" />
@@ -31,13 +55,16 @@
       href="/fonts/Geist-Variable.woff2"
       crossorigin
     />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/GeistMono-Variable.woff2"
+      crossorigin
+    />
     <!-- LXGW 分段字体：相对路径 + unicode-range，勿 preload 整包 -->
     <link rel="stylesheet" href="/fonts/lxgw/result.css" />
     <link rel="stylesheet" href="/fonts/lxgw-mono/result.css" />
-    <meta
-      name="viewport"
-      content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,viewport-fit=cover"
-    />
     <meta name="description" content="浏览 GitHub 仓库中的 Markdown 笔记" />
     <title>Memento · 笔记</title>
     <style>
@@ -47,6 +74,14 @@
         font-weight: 100 900;
         font-display: swap;
         src: url("/fonts/Geist-Variable.woff2") format("woff2");
+      }
+
+      @font-face {
+        font-family: "GeistMono";
+        font-style: normal;
+        font-weight: 100 900;
+        font-display: swap;
+        src: url("/fonts/GeistMono-Variable.woff2") format("woff2");
       }
 
       html:not([data-splash="1"]) #app-splash {
@@ -62,9 +97,7 @@
         overflow: hidden;
         background: #04070e;
         color: rgba(245, 240, 255, 0.95);
-        font-family:
-          "Geist", "LXGWWenKai", "Segoe UI", "PingFang SC", "Hiragino Sans GB",
-          "Microsoft YaHei", sans-serif;
+        font-family: "Geist", "LXGWWenKai", Arial, Helvetica, sans-serif;
         -webkit-font-smoothing: antialiased;
       }
 
@@ -75,21 +108,34 @@
         animation: splashRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
       }
 
-      #app-splash picture {
-        display: block;
-        width: 100%;
-        height: 100%;
+      #app-splash .splash-banners {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        transform-origin: 50% 40%;
+        animation: splashDrift 16s ease-in-out infinite alternate;
       }
 
       #app-splash .splash-banner {
+        position: absolute;
+        inset: 0;
         display: block;
         width: 100%;
         height: 100%;
         object-fit: cover;
         object-position: center 28%;
-        transform-origin: 50% 40%;
+        opacity: 0;
         filter: saturate(1.08) contrast(1.03);
-        animation: splashDrift 16s ease-in-out infinite alternate;
+        transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: opacity;
+        pointer-events: none;
+        backface-visibility: hidden;
+        z-index: 0;
+      }
+
+      #app-splash .splash-banner.is-on {
+        opacity: 1;
+        z-index: 1;
       }
 
       #app-splash .splash-veil {
@@ -163,6 +209,7 @@
       #app-splash .splash-brand {
         margin: 0;
         color: rgba(245, 240, 255, 0.78);
+        font-family: "GeistMono", "LXGWWenKaiMono", ui-monospace, monospace;
         font-size: 11px;
         font-weight: 600;
         letter-spacing: 0.28em;
@@ -182,7 +229,7 @@
         line-height: 1.35;
       }
 
-      #app-splash .splash-title span:first-child {
+      #app-splash .splash-heading {
         background: linear-gradient(
           92deg,
           #f5f0ff 0%,
@@ -384,10 +431,13 @@
       }
 
       @media (min-width: 861px) {
-        #app-splash .splash-banner {
-          object-position: center 90%;
+        #app-splash .splash-banners {
           transform-origin: 50% 50%;
           animation-name: splashDriftPc;
+        }
+
+        #app-splash .splash-banner {
+          object-position: center 90%;
         }
       }
 
@@ -417,6 +467,7 @@
 
       @media (prefers-reduced-motion: reduce) {
         #app-splash .splash-stage,
+        #app-splash .splash-banners,
         #app-splash .splash-banner,
         #app-splash .splash-card,
         #app-splash .splash-mark,
@@ -427,37 +478,50 @@
           transition: none;
         }
 
-        #app-splash .splash-banner {
+        #app-splash .splash-banners {
           transform: none;
         }
       }
 
       @media (prefers-reduced-motion: reduce) and (min-width: 861px) {
-        #app-splash .splash-banner {
+        #app-splash .splash-banners {
           transform: scale(1.44) translateY(-13%);
         }
       }
     </style>
   </head>
   <body>
-    <div id="root">
-      <div id="app-splash" role="status" aria-live="polite" aria-busy="true">
+    <div id="app-splash" role="status" aria-live="polite" aria-busy="true">
         <div class="splash-stage">
-          <picture>
-            <source
-              media="(min-width: 861px)"
-              srcset="
-                https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background2.png
-              "
-            />
+          <div class="splash-banners">
             <img
-              class="splash-banner"
-              src="https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-mobile-background2.png"
+              class="splash-banner is-on"
+              id="splash-banner-a"
               alt=""
               decoding="async"
               fetchpriority="high"
+              loading="eager"
             />
-          </picture>
+            <img
+              class="splash-banner"
+              id="splash-banner-b"
+              alt=""
+              decoding="async"
+              loading="eager"
+            />
+          </div>
+          <script>
+            (function () {
+              var boot = window.__MEMENTO_SPLASH__;
+              if (!boot || !boot.urls || !boot.urls.length) return;
+              var a = document.getElementById("splash-banner-a");
+              var b = document.getElementById("splash-banner-b");
+              var first = boot.urls[boot.index];
+              if (a && first) a.src = first;
+              if (b && boot.urls.length > 1)
+                b.src = boot.urls[(boot.index + 1) % boot.urls.length];
+            })();
+          </script>
           <div class="splash-veil" aria-hidden="true"></div>
           <div class="splash-panel">
             <div class="splash-card">
@@ -466,7 +530,7 @@
                 <p class="splash-brand">Memento</p>
               </div>
               <p class="splash-title">
-                <span>资源加载中</span>
+                <span class="splash-heading">资源加载中</span>
                 <span class="splash-dots" aria-hidden="true">
                   <span></span><span></span><span></span>
                 </span>
@@ -480,7 +544,7 @@
                 <p class="splash-percent" id="splash-percent">0%</p>
               </div>
               <p class="splash-label" id="splash-label">
-                正在准备笔记空间，请稍候
+                宝宝耐性等等，正在准备札记空间哦~
               </p>
             </div>
           </div>
@@ -497,20 +561,30 @@
           var reduce =
             window.matchMedia &&
             window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          var doneLabels = [
+            "宝宝准备好啦！即将翻开札记哦…",
+            "亲爱的 札记已经就绪，这就为你打开啦…",
+          ];
+          var pickDone = function () {
+            return doneLabels[Math.floor(Math.random() * doneLabels.length)];
+          };
+
           if (reduce) {
             fill.style.width = "90%";
             pctEl.textContent = "90%";
+            if (labelEl) labelEl.textContent = pickDone();
             return;
           }
 
           var CAP = 90;
           var start = performance.now();
           var lastShown = -1;
+          var doneText = pickDone();
           var labels = [
-            [0, "正在准备笔记空间，请稍候"],
-            [28, "正在加载核心资源…"],
-            [55, "正在整理笔记环境…"],
-            [78, "即将就绪…"],
+            [0, "宝宝耐性等等，正在准备札记空间哦~"],
+            [28, "亲爱的 核心资源正在飞奔过来啦…"],
+            [55, "小笨蛋 正在悄悄为你整理环境哦…"],
+            [78, "宝贝 马上就准备好啦，再等人家一秒秒…"],
           ];
 
           var tick = function (now) {
@@ -527,10 +601,15 @@
               lastShown = p;
               fill.style.width = p + "%";
               pctEl.textContent = p + "%";
-              for (var i = labels.length - 1; i >= 0; i--) {
-                if (p >= labels[i][0]) {
-                  if (labelEl) labelEl.textContent = labels[i][1];
-                  break;
+              if (labelEl) {
+                if (p >= CAP) labelEl.textContent = doneText;
+                else {
+                  for (var i = labels.length - 1; i >= 0; i--) {
+                    if (p >= labels[i][0]) {
+                      labelEl.textContent = labels[i][1];
+                      break;
+                    }
+                  }
                 }
               }
             }
@@ -539,7 +618,114 @@
           window.requestAnimationFrame(tick);
         })();
       </script>
+      <script>
+        (function () {
+          if (document.documentElement.dataset.splash !== "1") return;
+          var boot = window.__MEMENTO_SPLASH__;
+          var slotA = document.getElementById("splash-banner-a");
+          var slotB = document.getElementById("splash-banner-b");
+          if (!boot || !slotA || !slotB || !boot.urls || boot.urls.length < 2) return;
+
+          var urls = boot.urls;
+          var index = boot.index;
+          var shown = slotA;
+          var hidden = slotB;
+          var INTERVAL = 3000;
+          var reduceMotion =
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          var FADE_MS = reduceMotion ? 0 : 900;
+
+          var decodeEl = function (el) {
+            if (typeof el.decode === "function")
+              return el.decode().then(
+                function () {},
+                function () {},
+              );
+            return Promise.resolve();
+          };
+
+          var armSrc = function (el, src) {
+            return new Promise(function (resolve) {
+              var finish = function () {
+                el.onload = null;
+                el.onerror = null;
+                decodeEl(el).then(resolve);
+              };
+              if (el.getAttribute("src") === src && el.complete && el.naturalWidth > 0) {
+                finish();
+                return;
+              }
+              el.onload = finish;
+              el.onerror = function () {
+                el.onload = null;
+                el.onerror = null;
+                resolve();
+              };
+              el.src = src;
+            });
+          };
+
+          var preloadUrl = function (src) {
+            var img = new Image();
+            img.decoding = "async";
+            img.src = src;
+            if (typeof img.decode === "function")
+              void img.decode().then(
+                function () {},
+                function () {},
+              );
+          };
+
+          var sleepMs = function (ms) {
+            return new Promise(function (resolve) {
+              window.setTimeout(resolve, ms);
+            });
+          };
+
+          var raf2 = function () {
+            return new Promise(function (resolve) {
+              window.requestAnimationFrame(function () {
+                window.requestAnimationFrame(resolve);
+              });
+            });
+          };
+
+          void armSrc(shown, urls[index]).then(function () {
+            var lastSwitch = performance.now();
+            preloadUrl(urls[(index + 1) % urls.length]);
+
+            var alive = function () {
+              return !!document.getElementById("app-splash");
+            };
+
+            var loop = function () {
+              if (!alive()) return;
+              var next = (index + 1) % urls.length;
+              var remain = Math.max(0, INTERVAL - (performance.now() - lastSwitch));
+              Promise.all([armSrc(hidden, urls[next]), sleepMs(remain)])
+                .then(function () {
+                  return raf2();
+                })
+                .then(function () {
+                  if (!alive()) return;
+                  hidden.classList.add("is-on");
+                  shown.classList.remove("is-on");
+                  var outgoing = shown;
+                  shown = hidden;
+                  hidden = outgoing;
+                  index = next;
+                  lastSwitch = performance.now();
+                  preloadUrl(urls[(index + 1) % urls.length]);
+                  sleepMs(FADE_MS).then(loop);
+                });
+            };
+            loop();
+          });
+        })();
+      </script>
     </div>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

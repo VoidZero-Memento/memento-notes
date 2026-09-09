@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { MOBILE_BG_MQ } from "@/lib/bg-photos/constants";
 import { useMediaQuery } from "@/lib/dom/use-media-query";
@@ -16,6 +16,7 @@ import { useSidebarBgTransition } from "@/lib/prefs/useSidebarBgTransition";
 import { toast } from "@/lib/toast/toast";
 import { EmptyState } from "@/components/common/EmptyState";
 import { GalleryLink } from "@/components/gallery/GalleryLink";
+import { useAppBg } from "@/components/theme/AppBgProvider";
 import { BgTransitionOverlay } from "@/components/theme/BgTransitionOverlay";
 import { ImmersiveEnter, ImmersiveLayer } from "@/components/theme/ImmersiveLayer";
 import { SidebarBgToggle } from "@/components/theme/SidebarBgToggle";
@@ -29,8 +30,6 @@ import { OwnerFooter } from "./OwnerFooter";
 import { RepoSelect } from "./RepoSelect";
 import styles from "./NotesShell.module.css";
 
-import type { MobileBgCarouselHandle } from "@/components/theme/MobileBgCarousel";
-import type { PcBgCarouselHandle } from "@/components/theme/PcBgCarousel";
 import type { GithubRepoConfig } from "@/config/github.types";
 import type { GithubFileTreeNode } from "@/lib/github/github.types";
 
@@ -46,15 +45,6 @@ type NotesWorkspaceProps = {
 };
 
 const describeNoteLoadError = (message: string) => describeGithubError(message).description;
-
-/** 仅手机挂载，动态分包避免 PC 加载图集轮播 */
-const MobileBgCarousel = lazy(() =>
-  import("@/components/theme/MobileBgCarousel").then((m) => ({ default: m.MobileBgCarousel })),
-);
-
-const PcBgCarousel = lazy(() =>
-  import("@/components/theme/PcBgCarousel").then((m) => ({ default: m.PcBgCarousel })),
-);
 
 const SidebarEdgeChevron = ({ direction }: { direction: "left" | "right" }) => (
   <svg
@@ -85,6 +75,7 @@ export const NotesWorkspace = ({
   const alive = useKeepAliveActive();
   const isMobile = useMediaQuery(MOBILE_BG_MQ);
   const { unlocked: galleryBgUnlocked, unlock: unlockGalleryBg } = useGalleryBgGate();
+  const { ready: pageBgReady, advance: advancePageBg, setImmersive: setBgImmersive } = useAppBg();
   const { looping: sidebarBgLooping, setLooping: setSidebarBgLooping } = useSidebarBgLoop();
   const { enabled: borderFlowEnabled, setEnabled: setBorderFlowEnabled } = useBorderFlow();
   const { enabled: galleryLinkEnabled, setEnabled: setGalleryLinkEnabled } = useGalleryLink();
@@ -98,12 +89,8 @@ export const NotesWorkspace = ({
   const mobileBgCarousel = isMobile && sidebarBgEnabled;
   const pcBgCarousel = !isMobile && sidebarBgEnabled;
   const pageBgCarousel = mobileBgCarousel || pcBgCarousel;
-  const [bgImmersive, setBgImmersive] = useState(false);
-  const [mobileBgReady, setMobileBgReady] = useState(false);
-  const mobileBgCovering = mobileBgCarousel && !mobileBgReady;
+  const mobileBgCovering = mobileBgCarousel && !pageBgReady;
   const viewerBodyRef = useRef<HTMLDivElement>(null);
-  const bgCarouselRef = useRef<MobileBgCarouselHandle>(null);
-  const pcBgCarouselRef = useRef<PcBgCarouselHandle>(null);
   const { content, loading, pending, error, selectNote, retry } = useNoteContent(
     config,
     selectedPath,
@@ -239,9 +226,8 @@ export const NotesWorkspace = ({
     ? `${styles.backdrop} ${styles.backdropVisible}`
     : styles.backdrop;
 
-  /** 手机+背景：有正文可看时保留磨砂（含切文 pending）；首载/空态/失败不铺 */
-  const viewingMarkdown = !treeLoading && !!selectedPath && !!content && !loading;
-  const showViewerGlass = !mobileBgCarousel || viewingMarkdown;
+  /** 有背景图时不铺整块磨砂，改由正文列淡暗罩 + 字影保证可读 */
+  const showViewerGlass = !pageBgCarousel;
   const immersiveBgEmpty = mobileBgCarousel && !treeLoading && !selectedPath;
 
   return (
@@ -249,10 +235,7 @@ export const NotesWorkspace = ({
       enabled={pageBgCarousel && alive}
       showEnter={immersiveBgEmpty}
       onImmersiveChange={setBgImmersive}
-      onClearTap={() => {
-        bgCarouselRef.current?.advance();
-        pcBgCarouselRef.current?.advance();
-      }}
+      onClearTap={advancePageBg}
       className={[
         styles.root,
         sidebarHidden ? styles.rootSidebarHidden : "",
@@ -266,24 +249,6 @@ export const NotesWorkspace = ({
       ]
         .filter(Boolean)
         .join(" ")}
-      background={
-        mobileBgCarousel ? (
-          <Suspense fallback={null}>
-            <MobileBgCarousel
-              ref={bgCarouselRef}
-              looping={sidebarBgLooping && alive && !bgImmersive}
-              onReady={() => setMobileBgReady(true)}
-            />
-          </Suspense>
-        ) : pcBgCarousel ? (
-          <Suspense fallback={null}>
-            <PcBgCarousel
-              ref={pcBgCarouselRef}
-              looping={sidebarBgLooping && alive && !bgImmersive}
-            />
-          </Suspense>
-        ) : null
-      }
     >
       <div
         className={[

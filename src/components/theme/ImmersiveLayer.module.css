@@ -111,10 +111,45 @@
   }
 }
 
+@media (max-width: 860px) {
+  .pane {
+    z-index: 1;
+    transition: opacity var(--immersive-ms) cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .surface[data-immersive="true"] .pane {
+    display: flex;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .enter,
+  .restore {
+    transform: translateY(-6px);
+    transition:
+      opacity 200ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.15s ease;
+  }
+
+  .enterOn,
+  .restoreOn {
+    transform: translateY(0);
+    transition:
+      opacity 280ms cubic-bezier(0.22, 1, 0.36, 1) 90ms,
+      transform 280ms cubic-bezier(0.22, 1, 0.36, 1) 90ms,
+      color 0.15s ease;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .enter,
   .restore,
-  .restoreOn {
+  .enterOn,
+  .restoreOn,
+  .pane,
+  .surface[data-immersive="true"] .pane {
     transition: none;
+    transform: none;
   }
 }

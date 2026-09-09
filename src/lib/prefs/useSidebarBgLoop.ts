@@ -1,13 +1,31 @@
-import { useEffect, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
-import { persistSidebarBgLoop, readStoredSidebarBgLoop } from "@/lib/prefs/sidebar-bg-loop";
+import { DEFAULT_SIDEBAR_BG_LOOP, persistSidebarBgLoop, readStoredSidebarBgLoop } from "./sidebar-bg-loop";
+
+const listeners = new Set<() => void>();
+
+let looping = readStoredSidebarBgLoop();
+
+const emit = () => {
+  listeners.forEach((listener) => listener());
+};
+
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+
+const getLooping = () => looping;
 
 export const useSidebarBgLoop = () => {
-  const [looping, setLooping] = useState(() => readStoredSidebarBgLoop());
+  const isLooping = useSyncExternalStore(subscribe, getLooping, () => DEFAULT_SIDEBAR_BG_LOOP);
 
-  useEffect(() => {
-    persistSidebarBgLoop(looping);
-  }, [looping]);
+  const setLooping = useCallback((next: boolean) => {
+    if (next === looping) return;
+    looping = next;
+    persistSidebarBgLoop(next);
+    emit();
+  }, []);
 
-  return { looping, setLooping };
+  return { looping: isLooping, setLooping };
 };

@@ -27,16 +27,14 @@
   object-fit: cover;
   object-position: center;
   transform: scale(1.06);
-  filter: saturate(0.8) brightness(0.82) blur(8px);
-  transition:
-    transform var(--mobile-bg-fade-ms, 1400ms) cubic-bezier(0.22, 1, 0.36, 1),
-    filter var(--immersive-ms, 640ms) ease;
-  will-change: transform, filter;
+  filter: saturate(1) brightness(0.96);
+  transition: transform var(--mobile-bg-fade-ms, 1400ms) cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
 
 .slotVisible .cover {
   transform: scale(1);
-  filter: saturate(0.8) brightness(0.82) blur(8px);
+  filter: saturate(1) brightness(0.96);
 }
 
 .coverSharp {
@@ -50,13 +48,13 @@
   object-position: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--immersive-ms, 640ms) ease;
+  transition: opacity var(--immersive-ms, 640ms) cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity;
 }
 
 .immersive .cover,
 .immersive .slotVisible .cover {
   transform: scale(1);
-  filter: saturate(1) brightness(1) blur(0);
 }
 
 .immersive .coverSharp {
@@ -78,9 +76,9 @@
   opacity: 1;
   background: linear-gradient(
     180deg,
-    rgba(4, 7, 14, 0.36) 0%,
-    rgba(4, 7, 14, 0.26) 42%,
-    rgba(4, 7, 14, 0.42) 100%
+    rgba(4, 7, 14, 0.12) 0%,
+    rgba(4, 7, 14, 0.08) 42%,
+    rgba(4, 7, 14, 0.16) 100%
   );
   transition: opacity var(--immersive-ms, 640ms) cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -123,7 +121,7 @@
 
   .cover {
     transform: none;
-    filter: saturate(0.8) brightness(0.82);
+    filter: saturate(1) brightness(0.96);
   }
 }
 

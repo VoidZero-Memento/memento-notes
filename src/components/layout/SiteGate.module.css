@@ -9,24 +9,6 @@
   width: 100%;
 }
 
-.rootBg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(4, 7, 14, 0.36) 0%,
-      rgba(4, 7, 14, 0.26) 42%,
-      rgba(4, 7, 14, 0.42) 100%
-    ),
-    url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background1.png")
-      40% 70% / cover no-repeat;
-  filter: saturate(0.8) brightness(0.82);
-}
-
 .panel {
   position: relative;
   z-index: 1;
@@ -39,24 +21,5 @@
 @media (min-width: 861px) {
   .root {
     overflow: hidden;
-  }
-
-  .rootBg::before {
-    filter: saturate(1.05) brightness(0.42) blur(36px);
-    transform: scale(1.2);
-  }
-}
-
-@media (max-width: 860px) {
-  .rootBg::before {
-    background:
-      linear-gradient(
-        180deg,
-        rgba(4, 7, 14, 0.36) 0%,
-        rgba(4, 7, 14, 0.26) 42%,
-        rgba(4, 7, 14, 0.42) 100%
-      ),
-      url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-mobile-background1.png")
-        center / cover no-repeat;
   }
 }

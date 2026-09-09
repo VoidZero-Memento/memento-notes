@@ -71,6 +71,35 @@ export const nextPhotoIndex = (length: number, lastIndex: number): number => {
   return (lastIndex + 1 + length) % length;
 };
 
+/** 等页面上的 <img> 解码完成，避免 URL 已写入但像素还没画出来 */
+export const waitImgElementPainted = (img: HTMLImageElement): Promise<void> =>
+  new Promise((resolve) => {
+    const finish = () => {
+      if (typeof img.decode === "function") {
+        void img.decode().then(() => resolve(), () => resolve());
+        return;
+      }
+      resolve();
+    };
+    if (img.complete) {
+      if (img.naturalWidth > 0) finish();
+      else resolve();
+      return;
+    }
+    const onDone = () => {
+      img.removeEventListener("load", onDone);
+      img.removeEventListener("error", onFail);
+      finish();
+    };
+    const onFail = () => {
+      img.removeEventListener("load", onDone);
+      img.removeEventListener("error", onFail);
+      resolve();
+    };
+    img.addEventListener("load", onDone);
+    img.addEventListener("error", onFail);
+  });
+
 export const preloadPhoto = (url: string, signal?: AbortSignal): Promise<{ width: number; height: number }> =>
   new Promise((resolve) => {
     if (signal?.aborted) {
