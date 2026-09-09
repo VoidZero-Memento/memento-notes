@@ -158,7 +158,7 @@
   min-height: 0;
   min-width: 0;
   overflow: hidden;
-  padding: 16px;
+  padding: 16px 16px 10px;
   transform: translateX(0) scale(1);
   filter: blur(0) saturate(1);
   opacity: 1;
@@ -193,7 +193,7 @@
       rgba(4, 7, 14, 0.16) 100%
     ),
     url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background1.png")
-      40% 70% / cover no-repeat;
+      40% 90% / cover no-repeat;
   filter: saturate(1) brightness(0.96);
 }
 
@@ -216,6 +216,50 @@
     -webkit-backdrop-filter: none;
   }
 
+  /* 整页磨砂 / 代码块磨砂都要采到 .root 外的 PC 轮播底图 */
+  .rootBgEnabled.pcBgBlur {
+    isolation: auto;
+  }
+
+  /* 磨砂铺在 pane 外的整页层；正文本身不再糊，只留浅罩 */
+  .pageFrost {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: rgba(4, 7, 14, 0.18);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transition: opacity var(--immersive-ms, 420ms) cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .pageFrostOn {
+    opacity: 1;
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+  }
+
+  .rootBgEnabled.pcBgBlur .viewer {
+    isolation: auto;
+    background: rgba(4, 7, 14, 0.14);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* 正文磨砂挪到代码块；不过渡 blur，避免清屏结尾重建图层 */
+  .rootBgEnabled.pcBgBlur :global([data-code-block]) {
+    background: rgba(4, 7, 14, 0.4);
+    backdrop-filter: blur(28px) saturate(155%);
+    -webkit-backdrop-filter: blur(28px) saturate(155%);
+  }
+
+  .rootBgEnabled.pcBgBlur .sidebar {
+    background: rgba(4, 7, 14, 0.28);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
   .rootBgEnabled .sidebar {
     text-shadow:
       0 1px 2px rgba(0, 0, 0, 0.8),
@@ -226,8 +270,32 @@
     content: none;
   }
 
+  /* 模糊开：目录用手机侧栏同图，再叠一层灰黑蒙层衬白字 */
+  .rootBgEnabled.pcBgBlur .sidebarBgEnabled::before {
+    content: "";
+    opacity: 1;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(4, 7, 14, 0.38) 0%,
+        rgba(4, 7, 14, 0.32) 45%,
+        rgba(4, 7, 14, 0.46) 100%
+      ),
+      url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-slider-background.png")
+        30% bottom / auto 102% no-repeat;
+    filter: saturate(0.82) brightness(0.82);
+  }
+
   .rootBgEnabled .ownerName {
     text-shadow: none;
+  }
+
+  /* 有底图时面包屑默认 0.4 太淡，模糊开/关都提亮 */
+  .rootBgEnabled .viewerPath {
+    color: rgba(var(--fg-rgb), 0.86);
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.92),
+      0 0 12px rgba(0, 0, 0, 0.55);
   }
 }
 
@@ -723,7 +791,7 @@
   justify-content: space-between;
   gap: 10px;
   border-top: 1px solid rgba(var(--accent-rgb), 0.1);
-  padding-top: 12px;
+  padding-top: 10px;
 }
 
 .ownerFooterActions {
@@ -739,10 +807,14 @@
   align-items: center;
   gap: 10px;
   min-width: 0;
+  min-height: 32px;
 }
 
 .ownerName {
+  display: flex;
+  align-items: center;
   overflow: hidden;
+  height: 32px;
   min-width: 0;
   background-image: linear-gradient(
     105deg,
@@ -762,7 +834,7 @@
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.06em;
-  line-height: 1.2;
+  line-height: 1;
   white-space: nowrap;
   text-overflow: ellipsis;
   /* 单层 drop-shadow：仅本节点光栅化，避免多层 filter / 全局 blur */
@@ -1124,6 +1196,14 @@
       -webkit-backdrop-filter var(--immersive-ms, 420ms) cubic-bezier(0.22, 1, 0.36, 1);
   }
 
+  /* 清屏只淡透明度，不插值 backdrop-filter */
+  .rootBgEnabled.pcBgBlur .viewer {
+    transition:
+      opacity var(--immersive-ms, 420ms) cubic-bezier(0.22, 1, 0.36, 1),
+      background var(--immersive-ms, 420ms) cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow var(--immersive-ms, 420ms) cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
   .viewerContent,
   .viewer::before,
   .viewer::after {
@@ -1168,6 +1248,37 @@
     isolation: auto;
     box-shadow: none;
     background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* 清屏：整页磨砂只改透明度，blur 留着，避免结尾图层拆掉顿一下 */
+  .root[data-immersive="true"] .pageFrostOn {
+    opacity: 0;
+  }
+
+  /* 正文已无磨砂，整块用透明度淡出即可 */
+  .rootBgEnabled.pcBgBlur[data-immersive="true"] .viewer {
+    isolation: auto;
+    opacity: 0;
+    box-shadow: none;
+    background: rgba(4, 7, 14, 0.14);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    visibility: hidden;
+    transition:
+      opacity var(--immersive-ms, 420ms) cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s linear var(--immersive-ms, 420ms);
+  }
+
+  .rootBgEnabled.pcBgBlur[data-immersive="true"] .sidebar {
+    background: rgba(4, 7, 14, 0.28);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .rootBgEnabled.pcBgBlur[data-immersive="true"] .sidebarBgEnabled::before {
+    opacity: 0;
   }
 
   .root[data-immersive="true"] .viewerContent,
@@ -1187,7 +1298,11 @@
     .viewerContent,
     .viewer::before,
     .viewer::after,
-    .root[data-immersive="true"] .sidebar {
+    .root[data-immersive="true"] .sidebar,
+    .rootBgEnabled.pcBgBlur[data-immersive="true"] .viewer,
+    .pageFrost,
+    .pageFrostOn,
+    .root[data-immersive="true"] .pageFrostOn {
       transition: none;
     }
   }

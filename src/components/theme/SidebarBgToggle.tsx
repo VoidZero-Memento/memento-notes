@@ -39,7 +39,10 @@ type SidebarBgToggleProps = {
   showLoopOption: boolean;
   /** 图集切换仅手机 */
   showFolderOption?: boolean;
+  /** 背景模糊仅 PC */
+  showBgBlurOption?: boolean;
   borderFlowEnabled: boolean;
+  bgBlurEnabled: boolean;
   galleryLinkEnabled: boolean;
   disabled?: boolean;
   needsUnlock?: boolean;
@@ -47,6 +50,7 @@ type SidebarBgToggleProps = {
   onEnabledChange: (enabled: boolean) => void;
   onLoopingChange: (looping: boolean) => void;
   onBorderFlowChange: (enabled: boolean) => void;
+  onBgBlurChange: (enabled: boolean) => void;
   onGalleryLinkChange: (enabled: boolean) => void;
 };
 
@@ -55,7 +59,9 @@ export const SidebarBgToggle = ({
   looping,
   showLoopOption,
   showFolderOption = false,
+  showBgBlurOption = false,
   borderFlowEnabled,
+  bgBlurEnabled,
   galleryLinkEnabled,
   disabled = false,
   needsUnlock = false,
@@ -63,6 +69,7 @@ export const SidebarBgToggle = ({
   onEnabledChange,
   onLoopingChange,
   onBorderFlowChange,
+  onBgBlurChange,
   onGalleryLinkChange,
 }: SidebarBgToggleProps) => {
   const { folder } = useOssFolder();
@@ -141,6 +148,8 @@ export const SidebarBgToggle = ({
     setOpen((prev) => !prev);
   };
 
+  const borderFlowAvailable = !showBgBlurOption || !enabled || bgBlurEnabled;
+
   const handleToggleEnabled = () => {
     if (disabled) return;
     if (enabled) {
@@ -160,7 +169,15 @@ export const SidebarBgToggle = ({
   };
 
   const handleToggleBorderFlow = () => {
+    if (!borderFlowAvailable) return;
     onBorderFlowChange(!borderFlowEnabled);
+    blurActiveInside(menuRef.current);
+    setOpen(false);
+  };
+
+  const handleToggleBgBlur = () => {
+    if (!enabled) return;
+    onBgBlurChange(!bgBlurEnabled);
     blurActiveInside(menuRef.current);
     setOpen(false);
   };
@@ -216,12 +233,13 @@ export const SidebarBgToggle = ({
               type="button"
               role="menuitemcheckbox"
               aria-checked={borderFlowEnabled}
-              tabIndex={visible ? 0 : -1}
-              className={`${styles.option}${borderFlowEnabled ? ` ${styles.optionSelected}` : ""}`}
+              tabIndex={visible && borderFlowAvailable ? 0 : -1}
+              className={`${styles.option}${borderFlowEnabled && borderFlowAvailable ? ` ${styles.optionSelected}` : ""}`}
+              disabled={!borderFlowAvailable}
               onClick={handleToggleBorderFlow}
             >
               <span className={styles.optionLabel}>边框流光</span>
-              <span className={styles.optionState}>{borderFlowEnabled ? "开" : "关"}</span>
+              <span className={styles.optionState}>{borderFlowEnabled && borderFlowAvailable ? "开" : "关"}</span>
             </button>
           </li>
           <li role="presentation">
@@ -238,6 +256,22 @@ export const SidebarBgToggle = ({
               <span className={styles.optionState}>{enabled ? "开" : "关"}</span>
             </button>
           </li>
+          {showBgBlurOption ? (
+            <li role="presentation">
+              <button
+                type="button"
+                role="menuitemcheckbox"
+                aria-checked={bgBlurEnabled}
+                tabIndex={visible && enabled ? 0 : -1}
+                className={`${styles.option}${bgBlurEnabled && enabled ? ` ${styles.optionSelected}` : ""}`}
+                disabled={!enabled}
+                onClick={handleToggleBgBlur}
+              >
+                <span className={styles.optionLabel}>背景模糊</span>
+                <span className={styles.optionState}>{bgBlurEnabled ? "开" : "关"}</span>
+              </button>
+            </li>
+          ) : null}
           {showLoopOption ? (
             <li role="presentation">
               <button

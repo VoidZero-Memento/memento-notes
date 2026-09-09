@@ -1,4 +1,4 @@
-import { preloadPhoto, toBackdropPhotoUrl, toGalleryPhotoUrl } from "@/lib/bg-photos/photo-utils";
+import { preloadPhoto, toGalleryPhotoUrl } from "@/lib/bg-photos/photo-utils";
 
 import type { OssImageMeta } from "@/lib/bg-photos/bg-photos.types";
 import type { GalleryNaturalSize, GalleryPreparedShot, GallerySlot } from "@/lib/gallery/gallery.types";
@@ -32,9 +32,6 @@ const decodeShot = async (photos: OssImageMeta[], idx: number): Promise<GalleryP
   const meta = photos[idx];
   if (!meta) return null;
   const url = toGalleryPhotoUrl(meta.url);
-  const backdrop = toBackdropPhotoUrl(meta.url);
-  const warmBackdrop = new Image();
-  warmBackdrop.src = backdrop;
   const img = new Image();
   img.src = url;
   try {
@@ -42,13 +39,13 @@ const decodeShot = async (photos: OssImageMeta[], idx: number): Promise<GalleryP
     else {
       const size = await preloadPhoto(url);
       if (size.width <= 0) return null;
-      return { idx, url, backdrop, size };
+      return { idx, url, size };
     }
   } catch {
     if (img.naturalWidth <= 0) return null;
   }
   if (img.naturalWidth <= 0) return null;
-  return { idx, url, backdrop, size: { width: img.naturalWidth, height: img.naturalHeight } };
+  return { idx, url, size: { width: img.naturalWidth, height: img.naturalHeight } };
 };
 
 export const loadShot = async (

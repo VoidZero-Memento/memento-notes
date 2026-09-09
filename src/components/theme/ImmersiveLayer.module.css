@@ -4,6 +4,7 @@
 }
 
 .pane {
+  z-index: 1;
   display: flex;
   flex: 1 1 auto;
   flex-direction: inherit;

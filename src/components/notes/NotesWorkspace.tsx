@@ -9,6 +9,7 @@ import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
 import { parseOutline } from "@/lib/markdown/parse-outline";
 import { getNoteTitleFromPath, getRepoWorkspaceTitle } from "@/lib/note-title";
 import { useNoteContent } from "@/lib/notes/use-note-content";
+import { useBgBlur } from "@/lib/prefs/useBgBlur";
 import { useBorderFlow } from "@/lib/prefs/useBorderFlow";
 import { useGalleryLink } from "@/lib/prefs/useGalleryLink";
 import { useSidebarBgLoop } from "@/lib/prefs/useSidebarBgLoop";
@@ -78,6 +79,7 @@ export const NotesWorkspace = ({
   const { ready: pageBgReady, advance: advancePageBg, setImmersive: setBgImmersive } = useAppBg();
   const { looping: sidebarBgLooping, setLooping: setSidebarBgLooping } = useSidebarBgLoop();
   const { enabled: borderFlowEnabled, setEnabled: setBorderFlowEnabled } = useBorderFlow();
+  const { enabled: bgBlurEnabled, setEnabled: setBgBlurEnabled } = useBgBlur();
   const { enabled: galleryLinkEnabled, setEnabled: setGalleryLinkEnabled } = useGalleryLink();
   const {
     enabled: sidebarBgEnabled,
@@ -236,6 +238,14 @@ export const NotesWorkspace = ({
       showEnter={immersiveBgEmpty}
       onImmersiveChange={setBgImmersive}
       onClearTap={advancePageBg}
+      background={
+        pcBgCarousel ? (
+          <div
+            className={`${styles.pageFrost}${bgBlurEnabled ? ` ${styles.pageFrostOn}` : ""}`}
+            aria-hidden
+          />
+        ) : null
+      }
       className={[
         styles.root,
         sidebarHidden ? styles.rootSidebarHidden : "",
@@ -244,7 +254,8 @@ export const NotesWorkspace = ({
         sidebarBgEnabled ? styles.rootBgEnabled : "",
         pageBgCarousel ? styles.rootBgCarousel : "",
         immersiveBgEmpty ? styles.rootBgEmpty : "",
-        !borderFlowEnabled ? styles.borderFlowOff : "",
+        !borderFlowEnabled || (pcBgCarousel && !bgBlurEnabled) ? styles.borderFlowOff : "",
+        pcBgCarousel && bgBlurEnabled ? styles.pcBgBlur : "",
         mobileNavOpen ? styles.rootMobileNavOpen : "",
       ]
         .filter(Boolean)
@@ -356,7 +367,9 @@ export const NotesWorkspace = ({
                 looping={sidebarBgLooping}
                 showLoopOption
                 showFolderOption={isMobile}
+                showBgBlurOption={!isMobile}
                 borderFlowEnabled={borderFlowEnabled}
+                bgBlurEnabled={bgBlurEnabled}
                 galleryLinkEnabled={galleryLinkEnabled}
                 disabled={bgTransitionBusy}
                 needsUnlock={!galleryBgUnlocked}
@@ -369,6 +382,10 @@ export const NotesWorkspace = ({
                 onBorderFlowChange={(next) => {
                   setBorderFlowEnabled(next);
                   toast.success(next ? "已开启边框流光" : "已关闭边框流光");
+                }}
+                onBgBlurChange={(next) => {
+                  setBgBlurEnabled(next);
+                  toast.success(next ? "已开启背景模糊" : "已关闭背景模糊");
                 }}
                 onGalleryLinkChange={(next) => {
                   setGalleryLinkEnabled(next);

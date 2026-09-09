@@ -30,6 +30,10 @@
   transition: filter var(--immersive-ms, 640ms) cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.cover[src*="notes-background1.png"] {
+  object-position: 40% 90%;
+}
+
 .veil {
   position: absolute;
   inset: 0;

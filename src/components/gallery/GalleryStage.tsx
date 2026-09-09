@@ -6,6 +6,7 @@ import { useGalleryArtBox } from "@/lib/gallery/use-gallery-art-box";
 import { useGalleryChrome } from "@/lib/gallery/use-gallery-chrome";
 import { useGalleryStage } from "@/lib/gallery/use-gallery-stage";
 
+import { GalleryFrost } from "@/components/gallery/GalleryFrost";
 import { ImmersiveLayer } from "@/components/theme/ImmersiveLayer";
 
 import styles from "./GalleryStage.module.css";
@@ -131,6 +132,7 @@ export const GalleryStage = () => {
         <>
           <AmbientLayer src={backdropA} shown={!backdropShowB} />
           <AmbientLayer src={backdropB} shown={backdropShowB} />
+          <GalleryFrost />
         </>
       }
     >

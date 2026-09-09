@@ -432,12 +432,27 @@
 
       @media (min-width: 861px) {
         #app-splash .splash-banners {
+          z-index: 0;
           transform-origin: 50% 50%;
-          animation-name: splashDriftPc;
+          animation: none;
+        }
+
+        #app-splash .splash-veil,
+        #app-splash .splash-panel {
+          z-index: 2;
         }
 
         #app-splash .splash-banner {
           object-position: center 90%;
+          transform-origin: 50% 50%;
+          animation: splashDriftPc 16s ease-in-out infinite alternate;
+        }
+
+        /* 与正文底图同框，避免进页后跳变 */
+        #app-splash .splash-banner[src*="notes-background1.png"] {
+          object-position: 40% 90%;
+          animation: none;
+          transform: none;
         }
       }
 
@@ -485,7 +500,15 @@
 
       @media (prefers-reduced-motion: reduce) and (min-width: 861px) {
         #app-splash .splash-banners {
+          transform: none;
+        }
+
+        #app-splash .splash-banner {
           transform: scale(1.44) translateY(-13%);
+        }
+
+        #app-splash .splash-banner[src*="notes-background1.png"] {
+          transform: none;
         }
       }
     </style>

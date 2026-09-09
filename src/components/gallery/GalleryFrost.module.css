@@ -1,0 +1,28 @@
+.frost {
+  display: none;
+}
+
+@media (min-width: 861px) {
+  .frost {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 1;
+    background: rgba(4, 7, 14, 0.03);
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    transition: opacity var(--immersive-ms, 640ms) ease;
+  }
+
+  .off {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frost {
+    transition: none;
+  }
+}

@@ -63,7 +63,7 @@ export const CodeBlock = ({ children, className }: CodeBlockProps) => {
   const preClassName = className ? `${styles.pre} ${className}` : styles.pre;
 
   return (
-    <div className={styles.block}>
+    <div className={styles.block} data-code-block>
       <div className={styles.header}>
         <div className={styles.dots} aria-hidden="true">
           <span className={`${styles.dot} ${styles.dotRed}`} />

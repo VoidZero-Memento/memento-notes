@@ -19,6 +19,5 @@ export type GalleryNaturalSize = {
 export type GalleryPreparedShot = {
   idx: number;
   url: string;
-  backdrop: string;
   size: GalleryNaturalSize;
 };

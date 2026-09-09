@@ -2,6 +2,7 @@ import { toImmersiveBgUrl } from "@/lib/bg-photos/photo-utils";
 import { HALL_BG_FADE_MS } from "@/lib/gallery/constants";
 import { useHallDesktop } from "@/lib/gallery/use-hall-desktop";
 
+import { GalleryFrost } from "@/components/gallery/GalleryFrost";
 import { useImmersiveFrost } from "@/components/theme/use-immersive-frost";
 
 import styles from "./GalleryHallBackdrop.module.css";
@@ -45,7 +46,7 @@ export const GalleryHallBackdrop = ({ paused, slotA, slotB }: GalleryHallBackdro
     >
       <BackdropSlot desktop={desktop} sharp={sharpOn} slot={slotA} />
       <BackdropSlot desktop={desktop} sharp={sharpOn} slot={slotB} />
-      <div className={styles.frost} />
+      <GalleryFrost off={frostOff} />
     </div>
   );
 };

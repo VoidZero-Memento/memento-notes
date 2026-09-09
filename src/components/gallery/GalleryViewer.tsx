@@ -5,6 +5,8 @@ import { fitViewerRect, invertOf } from "@/lib/gallery/hall-photo";
 import { useHallDesktop } from "@/lib/gallery/use-hall-desktop";
 import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
 
+import { GalleryFrost } from "@/components/gallery/GalleryFrost";
+
 import styles from "./GalleryViewer.module.css";
 
 import type { CSSProperties } from "react";
@@ -80,7 +82,10 @@ export const GalleryViewer = ({ onClose, selection }: GalleryViewerProps) => {
     <div className={styles.root} style={vars} role="dialog" aria-modal aria-label="照片">
       <div className={`${styles.dim}${open ? ` ${styles.dimOn}` : ""}`} aria-hidden>
         {desktop ? (
-          <img className={styles.fill} src={photo.desktopBackdropUrl} alt="" decoding="async" draggable={false} />
+          <>
+            <img className={styles.fill} src={photo.desktopBackdropUrl} alt="" decoding="async" draggable={false} />
+            <GalleryFrost />
+          </>
         ) : null}
       </div>
       <button type="button" className={styles.hit} aria-label="关闭" onClick={finishClose} />

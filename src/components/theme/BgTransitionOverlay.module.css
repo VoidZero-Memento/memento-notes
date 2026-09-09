@@ -32,10 +32,10 @@
       rgba(4, 7, 14, 0.16) 100%
     ),
     url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background1.png")
-      40% 70% / cover no-repeat;
+      40% 90% / cover no-repeat;
   filter: saturate(1) brightness(0.96);
   transform: scale(1);
-  transform-origin: 40% 70%;
+  transform-origin: 40% 90%;
   will-change: transform, filter;
 }
 
