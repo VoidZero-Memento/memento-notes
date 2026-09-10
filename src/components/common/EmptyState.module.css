@@ -6,6 +6,7 @@
   gap: 10px;
   margin: auto;
   padding: 32px 16px;
+  font-family: "LXGWWenKai", var(--font-geist-sans);
   text-align: center;
 }
 
@@ -159,7 +160,7 @@
 .description {
   margin: 0;
   max-width: 280px;
-  color: rgba(var(--fg-rgb), 0.45);
+  color: rgba(var(--fg-rgb), 0.7);
   font-size: 13px;
   line-height: 1.6;
 }

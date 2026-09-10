@@ -362,6 +362,7 @@
 .sidebarTitle {
   margin: 0;
   color: var(--foreground);
+  font-family: "LXGWWenKai", var(--font-geist-sans);
   font-size: 15px;
   font-weight: 700;
   line-height: 1.4;
@@ -708,10 +709,10 @@
 .sidebarTabsThumb {
   position: absolute;
   top: 3px;
-  bottom: 3px;
   left: 3px;
   z-index: 0;
   width: calc((100% - 10px) / 2);
+  height: calc(100% - 6px);
   border-radius: 8px;
   background: linear-gradient(
     135deg,
@@ -722,11 +723,14 @@
     inset 0 0 0 1px rgba(var(--accent-3-rgb), 0.4),
     0 0 12px rgba(var(--accent-3-rgb), 0.28);
   pointer-events: none;
+  transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .sidebarTabsThumbOutline {
-  transform: translateX(calc(100% + 4px));
+  transform: translate3d(calc(100% + 4px), 0, 0);
 }
 
 .sidebarTab {
@@ -771,9 +775,27 @@
   flex: 1;
   min-height: 0;
   min-width: 0;
-  overflow: auto;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  overflow: hidden;
   margin: 0 -4px;
   padding: 0 4px;
+}
+
+.treePane {
+  grid-area: 1 / 1;
+  z-index: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+}
+
+.treePaneHidden {
+  z-index: 0;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .sidebarFooter {
@@ -830,7 +852,7 @@
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  font-family: var(--font-geist-mono);
+  font-family: "LXGWWenKai", var(--font-geist-sans);
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -1394,7 +1416,7 @@
     border-radius: 0 14px 14px 0;
     padding: 16px;
     padding-top: max(16px, env(safe-area-inset-top, 0px));
-    padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
     opacity: 1;
     visibility: visible;
     filter: none;
@@ -1450,7 +1472,7 @@
     margin: 0;
     padding: 16px;
     padding-top: max(16px, env(safe-area-inset-top, 0px));
-    padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
     gap: 14px;
     opacity: 1;
     visibility: visible;
@@ -1469,6 +1491,22 @@
 
   .rootSidebarHidden {
     gap: 0;
+  }
+
+  .ownerFooter,
+  .ownerIdentity,
+  .ownerFooterActions {
+    min-height: 32px;
+    align-items: center;
+  }
+
+  /* WebKit 上 gradient + clip 文字额外裁掉字框空白，才能跟 32px 按钮对齐 */
+  .ownerName {
+    display: flex;
+    align-items: center;
+    height: 32px;
+    line-height: 1;
+    text-box: trim-both cap alphabetic;
   }
 
   .sidebarOpen {
@@ -1586,6 +1624,7 @@
     min-width: 0;
     overflow: hidden;
     color: var(--foreground);
+    font-family: "LXGWWenKai", var(--font-geist-sans);
     font-size: 15px;
     font-weight: 700;
     line-height: 1.3;
@@ -1648,5 +1687,72 @@
     bottom: max(14px, env(safe-area-inset-bottom, 0px));
     width: 40px;
     height: 40px;
+  }
+
+  /* 背景模糊：整页磨砂 / 代码块磨砂，默认关时不套 .mobileBgBlur，保持现有直透 */
+  .pageFrost {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: rgba(4, 7, 14, 0.18);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transition: opacity var(--immersive-ms, 640ms) cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .pageFrostOn {
+    opacity: 1;
+    backdrop-filter: blur(8px) saturate(130%);
+    -webkit-backdrop-filter: blur(8px) saturate(130%);
+  }
+
+  /* 清屏只改透明度，blur 留着，避免返回结尾重建磨砂图层 */
+  .root[data-immersive="true"] .pageFrostOn {
+    opacity: 0;
+  }
+
+  .rootBgEnabled.mobileBgBlur {
+    isolation: auto;
+  }
+
+  .rootBgEnabled.mobileBgBlur .viewer {
+    isolation: auto;
+    background: rgba(4, 7, 14, 0.14);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transition:
+      opacity var(--immersive-ms, 640ms) cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s linear;
+  }
+
+  /* 不要让 pane 整层透明：半透明组会把代码块磨砂从底图上撕开，返回结尾会顿 */
+  .rootBgEnabled.mobileBgBlur[data-immersive="true"] [data-pane] {
+    opacity: 1;
+  }
+
+  .rootBgEnabled.mobileBgBlur[data-immersive="true"] .viewer {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity var(--immersive-ms, 640ms) cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s linear var(--immersive-ms, 640ms);
+  }
+
+  .rootBgEnabled.mobileBgBlur :global([data-code-block]) {
+    background: rgba(4, 7, 14, 0.4);
+    backdrop-filter: blur(10px) saturate(135%);
+    -webkit-backdrop-filter: blur(10px) saturate(135%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pageFrost,
+    .pageFrostOn,
+    .root[data-immersive="true"] .pageFrostOn,
+    .rootBgEnabled.mobileBgBlur .viewer,
+    .rootBgEnabled.mobileBgBlur[data-immersive="true"] .viewer {
+      transition: none;
+    }
   }
 }

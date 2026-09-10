@@ -39,8 +39,10 @@ type SidebarBgToggleProps = {
   showLoopOption: boolean;
   /** 图集切换仅手机 */
   showFolderOption?: boolean;
-  /** 背景模糊仅 PC */
+  /** 背景模糊开关；PC / 手机都显示 */
   showBgBlurOption?: boolean;
+  /** 边框流光是否必须先开背景模糊；手机不锁，模糊关时保持现有流光 */
+  lockBorderFlowToBgBlur?: boolean;
   borderFlowEnabled: boolean;
   bgBlurEnabled: boolean;
   galleryLinkEnabled: boolean;
@@ -60,6 +62,7 @@ export const SidebarBgToggle = ({
   showLoopOption,
   showFolderOption = false,
   showBgBlurOption = false,
+  lockBorderFlowToBgBlur = showBgBlurOption,
   borderFlowEnabled,
   bgBlurEnabled,
   galleryLinkEnabled,
@@ -148,7 +151,7 @@ export const SidebarBgToggle = ({
     setOpen((prev) => !prev);
   };
 
-  const borderFlowAvailable = !showBgBlurOption || !enabled || bgBlurEnabled;
+  const borderFlowAvailable = !lockBorderFlowToBgBlur || !enabled || bgBlurEnabled;
 
   const handleToggleEnabled = () => {
     if (disabled) return;

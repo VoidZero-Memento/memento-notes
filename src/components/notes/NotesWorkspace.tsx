@@ -235,11 +235,11 @@ export const NotesWorkspace = ({
   return (
     <ImmersiveLayer
       enabled={pageBgCarousel && alive}
-      showEnter={immersiveBgEmpty}
+      showEnter={immersiveBgEmpty && !mobileNavOpen}
       onImmersiveChange={setBgImmersive}
       onClearTap={advancePageBg}
       background={
-        pcBgCarousel ? (
+        pageBgCarousel ? (
           <div
             className={`${styles.pageFrost}${bgBlurEnabled ? ` ${styles.pageFrostOn}` : ""}`}
             aria-hidden
@@ -256,6 +256,7 @@ export const NotesWorkspace = ({
         immersiveBgEmpty ? styles.rootBgEmpty : "",
         !borderFlowEnabled || (pcBgCarousel && !bgBlurEnabled) ? styles.borderFlowOff : "",
         pcBgCarousel && bgBlurEnabled ? styles.pcBgBlur : "",
+        mobileBgCarousel && bgBlurEnabled ? styles.mobileBgBlur : "",
         mobileNavOpen ? styles.rootMobileNavOpen : "",
       ]
         .filter(Boolean)
@@ -325,7 +326,11 @@ export const NotesWorkspace = ({
           </div>
         </div>
         <div className={styles.treePanel}>
-          <div hidden={sidebarMode !== "files"}>
+          <div
+            className={`${styles.treePane}${sidebarMode !== "files" ? ` ${styles.treePaneHidden}` : ""}`}
+            aria-hidden={sidebarMode !== "files"}
+            inert={sidebarMode !== "files"}
+          >
             {treeLoading ? <LoadingState label="加载文件树" /> : null}
             {!treeLoading && treeError ? <p className={styles.error}>{treeError}</p> : null}
             {!treeLoading && !treeError ? (
@@ -337,7 +342,11 @@ export const NotesWorkspace = ({
               />
             ) : null}
           </div>
-          <div hidden={sidebarMode !== "outline"}>
+          <div
+            className={`${styles.treePane}${sidebarMode !== "outline" ? ` ${styles.treePaneHidden}` : ""}`}
+            aria-hidden={sidebarMode !== "outline"}
+            inert={sidebarMode !== "outline"}
+          >
             {treeLoading ? (
               <LoadingState label="加载文件树" />
             ) : (
@@ -367,7 +376,8 @@ export const NotesWorkspace = ({
                 looping={sidebarBgLooping}
                 showLoopOption
                 showFolderOption={isMobile}
-                showBgBlurOption={!isMobile}
+                showBgBlurOption
+                lockBorderFlowToBgBlur={!isMobile}
                 borderFlowEnabled={borderFlowEnabled}
                 bgBlurEnabled={bgBlurEnabled}
                 galleryLinkEnabled={galleryLinkEnabled}

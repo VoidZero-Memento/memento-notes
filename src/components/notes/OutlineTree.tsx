@@ -19,42 +19,29 @@ const BASE_PAD = 8;
 const ROOT_STEP = 14;
 const NEST_STEP = ICON_SLOT + ROW_GAP;
 
-const LevelIcon = ({ level }: { level: number }) => {
-  if (level <= 1) {
-    return (
-      <svg className={`${styles.icon} ${styles.iconL1}`} viewBox="0 0 16 16" aria-hidden>
-        <path fill="currentColor" d="M8 1.6 13.8 8 8 14.4 2.2 8 8 1.6Z" />
-      </svg>
-    );
-  }
-
-  if (level === 2) {
-    return (
-      <svg className={`${styles.icon} ${styles.iconL2}`} viewBox="0 0 16 16" aria-hidden>
-        <path
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          d="M8 2.4 13.2 8 8 13.6 2.8 8 8 2.4Z"
-        />
-      </svg>
-    );
-  }
-
-  if (level === 3) {
-    return (
-      <svg className={`${styles.icon} ${styles.iconL3}`} viewBox="0 0 16 16" aria-hidden>
-        <rect x="3.5" y="3.5" width="9" height="9" rx="1.4" fill="currentColor" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg className={`${styles.icon} ${styles.iconLn}`} viewBox="0 0 16 16" aria-hidden>
-      <rect x="3.2" y="6.8" width="9.6" height="2.4" rx="1.2" fill="currentColor" />
-    </svg>
-  );
+const iconClassName = (level: number) => {
+  if (level <= 1) return `${styles.icon} ${styles.iconL1}`;
+  if (level === 2) return `${styles.icon} ${styles.iconL2}`;
+  if (level === 3) return `${styles.icon} ${styles.iconL3}`;
+  return `${styles.icon} ${styles.iconLn}`;
 };
+
+const LevelGlyph = ({ level }: { level: number }) => {
+  if (level <= 1) return <path fill="currentColor" d="M8 1.6 13.8 8 8 14.4 2.2 8 8 1.6Z" />;
+  if (level === 2) {
+    return <path fill="none" stroke="currentColor" strokeWidth="1.6" d="M8 2.4 13.2 8 8 13.6 2.8 8 8 2.4Z" />;
+  }
+  if (level === 3) return <rect x="3.5" y="3.5" width="9" height="9" rx="1.4" fill="currentColor" />;
+  return <rect x="3.2" y="6.8" width="9.6" height="2.4" rx="1.2" fill="currentColor" />;
+};
+
+const LevelIcon = ({ level }: { level: number }) => (
+  <span className={styles.iconSlot}>
+    <svg className={iconClassName(level)} width={ICON_SLOT} height={ICON_SLOT} viewBox="0 0 16 16" aria-hidden>
+      <LevelGlyph level={level} />
+    </svg>
+  </span>
+);
 
 export const OutlineTree = ({
   items,
@@ -83,8 +70,10 @@ export const OutlineTree = ({
               title={item.text}
               onClick={() => onNavigate(item.id)}
             >
-              <LevelIcon level={item.level} />
-              <span className={styles.name}>{item.text}</span>
+              <span className={styles.rowInner}>
+                <LevelIcon level={item.level} />
+                <span className={styles.name}>{item.text}</span>
+              </span>
             </button>
           </li>
         );

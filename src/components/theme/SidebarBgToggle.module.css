@@ -55,6 +55,20 @@
   height: 16px;
 }
 
+@media (max-width: 860px) {
+  .root,
+  .trigger {
+    height: 32px;
+    align-items: center;
+  }
+
+  .trigger {
+    min-height: 32px;
+    padding: 0;
+    line-height: 0;
+  }
+}
+
 .menu {
   position: absolute;
   right: 0;

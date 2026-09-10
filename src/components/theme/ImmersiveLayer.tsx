@@ -180,7 +180,7 @@ export const ImmersiveLayer = ({
             背景
           </button>
         ) : null}
-        <div className={styles.pane} aria-hidden={immersive} {...(immersive ? { inert: true } : {})}>
+        <div className={styles.pane} data-pane aria-hidden={immersive} {...(immersive ? { inert: true } : {})}>
           {children}
         </div>
       </div>

@@ -22,6 +22,7 @@
   padding: 9px 12px;
   color: var(--foreground);
   font: inherit;
+  font-family: "LXGWWenKai", var(--font-geist-sans);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -130,6 +131,7 @@
   padding: 10px 12px;
   color: rgba(var(--fg-rgb), 0.78);
   font: inherit;
+  font-family: "LXGWWenKai", var(--font-geist-sans);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.02em;

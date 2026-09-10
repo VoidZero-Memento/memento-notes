@@ -14,17 +14,16 @@
 }
 
 .row {
-  display: flex;
+  display: block;
   width: 100%;
   box-sizing: border-box;
-  align-items: center;
-  gap: 7px;
   border: none;
   border-radius: 8px;
   background: transparent;
   padding: 6px 8px;
   color: rgba(var(--fg-rgb), 0.78);
   font: inherit;
+  font-family: "LXGWWenKai", var(--font-geist-sans);
   font-size: 13px;
   line-height: 1.35;
   text-align: left;
@@ -35,6 +34,22 @@
     box-shadow 0.15s ease;
 }
 
+.rowInner {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.iconSlot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
 .row:hover {
   background: rgba(var(--accent-rgb), 0.06);
   color: rgba(var(--fg-rgb), 0.95);
@@ -42,9 +57,10 @@
 }
 
 .icon {
-  display: inline-flex;
+  display: block;
   width: 12px;
   height: 12px;
+  overflow: visible;
   flex-shrink: 0;
 }
 
