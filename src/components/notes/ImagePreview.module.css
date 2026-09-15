@@ -1,0 +1,74 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  cursor: zoom-out;
+  user-select: none;
+  touch-action: none;
+  overscroll-behavior: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.root:focus,
+.root:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stage {
+  position: fixed;
+  z-index: 1;
+  display: block;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.stageReady {
+  pointer-events: auto;
+}
+
+.full {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
+  object-fit: fill;
+  transform-origin: center center;
+  cursor: grab;
+  backface-visibility: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  will-change: transform;
+}
+
+.full:focus,
+.full:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.full[data-panning] {
+  cursor: grabbing;
+}

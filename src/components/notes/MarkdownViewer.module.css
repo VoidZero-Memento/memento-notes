@@ -278,6 +278,7 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin: 1.1em 0;
+  padding: 1px;
 }
 
 .viewer :global(table) {

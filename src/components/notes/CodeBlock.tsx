@@ -4,11 +4,12 @@ import { toast } from "@/lib/toast/toast";
 
 import styles from "./CodeBlock.module.css";
 
-import type { ReactElement, ReactNode } from "react";
+import type { KeyboardEvent, MouseEvent, ReactElement, ReactNode } from "react";
 
 type CodeBlockProps = {
   children: ReactNode;
   className?: string;
+  language?: string | null;
 };
 
 const extractText = (node: unknown): string => {
@@ -43,9 +44,13 @@ const normalizeCodeChildren = (children: ReactNode): ReactNode =>
     });
   });
 
-export const CodeBlock = ({ children, className }: CodeBlockProps) => {
+export const CodeBlock = ({ children, className, language }: CodeBlockProps) => {
   const [copied, setCopied] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const content = normalizeCodeChildren(children);
+  const langLabel = language?.trim() || null;
+
+  const toggleCollapsed = () => setCollapsed((prev) => !prev);
 
   const handleCopy = async () => {
     const text = extractText(content);
@@ -60,25 +65,61 @@ export const CodeBlock = ({ children, className }: CodeBlockProps) => {
     }
   };
 
+  const handleHeaderKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    toggleCollapsed();
+  };
+
+  const stopToggle = (event: MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+  };
+
+  const handleCopyClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    void handleCopy();
+  };
+
+  const handleCopyKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+  };
+
   const preClassName = className ? `${styles.pre} ${className}` : styles.pre;
+  const bodyClassName = collapsed ? `${styles.body} ${styles.bodyCollapsed}` : styles.body;
 
   return (
     <div className={styles.block} data-code-block>
-      <div className={styles.header}>
-        <div className={styles.dots} aria-hidden="true">
-          <span className={`${styles.dot} ${styles.dotRed}`} />
-          <span className={`${styles.dot} ${styles.dotYellow}`} />
-          <span className={`${styles.dot} ${styles.dotGreen}`} />
-        </div>
+      <div
+        className={styles.header}
+        role="button"
+        tabIndex={0}
+        aria-expanded={!collapsed}
+        aria-label={collapsed ? "展开代码" : "收起代码"}
+        onClick={toggleCollapsed}
+        onKeyDown={handleHeaderKeyDown}
+      >
+        <span className={styles.meta} onClick={stopToggle}>
+          <span className={styles.dots} aria-hidden="true">
+            <span className={`${styles.dot} ${styles.dotRed}`} />
+            <span className={`${styles.dot} ${styles.dotYellow}`} />
+            <span className={`${styles.dot} ${styles.dotGreen}`} />
+          </span>
+          {langLabel ? <span className={styles.lang}>{langLabel}</span> : null}
+        </span>
         <button
           type="button"
           className={styles.copyBtn}
-          onClick={() => void handleCopy()}
+          onClick={handleCopyClick}
+          onKeyDown={handleCopyKeyDown}
         >
           {copied ? "已复制" : "复制代码"}
         </button>
       </div>
-      <pre className={preClassName}>{content}</pre>
+      <div className={bodyClassName} aria-hidden={collapsed}>
+        <div className={styles.bodyInner}>
+          <pre className={preClassName}>{content}</pre>
+        </div>
+      </div>
     </div>
   );
 };

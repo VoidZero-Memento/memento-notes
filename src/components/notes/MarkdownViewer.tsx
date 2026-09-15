@@ -70,15 +70,19 @@ const markdownComponents: Components = {
   pre: ({ children, className }) => {
     const childList = Children.toArray(children);
     const codeChild = childList.find((child) => isValidElement(child));
+    const language = isValidElement<{ className?: string; children?: unknown }>(codeChild)
+      ? getCodeLanguage(codeChild.props.className)
+      : null;
 
-    if (isValidElement<{ className?: string; children?: unknown }>(codeChild)) {
-      const language = getCodeLanguage(codeChild.props.className);
-      if (language === "mermaid") {
-        return <MermaidBlock chart={extractText(codeChild.props.children).replace(/\n$/, "")} />;
-      }
+    if (language === "mermaid" && isValidElement<{ children?: unknown }>(codeChild)) {
+      return <MermaidBlock chart={extractText(codeChild.props.children).replace(/\n$/, "")} />;
     }
 
-    return <CodeBlock className={className}>{children as ReactNode}</CodeBlock>;
+    return (
+      <CodeBlock className={className} language={language}>
+        {children as ReactNode}
+      </CodeBlock>
+    );
   },
 };
 

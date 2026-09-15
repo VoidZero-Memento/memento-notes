@@ -9,6 +9,7 @@ import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
 import { parseOutline } from "@/lib/markdown/parse-outline";
 import { getNoteTitleFromPath, getRepoWorkspaceTitle } from "@/lib/note-title";
 import { useNoteContent } from "@/lib/notes/use-note-content";
+import { useSidebarDesktopSlide } from "@/lib/notes/use-sidebar-desktop-slide";
 import { useBgBlur } from "@/lib/prefs/useBgBlur";
 import { useBorderFlow } from "@/lib/prefs/useBorderFlow";
 import { useGalleryLink } from "@/lib/prefs/useGalleryLink";
@@ -99,13 +100,14 @@ export const NotesWorkspace = ({
     onSelectPath,
   );
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>("files");
-  const [sidebarHidden, setSidebarHidden] = useState(false);
   const [sidebarFx, setSidebarFx] = useState<"idle" | "collapse" | "expand">("idle");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [scrollAtTop, setScrollAtTop] = useState(true);
   const [scrollAtBottom, setScrollAtBottom] = useState(true);
   const sidebarFxTimerRef = useRef<number | null>(null);
+  const { sidebarRef, viewerRef, hidden: sidebarHidden, collapsing, expanding, slideCollapse, slideExpand, reveal } =
+    useSidebarDesktopSlide(!isMobile);
 
   const clearSidebarFxTimer = () => {
     if (sidebarFxTimerRef.current == null) return;
@@ -123,20 +125,20 @@ export const NotesWorkspace = ({
   };
 
   const collapseSidebar = () => {
-    setSidebarHidden(true);
-    playSidebarFx("collapse", 520);
+    playSidebarFx("collapse", 500);
+    slideCollapse();
   };
 
   const expandSidebar = () => {
-    setSidebarHidden(false);
-    playSidebarFx("expand", 580);
+    playSidebarFx("expand", 500);
+    slideExpand();
   };
 
   useEffect(() => () => clearSidebarFxTimer(), []);
 
   const handleBrowseFiles = () => {
     setSidebarMode("files");
-    setSidebarHidden(false);
+    reveal();
     setMobileNavOpen(true);
   };
 
@@ -217,6 +219,8 @@ export const NotesWorkspace = ({
     styles.sidebar,
     mobileNavOpen ? styles.sidebarOpen : "",
     sidebarHidden ? styles.sidebarHidden : "",
+    collapsing ? styles.sidebarCollapsing : "",
+    expanding ? styles.sidebarExpanding : "",
     sidebarFx === "collapse" ? styles.sidebarFxCollapse : "",
     sidebarFx === "expand" ? styles.sidebarFxExpand : "",
     sidebarBgEnabled ? styles.sidebarBgEnabled : "",
@@ -248,7 +252,9 @@ export const NotesWorkspace = ({
       }
       className={[
         styles.root,
-        sidebarHidden ? styles.rootSidebarHidden : "",
+        sidebarHidden || collapsing ? styles.rootSidebarHidden : "",
+        collapsing ? styles.rootCollapsing : "",
+        expanding ? styles.rootExpanding : "",
         sidebarFx === "collapse" ? styles.rootFxCollapse : "",
         sidebarFx === "expand" ? styles.rootFxExpand : "",
         sidebarBgEnabled ? styles.rootBgEnabled : "",
@@ -267,7 +273,6 @@ export const NotesWorkspace = ({
           styles.sidebarRailFx,
           sidebarFx === "collapse" ? styles.sidebarRailFxCollapse : "",
           sidebarFx === "expand" ? styles.sidebarRailFxExpand : "",
-          sidebarFx === "idle" && !sidebarHidden ? styles.sidebarRailFxIdle : "",
         ]
           .filter(Boolean)
           .join(" ")}
@@ -281,7 +286,7 @@ export const NotesWorkspace = ({
         tabIndex={mobileNavOpen ? 0 : -1}
         onClick={() => setMobileNavOpen(false)}
       />
-      <aside className={sidebarClassName} aria-hidden={sidebarHidden}>
+      <aside ref={sidebarRef} className={sidebarClassName} aria-hidden={sidebarHidden}>
         <div className={styles.sidebarHeader}>
           <div className={styles.sidebarTitleRow}>
             <h2 className={styles.sidebarTitle}>{workspaceTitle}</h2>
@@ -409,7 +414,7 @@ export const NotesWorkspace = ({
         </div>
       </aside>
       <BgTransitionOverlay open={bgOverlayOpen || mobileBgCovering} crawlProgress={bgOverlayCrawl} />
-      <main className={styles.viewer}>
+      <main ref={viewerRef} className={styles.viewer}>
         {showViewerGlass ? <div className={styles.viewerGlass} aria-hidden /> : null}
         <div className={styles.viewerContent}>
           {immersiveBgEmpty ? null : (
