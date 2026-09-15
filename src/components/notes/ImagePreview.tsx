@@ -4,7 +4,8 @@ import { createPortal } from "react-dom";
 import {
   IMAGE_PREVIEW_FLIP_IDENTITY,
   IMAGE_PREVIEW_FLIP_MS,
-  fitPreviewRect,
+  fittedPreviewRect,
+  isIosTouch,
   openPreviewTransform,
   playPreviewFade,
   playPreviewFlip,
@@ -16,7 +17,8 @@ import { useImageZoom } from "@/lib/image-preview/use-image-zoom";
 
 import styles from "./ImagePreview.module.css";
 
-import type { ImagePreviewRect } from "@/lib/image-preview/flip";
+import type { CSSProperties } from "react";
+import type { ImagePreviewRect, PreviewAnimation } from "@/lib/image-preview/flip";
 
 type ImagePreviewProps = {
   alt: string;
@@ -30,6 +32,11 @@ type ImagePreviewProps = {
 };
 
 const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const afterFirstPaint = (fn: () => void) => {
+  const raf = requestAnimationFrame(fn);
+  return () => cancelAnimationFrame(raf);
+};
 
 export const ImagePreview = ({
   alt,
@@ -49,18 +56,30 @@ export const ImagePreview = ({
   const onCoverRef = useRef(onCover);
   const closingRef = useRef(false);
   const finishedRef = useRef(false);
+  const iosTouch = isIosTouch();
   const [settled, setSettled] = useState(false);
   const [closing, setClosing] = useState(false);
-  const [placed, setPlaced] = useState<ImagePreviewRect | null>(null);
+  const [placed, setPlaced] = useState<ImagePreviewRect | null>(() =>
+    iosTouch ? fittedPreviewRect(origin, { height: naturalHeight, width: naturalWidth }) : null,
+  );
   const originRef = useRef(origin);
   const naturalRef = useRef({ height: naturalHeight, width: naturalWidth });
+  const ignoreCloseUntilRef = useRef(0);
   originRef.current = origin;
   naturalRef.current = { height: naturalHeight, width: naturalWidth };
   onCloseRef.current = onClose;
   onCoverRef.current = onCover;
+  const previewBox = placed ?? origin;
+  const fitScale =
+    iosTouch && naturalWidth > 0 && naturalHeight > 0
+      ? Math.min(previewBox.width / naturalWidth, previewBox.height / naturalHeight)
+      : undefined;
   const { consumeOverlayClick, resetZoom } = useImageZoom({
     enabled: settled && !closing,
+    fitScale,
     imageRef,
+    naturalHeight: fitScale != null ? naturalHeight : undefined,
+    naturalWidth: fitScale != null ? naturalWidth : undefined,
     overlayRef,
   });
 
@@ -78,11 +97,11 @@ export const ImagePreview = ({
     const originBox = originRef.current;
     const natural = naturalRef.current;
     const viewport = readViewportSize();
-    const scale = previewScaleOf(originBox, natural, viewport);
-    const target = fitPreviewRect(originBox, scale, viewport);
-    const fly = openPreviewTransform(originBox, scale, viewport);
+    const target = fittedPreviewRect(originBox, natural, viewport);
+    const fly = openPreviewTransform(originBox, previewScaleOf(originBox, natural, viewport), viewport);
+    ignoreCloseUntilRef.current = performance.now() + 380;
 
-    if (prefersReducedMotion()) {
+    if (prefersReducedMotion() || iosTouch) {
       snapPreviewToRect(stage, target);
       if (dim) dim.style.opacity = "1";
       onCoverRef.current();
@@ -94,11 +113,12 @@ export const ImagePreview = ({
     let alive = true;
     let opened = false;
     let timer = 0;
-    let flip: Animation | null = null;
-    const raf = requestAnimationFrame(() => {
+    let flip: PreviewAnimation | null = null;
+    let fade: PreviewAnimation | null = null;
+    const cancelPaint = afterFirstPaint(() => {
       if (!alive) return;
       onCoverRef.current();
-      if (dim) playPreviewFade(dim, 0, 1);
+      if (dim) fade = playPreviewFade(dim, 0, 1);
       flip = playPreviewFlip(stage, IMAGE_PREVIEW_FLIP_IDENTITY, fly);
       const finishOpen = () => {
         if (!alive || opened || closingRef.current) return;
@@ -108,16 +128,17 @@ export const ImagePreview = ({
         setSettled(true);
       };
       flip.addEventListener("finish", finishOpen);
-      timer = window.setTimeout(finishOpen, IMAGE_PREVIEW_FLIP_MS + 40);
+      timer = window.setTimeout(finishOpen, IMAGE_PREVIEW_FLIP_MS + 80);
     });
 
     return () => {
       alive = false;
       flip?.cancel();
+      fade?.cancel();
       window.clearTimeout(timer);
-      cancelAnimationFrame(raf);
+      cancelPaint();
     };
-  }, []);
+  }, [iosTouch]);
 
   const requestClose = useCallback(() => {
     if (closingRef.current) return;
@@ -132,28 +153,34 @@ export const ImagePreview = ({
     if (!closing) return;
     const stage = stageRef.current;
     const dim = dimRef.current;
-    if (!stage || prefersReducedMotion()) {
+    if (!stage || prefersReducedMotion() || iosTouch) {
       finishClose();
       return;
     }
 
     const nextOrigin = getOrigin();
+    const dest = nextOrigin.width > 0 ? nextOrigin : originRef.current;
     const viewport = readViewportSize();
     const natural = { height: naturalHeight, width: naturalWidth };
-    const fly = openPreviewTransform(nextOrigin, previewScaleOf(nextOrigin, natural, viewport), viewport);
-    stage.style.left = `${nextOrigin.left}px`;
-    stage.style.top = `${nextOrigin.top}px`;
-    stage.style.width = `${nextOrigin.width}px`;
-    stage.style.height = `${nextOrigin.height}px`;
-    if (dim) playPreviewFade(dim, 1, 0);
-    const animation = playPreviewFlip(stage, fly, IMAGE_PREVIEW_FLIP_IDENTITY);
+    let fade: PreviewAnimation | null = null;
+    if (dim) fade = playPreviewFade(dim, 1, 0);
+    stage.style.left = `${dest.left}px`;
+    stage.style.top = `${dest.top}px`;
+    stage.style.width = `${dest.width}px`;
+    stage.style.height = `${dest.height}px`;
+    const animation = playPreviewFlip(
+      stage,
+      openPreviewTransform(dest, previewScaleOf(dest, natural, viewport), viewport),
+      IMAGE_PREVIEW_FLIP_IDENTITY,
+    );
     animation.addEventListener("finish", finishClose);
     const timer = window.setTimeout(finishClose, IMAGE_PREVIEW_FLIP_MS + 80);
     return () => {
       animation.cancel();
+      fade?.cancel();
       window.clearTimeout(timer);
     };
-  }, [closing, finishClose, getOrigin, naturalHeight, naturalWidth]);
+  }, [closing, finishClose, getOrigin, iosTouch, naturalHeight, naturalWidth]);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -168,17 +195,16 @@ export const ImagePreview = ({
     };
   }, [requestClose]);
 
-  const box = placed ?? origin;
-
   return createPortal(
     <div
       ref={overlayRef}
-      className={styles.root}
+      className={`${styles.root}${iosTouch ? ` ${styles.touch}` : ""}`}
       role="dialog"
       aria-modal="true"
       aria-label={alt || "图片预览"}
       onClick={() => {
-        if (!consumeOverlayClick() && settled) return;
+        if (closing || !settled || performance.now() < ignoreCloseUntilRef.current) return;
+        if (!consumeOverlayClick()) return;
         requestClose();
       }}
     >
@@ -186,10 +212,29 @@ export const ImagePreview = ({
       <div
         className={`${styles.stage}${settled && !closing ? ` ${styles.stageReady}` : ""}`}
         ref={stageRef}
-        style={{ height: box.height, left: box.left, top: box.top, width: box.width }}
+        style={{ height: previewBox.height, left: previewBox.left, top: previewBox.top, width: previewBox.width }}
         onClick={(event) => event.stopPropagation()}
       >
-        <img ref={imageRef} className={styles.full} src={src} alt={alt} draggable={false} />
+        <img
+          ref={imageRef}
+          className={styles.full}
+          src={src}
+          alt={alt}
+          width={Math.max(1, Math.round(iosTouch ? naturalWidth : origin.width))}
+          height={Math.max(1, Math.round(iosTouch ? naturalHeight : origin.height))}
+          draggable={false}
+          style={
+            iosTouch
+              ? ({
+                  "--preview-fit": String(fitScale ?? 1),
+                  height: naturalHeight,
+                  marginLeft: -naturalWidth / 2,
+                  marginTop: -naturalHeight / 2,
+                  width: naturalWidth,
+                } as CSSProperties)
+              : undefined
+          }
+        />
       </div>
     </div>,
     document.body,

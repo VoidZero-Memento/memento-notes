@@ -32,8 +32,10 @@
   margin: 0;
   padding: 0;
   line-height: 0;
+  transform: scale(1) translate3d(0px, 0px, 0px);
   transform-origin: 50% 50%;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   pointer-events: none;
   will-change: transform;
 }
@@ -54,6 +56,7 @@
   transform-origin: center center;
   cursor: grab;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   user-select: none;
   -webkit-user-select: none;
   -webkit-user-drag: none;
@@ -71,4 +74,33 @@
 
 .full[data-panning] {
   cursor: grabbing;
+}
+
+@supports (-webkit-touch-callout: none) {
+  @media (hover: none) and (pointer: coarse) {
+    .root {
+      overflow: visible;
+    }
+  }
+}
+
+.touch .stage {
+  overflow: visible;
+  will-change: auto;
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
+}
+
+.touch .full {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: auto;
+  height: auto;
+  max-width: none;
+  object-fit: fill;
+  transform: scale(var(--preview-fit, 1));
+  will-change: auto;
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
 }

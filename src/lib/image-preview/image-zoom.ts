@@ -11,6 +11,8 @@ export const clampNumber = (value: number, min: number, max: number) => Math.min
 
 export const clampScale = (scale: number) => clampNumber(scale, IMAGE_ZOOM_MIN, IMAGE_ZOOM_MAX);
 
+export const clampScaleRange = (value: number, min: number, max: number) => clampNumber(value, min, max);
+
 export const pointerDistance = (a: ImageZoomPoint, b: ImageZoomPoint) => Math.hypot(a.x - b.x, a.y - b.y);
 
 export const isPastMoveThreshold = (origin: ImageZoomPoint, next: ImageZoomPoint) =>
@@ -26,8 +28,9 @@ export const zoomAround = (
   nextScale: number,
   focal: ImageZoomPoint,
   center: ImageZoomPoint,
+  scaleLimit: (value: number) => number = clampScale,
 ): ImageZoomTransform => {
-  const scale = clampScale(nextScale);
+  const scale = scaleLimit(nextScale);
   if (scale === transform.scale) return { scale, x: transform.x, y: transform.y };
   const ratio = scale / transform.scale;
   return {

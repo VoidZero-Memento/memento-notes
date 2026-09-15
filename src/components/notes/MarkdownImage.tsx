@@ -40,9 +40,10 @@ export const MarkdownImage = ({ src, alt = "" }: MarkdownImageProps) => {
     <>
       <button
         type="button"
-        className={`${styles.trigger}${covered ? ` ${styles.triggerPreviewing}` : ""}`}
+        className={`${styles.trigger}${open ? ` ${styles.triggerOpen}` : ""}${covered ? ` ${styles.triggerPreviewing}` : ""}`}
         aria-label={alt ? `查看大图：${alt}` : "查看大图"}
         onClick={() => {
+          if (open) return;
           const node = originRef.current;
           if (!node) return;
           setOrigin(readPreviewRect(node));

@@ -12,6 +12,7 @@
   outline: none;
   box-shadow: none;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .trigger:focus,
@@ -20,8 +21,13 @@
   box-shadow: none;
 }
 
+.triggerOpen {
+  pointer-events: none;
+}
+
 .triggerPreviewing {
   visibility: hidden;
+  pointer-events: none;
 }
 
 .image {
