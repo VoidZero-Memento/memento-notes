@@ -37,7 +37,7 @@ type SidebarBgToggleProps = {
   looping: boolean;
   /** 循环播放：PC 写死双图、手机图集轮播都用 */
   showLoopOption: boolean;
-  /** 图集切换仅手机 */
+  /** 图集切换：PC / 手机同一套入口与面板 */
   showFolderOption?: boolean;
   /** 背景模糊开关；PC / 手机都显示 */
   showBgBlurOption?: boolean;
@@ -315,7 +315,7 @@ export const SidebarBgToggle = ({
                 disabled={disabled || !enabled}
                 onClick={handleOpenFolders}
               >
-                <span className={styles.optionLabel}>图集</span>
+                <span className={styles.optionLabel}>主题图集</span>
                 <span className={styles.optionState}>{OSS_FOLDER_LABELS[folder]}</span>
               </button>
             </li>

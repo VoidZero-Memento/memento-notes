@@ -1,4 +1,4 @@
-import { preloadPhoto, toGalleryPhotoUrl } from "@/lib/bg-photos/photo-utils";
+import { preloadPhoto, toGalleryPhotoUrl, toStageBackdropUrl } from "@/lib/bg-photos/photo-utils";
 
 import type { OssImageMeta } from "@/lib/bg-photos/bg-photos.types";
 import type { GalleryNaturalSize, GalleryPreparedShot, GallerySlot } from "@/lib/gallery/gallery.types";
@@ -8,14 +8,31 @@ const SHOT_CACHE_MAX = 16;
 const shotCache = new Map<number, GalleryPreparedShot>();
 const shotInflight = new Map<number, Promise<GalleryPreparedShot | null>>();
 
-export const emptySlot = (): GallerySlot => ({ url: "", motion: "leave" });
-
 export const emptySize = (): GalleryNaturalSize => ({ width: 0, height: 0 });
 
-export const afterPaint = (fn: () => void) => {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(fn);
+export const emptySlot = (): GallerySlot => ({ url: "", motion: "leave", size: emptySize() });
+
+export const afterPaint = (fn?: () => void) =>
+  new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        fn?.();
+        resolve();
+      });
+    });
   });
+
+export const nextShotIndex = (current: number, length: number) => {
+  if (length <= 0) return -1;
+  if (length === 1) return 0;
+  return (current + 1) % length;
+};
+
+export const upcomingShotIndexes = (from: number, length: number) => {
+  if (length <= 1) return [] as number[];
+  const second = nextShotIndex(from, length);
+  const third = nextShotIndex(second, length);
+  return second === from ? [] : [second, third];
 };
 
 const rememberShot = (idx: number, shot: GalleryPreparedShot) => {
@@ -28,24 +45,26 @@ const rememberShot = (idx: number, shot: GalleryPreparedShot) => {
   }
 };
 
-const decodeShot = async (photos: OssImageMeta[], idx: number): Promise<GalleryPreparedShot | null> => {
-  const meta = photos[idx];
-  if (!meta) return null;
-  const url = toGalleryPhotoUrl(meta.url);
+const decodeUrl = async (url: string) => {
   const img = new Image();
   img.src = url;
   try {
     if (img.decode) await img.decode();
-    else {
-      const size = await preloadPhoto(url);
-      if (size.width <= 0) return null;
-      return { idx, url, size };
-    }
+    else await preloadPhoto(url);
   } catch {
-    if (img.naturalWidth <= 0) return null;
+    /* naturalWidth 仍可判断 */
   }
-  if (img.naturalWidth <= 0) return null;
-  return { idx, url, size: { width: img.naturalWidth, height: img.naturalHeight } };
+  return img;
+};
+
+const decodeShot = async (photos: OssImageMeta[], idx: number): Promise<GalleryPreparedShot | null> => {
+  const meta = photos[idx];
+  if (!meta) return null;
+  const url = toGalleryPhotoUrl(meta.url);
+  const backdropUrl = toStageBackdropUrl(meta.url);
+  const [photo] = await Promise.all([decodeUrl(url), decodeUrl(backdropUrl)]);
+  if (photo.naturalWidth <= 0) return null;
+  return { idx, url, backdropUrl, size: { width: photo.naturalWidth, height: photo.naturalHeight } };
 };
 
 export const loadShot = async (

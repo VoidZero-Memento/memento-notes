@@ -1,15 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import { GALLERY_MAT_GAP } from "@/lib/gallery/constants";
-import { fitFrameSize } from "@/lib/gallery/fit-frame";
 
-import type { GalleryNaturalSize } from "@/lib/gallery/gallery.types";
-
-export const useGalleryArtBox = (natural: GalleryNaturalSize) => {
+export const useGalleryArtBox = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [maxBox, setMaxBox] = useState({ width: 0, height: 0 });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = canvasRef.current;
     if (!el) return;
 
@@ -31,10 +28,5 @@ export const useGalleryArtBox = (natural: GalleryNaturalSize) => {
     return () => observer.disconnect();
   }, []);
 
-  const art = useMemo(
-    () => fitFrameSize(natural.width, natural.height, maxBox.width, maxBox.height),
-    [maxBox.height, maxBox.width, natural.height, natural.width],
-  );
-
-  return { canvasRef, art };
+  return { canvasRef, maxBox };
 };

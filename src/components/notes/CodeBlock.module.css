@@ -150,17 +150,20 @@
 }
 
 .collapseBtn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.blockActive .collapseBtn,
+.block:focus-within .collapseBtn {
   opacity: 1;
+  pointer-events: auto;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .collapseBtn {
-    opacity: 0;
-  }
-
-  .block:hover .collapseBtn,
-  .block:focus-within .collapseBtn {
+  .block:hover .collapseBtn {
     opacity: 1;
+    pointer-events: auto;
   }
 }
 

@@ -380,7 +380,7 @@ export const NotesWorkspace = ({
                 enabled={sidebarBgEnabled}
                 looping={sidebarBgLooping}
                 showLoopOption
-                showFolderOption={isMobile}
+                showFolderOption
                 showBgBlurOption
                 lockBorderFlowToBgBlur={!isMobile}
                 borderFlowEnabled={borderFlowEnabled}

@@ -1,5 +1,7 @@
-import { Children, cloneElement, isValidElement, useState } from "react";
+import { Children, cloneElement, isValidElement, useEffect, useRef, useState } from "react";
 
+import { blurActiveInside } from "@/lib/dom/blur-active-inside";
+import { useMediaQuery } from "@/lib/dom/use-media-query";
 import { toast } from "@/lib/toast/toast";
 
 import styles from "./CodeBlock.module.css";
@@ -96,10 +98,28 @@ const CollapseIcon = ({ collapsed }: { collapsed: boolean }) => (
 );
 
 export const CodeBlock = ({ children, className, language }: CodeBlockProps) => {
+  const rootRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [active, setActive] = useState(false);
+  const hoverReveal = useMediaQuery("(hover: hover) and (pointer: fine)");
   const content = normalizeCodeChildren(children);
   const langLabel = language?.trim() || null;
+
+  useEffect(() => {
+    if (hoverReveal) setActive(false);
+  }, [hoverReveal]);
+
+  useEffect(() => {
+    if (!active) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (rootRef.current?.contains(event.target as Node)) return;
+      setActive(false);
+      blurActiveInside(rootRef.current);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [active]);
 
   const handleCopy = async () => {
     const text = extractText(content);
@@ -118,7 +138,12 @@ export const CodeBlock = ({ children, className, language }: CodeBlockProps) => 
   const bodyClassName = collapsed ? `${styles.body} ${styles.bodyCollapsed}` : styles.body;
 
   return (
-    <div className={styles.block} data-code-block>
+    <div
+      ref={rootRef}
+      className={active ? `${styles.block} ${styles.blockActive}` : styles.block}
+      data-code-block
+      onClick={hoverReveal ? undefined : () => setActive(true)}
+    >
       <div className={styles.header}>
         <span className={styles.meta}>
           <span className={styles.dots} aria-hidden="true">

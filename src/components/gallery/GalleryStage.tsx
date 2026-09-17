@@ -1,43 +1,86 @@
-import { useCallback } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { waitImgElementPainted } from "@/lib/bg-photos/photo-utils";
 import { GALLERY_BACKDROP_MS, GALLERY_FADE_MS, GALLERY_MAT_GAP } from "@/lib/gallery/constants";
+import { fitFrameSize } from "@/lib/gallery/fit-frame";
 import { useGalleryArtBox } from "@/lib/gallery/use-gallery-art-box";
 import { useGalleryChrome } from "@/lib/gallery/use-gallery-chrome";
 import { useGalleryStage } from "@/lib/gallery/use-gallery-stage";
 
-import { GalleryFrost } from "@/components/gallery/GalleryFrost";
 import { ImmersiveLayer } from "@/components/theme/ImmersiveLayer";
 
 import styles from "./GalleryStage.module.css";
 
-import type { AnimationEvent, CSSProperties, MouseEvent, SyntheticEvent } from "react";
+import type { CSSProperties, MouseEvent, SyntheticEvent } from "react";
 import type { GalleryLocationState, GallerySlot, GallerySlotMotion } from "@/lib/gallery/gallery.types";
 
-const slotClass = (motion: GallerySlotMotion) =>
-  `${styles.slot} ${motion === "leave" ? styles.slotLeave : styles.slotShow}`;
+const slotClass = (motion: GallerySlotMotion) => {
+  if (motion === "leave") return `${styles.card} ${styles.cardLeave}`;
+  if (motion === "enter") return `${styles.card} ${styles.cardEnter}`;
+  return `${styles.card} ${styles.cardShow}`;
+};
 
 const preventMenu = (event: SyntheticEvent) => event.preventDefault();
 
-type ShotSlotProps = {
+type ShotCardProps = {
   slot: GallerySlot;
-  onAnimationEnd: (event: AnimationEvent<HTMLDivElement>) => void;
+  maxBox: { width: number; height: number };
+  onPainted: (url: string) => void;
 };
 
-const ShotSlot = ({ slot, onAnimationEnd }: ShotSlotProps) => (
-  <div className={slot.url ? slotClass(slot.motion) : styles.slot} onAnimationEnd={onAnimationEnd}>
-    {slot.url ? (
-      <img
-        className={styles.photo}
-        src={slot.url}
-        alt=""
-        decoding="async"
-        fetchPriority={slot.motion === "leave" ? "low" : "high"}
-        draggable={false}
-      />
-    ) : null}
-  </div>
-);
+const ShotCard = ({ slot, maxBox, onPainted }: ShotCardProps) => {
+  const imgRef = useRef<HTMLImageElement>(null);
+  const fitted = slot.url
+    ? fitFrameSize(slot.size.width, slot.size.height, maxBox.width, maxBox.height)
+    : { width: 0, height: 0 };
+
+  useLayoutEffect(() => {
+    if (!slot.url || fitted.width < 1) return;
+    const img = imgRef.current;
+    if (!img) return;
+    if (img.complete && img.naturalWidth > 0) {
+      onPainted(slot.url);
+      return;
+    }
+    let cancelled = false;
+    void waitImgElementPainted(img).then(() => {
+      if (!cancelled) onPainted(slot.url);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [fitted.height, fitted.width, onPainted, slot.url]);
+
+  if (!slot.url || fitted.width < 1) return null;
+
+  return (
+    <div
+      className={slotClass(slot.motion)}
+      style={{
+        width: fitted.width + GALLERY_MAT_GAP * 2,
+        height: fitted.height + GALLERY_MAT_GAP * 2,
+      }}
+    >
+      <div className={styles.rim} aria-hidden>
+        <span className={styles.rimFlow} />
+      </div>
+      <FrameMark />
+      <div className={styles.stage}>
+        <img
+          key={slot.url}
+          ref={imgRef}
+          className={styles.photo}
+          src={slot.url}
+          alt=""
+          decoding="async"
+          loading="eager"
+          draggable={false}
+        />
+      </div>
+    </div>
+  );
+};
 
 const FrameMark = () => (
   <div className={styles.mark} aria-hidden>
@@ -51,13 +94,50 @@ const FrameMark = () => (
 type AmbientLayerProps = {
   src: string;
   shown: boolean;
+  front: boolean;
+  onPainted: (url: string) => void;
 };
 
-const AmbientLayer = ({ src, shown }: AmbientLayerProps) => (
-  <div className={`${styles.ambient}${src && shown ? ` ${styles.ambientShow}` : ""}`} aria-hidden>
-    {src ? <img className={styles.ambientImg} src={src} alt="" decoding="async" draggable={false} /> : null}
-  </div>
-);
+const AmbientLayer = ({ src, shown, front, onPainted }: AmbientLayerProps) => {
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useLayoutEffect(() => {
+    if (!src) return;
+    const img = imgRef.current;
+    if (!img) return;
+    if (img.complete && img.naturalWidth > 0) {
+      onPainted(src);
+      return;
+    }
+    let cancelled = false;
+    void waitImgElementPainted(img).then(() => {
+      if (!cancelled) onPainted(src);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [onPainted, src]);
+
+  const cls = src
+    ? `${styles.ambient} ${shown ? (front ? styles.ambientFront : styles.ambientShow) : styles.ambientHold}`
+    : styles.ambient;
+
+  return (
+    <div className={cls} aria-hidden>
+      {src ? (
+        <img
+          ref={imgRef}
+          className={styles.ambientImg}
+          src={src}
+          alt=""
+          decoding="async"
+          loading="eager"
+          draggable={false}
+        />
+      ) : null}
+    </div>
+  );
+};
 
 export const GalleryStage = () => {
   const navigate = useNavigate();
@@ -69,14 +149,15 @@ export const GalleryStage = () => {
     slotB,
     backdropA,
     backdropB,
+    backdropShowA,
     backdropShowB,
-    naturalSize,
+    backdropFrontIsB,
     busy,
     advance,
-    settleLeaving,
+    onSlotPainted,
     retry,
   } = useGalleryStage();
-  const { canvasRef, art } = useGalleryArtBox(naturalSize);
+  const { canvasRef, maxBox } = useGalleryArtBox();
   const { chromeOn, hintOn, dismissHint, pulseChrome } = useGalleryChrome(status === "ready");
 
   const handleBack = useCallback(
@@ -95,26 +176,18 @@ export const GalleryStage = () => {
   const fadeVars = {
     "--gallery-fade-ms": `${GALLERY_FADE_MS}ms`,
     "--gallery-backdrop-ms": `${GALLERY_BACKDROP_MS}ms`,
-    "--art-w": `${art.width}px`,
-    "--art-h": `${art.height}px`,
     "--gallery-mat": `${GALLERY_MAT_GAP}px`,
   } as CSSProperties;
-
-  const handleSlotAnimationEnd = (event: AnimationEvent<HTMLDivElement>) => {
-    if (event.target !== event.currentTarget) return;
-    if (!event.currentTarget.classList.contains(styles.slotLeave)) return;
-    settleLeaving();
-  };
 
   const handleTap = () => {
     if (status === "error") {
       retry();
       return;
     }
-    if (status !== "ready" || busy) return;
+    if (status !== "ready") return;
+    if (!advance()) return;
     dismissHint();
     pulseChrome();
-    advance();
   };
 
   const statusLabel = status === "error" ? (error ?? "UNABLE TO LOAD") : status === "loading" ? "LOADING" : null;
@@ -122,33 +195,37 @@ export const GalleryStage = () => {
   return (
     <ImmersiveLayer
       enabled={false}
-      className={`${styles.root}${status === "ready" ? ` ${styles.rootReady}` : ""}`}
+      className={`${styles.root}${status === "ready" ? ` ${styles.rootReady}` : ""}${busy ? ` ${styles.rootBusy}` : ""}`}
       style={fadeVars}
       role="presentation"
       aria-label={status === "ready" ? "点击查看下一张" : undefined}
       onContextMenu={preventMenu}
       onClick={handleTap}
       background={
-        <>
-          <AmbientLayer src={backdropA} shown={!backdropShowB} />
-          <AmbientLayer src={backdropB} shown={backdropShowB} />
-          <GalleryFrost />
-        </>
+        <div className={styles.ambientStack} aria-hidden>
+          <AmbientLayer
+            src={backdropA}
+            shown={status === "ready" && backdropShowA}
+            front={!backdropFrontIsB}
+            onPainted={onSlotPainted}
+          />
+          <AmbientLayer
+            src={backdropB}
+            shown={status === "ready" && backdropShowB}
+            front={backdropFrontIsB}
+            onPainted={onSlotPainted}
+          />
+          <div className={styles.ambientVeil} />
+        </div>
       }
     >
       <div className={styles.well}>
         <div className={styles.canvas} ref={canvasRef}>
-          {art.width > 0 ? (
-            <div className={styles.vessel}>
-              <div className={styles.rim} aria-hidden>
-                <span className={styles.rimFlow} />
-              </div>
-              <FrameMark />
-              <div className={styles.stage}>
-                <ShotSlot slot={slotA} onAnimationEnd={handleSlotAnimationEnd} />
-                <ShotSlot slot={slotB} onAnimationEnd={handleSlotAnimationEnd} />
-              </div>
-            </div>
+          {maxBox.width > 0 ? (
+            <>
+              <ShotCard slot={slotA} maxBox={maxBox} onPainted={onSlotPainted} />
+              <ShotCard slot={slotB} maxBox={maxBox} onPainted={onSlotPainted} />
+            </>
           ) : null}
         </div>
       </div>

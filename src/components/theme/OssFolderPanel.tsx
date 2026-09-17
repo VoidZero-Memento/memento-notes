@@ -68,7 +68,7 @@ export const OssFolderPanel = ({
       className={`${styles.panel}${visible ? ` ${styles.panelVisible}` : ""}`}
       style={box}
       role="dialog"
-      aria-label="选择图集"
+      aria-label="选择主题图集"
       aria-hidden={!visible}
       inert={!visible || undefined}
     >

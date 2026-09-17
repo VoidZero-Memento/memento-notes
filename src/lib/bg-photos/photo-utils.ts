@@ -7,6 +7,7 @@ const OSS_HALL_THUMB_PROCESS = "x-oss-process=image/resize,w_480/quality,q_62/fo
 const OSS_HALL_PROBE_PROCESS = "x-oss-process=image/resize,w_32/quality,q_30/format,webp";
 const OSS_HALL_BACKDROP_PROCESS = "x-oss-process=image/resize,w_720/blur,r_10,s_8/quality,q_55/format,webp";
 const OSS_HALL_DESKTOP_BACKDROP_PROCESS = "x-oss-process=image/resize,w_1440/quality,q_64/format,webp";
+const OSS_STAGE_BACKDROP_PROCESS = "x-oss-process=image/resize,w_1920/blur,r_8,s_6/quality,q_70/format,webp";
 
 const withOssProcess = (url: string, process: string): string => {
   if (!OSS_HOST_RE.test(url) || url.includes("x-oss-process")) return url;
@@ -32,6 +33,10 @@ export const toImmersiveBgUrl = (url: string): string => withOssProcess(stripOss
 
 /** 展台主图：webp + 中等边长，切图时少解码 */
 export const toGalleryPhotoUrl = (url: string): string => withOssProcess(url, OSS_GALLERY_PROCESS);
+
+/** 展台氛围底：高清轻糊，磨砂/滤镜由 CSS 叠加，切图只做透明度 */
+export const toStageBackdropUrl = (url: string): string =>
+  withOssProcess(stripOssProcess(url), OSS_STAGE_BACKDROP_PROCESS);
 
 /** 心形卫星小图：约 2x 显示尺寸 */
 export const toSatPhotoUrl = (url: string): string => withOssProcess(url, OSS_SAT_PROCESS);

@@ -1,11 +1,17 @@
 /** 循环播放时自动切图间隔 */
 export const GALLERY_AUTO_INTERVAL_MS = 5_000;
 
-/** 切图叠化时长 */
-export const GALLERY_FADE_MS = 420;
+/** 切图交叉淡化时长 */
+export const GALLERY_FADE_MS = 720;
 
-/** 背景氛围层交叉淡化，略长于切图 */
-export const GALLERY_BACKDROP_MS = 720;
+/** 系统要求减弱动效时的切图时长 */
+export const GALLERY_FADE_REDUCED_MS = 200;
+
+/** 过渡末帧余量，避免锁比画面先结束 */
+export const GALLERY_FADE_TAIL_MS = 80;
+
+/** 背景叠化与主图同长：新底盖在旧底上淡入，避免对穿闪黑 */
+export const GALLERY_BACKDROP_MS = GALLERY_FADE_MS;
 
 /** 图片与相框之间的留白 */
 export const GALLERY_MAT_GAP = 14;

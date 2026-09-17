@@ -24,7 +24,7 @@ export const OssFolderChips = ({ disabled = false, onPicked }: OssFolderChipsPro
   };
 
   return (
-    <div className={styles.root} role="radiogroup" aria-label="图集">
+    <div className={styles.root} role="radiogroup" aria-label="主题图集">
       {OSS_FOLDER_IDS.map((id) => {
         const selected = id === folder;
         return (
