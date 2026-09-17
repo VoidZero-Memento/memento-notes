@@ -4,7 +4,7 @@ import { toast } from "@/lib/toast/toast";
 
 import styles from "./CodeBlock.module.css";
 
-import type { KeyboardEvent, MouseEvent, ReactElement, ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 type CodeBlockProps = {
   children: ReactNode;
@@ -44,13 +44,62 @@ const normalizeCodeChildren = (children: ReactNode): ReactNode =>
     });
   });
 
+const CopyIcon = () => (
+  <svg className={styles.icon} viewBox="0 0 16 16" aria-hidden>
+    <rect
+      x="5.4"
+      y="1.7"
+      width="8.9"
+      height="8.9"
+      rx="1.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.35"
+    />
+    <rect
+      x="1.7"
+      y="5.4"
+      width="8.9"
+      height="8.9"
+      rx="1.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.35"
+    />
+  </svg>
+);
+
+const CopiedIcon = () => (
+  <svg className={styles.icon} viewBox="0 0 16 16" aria-hidden>
+    <path
+      d="M3.2 8.4 6.5 11.6 12.8 4.4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const CollapseIcon = ({ collapsed }: { collapsed: boolean }) => (
+  <svg className={styles.icon} viewBox="0 0 16 16" aria-hidden>
+    <path
+      d={collapsed ? "M3.4 5.9 8 10.5 12.6 5.9" : "M3.4 10.1 8 5.5 12.6 10.1"}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.35"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export const CodeBlock = ({ children, className, language }: CodeBlockProps) => {
   const [copied, setCopied] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const content = normalizeCodeChildren(children);
   const langLabel = language?.trim() || null;
-
-  const toggleCollapsed = () => setCollapsed((prev) => !prev);
 
   const handleCopy = async () => {
     const text = extractText(content);
@@ -65,40 +114,13 @@ export const CodeBlock = ({ children, className, language }: CodeBlockProps) => 
     }
   };
 
-  const handleHeaderKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    event.preventDefault();
-    toggleCollapsed();
-  };
-
-  const stopToggle = (event: MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-  };
-
-  const handleCopyClick = (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    void handleCopy();
-  };
-
-  const handleCopyKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-  };
-
   const preClassName = className ? `${styles.pre} ${className}` : styles.pre;
   const bodyClassName = collapsed ? `${styles.body} ${styles.bodyCollapsed}` : styles.body;
 
   return (
     <div className={styles.block} data-code-block>
-      <div
-        className={styles.header}
-        role="button"
-        tabIndex={0}
-        aria-expanded={!collapsed}
-        aria-label={collapsed ? "展开代码" : "收起代码"}
-        onClick={toggleCollapsed}
-        onKeyDown={handleHeaderKeyDown}
-      >
-        <span className={styles.meta} onClick={stopToggle}>
+      <div className={styles.header}>
+        <span className={styles.meta}>
           <span className={styles.dots} aria-hidden="true">
             <span className={`${styles.dot} ${styles.dotRed}`} />
             <span className={`${styles.dot} ${styles.dotYellow}`} />
@@ -106,14 +128,25 @@ export const CodeBlock = ({ children, className, language }: CodeBlockProps) => 
           </span>
           {langLabel ? <span className={styles.lang}>{langLabel}</span> : null}
         </span>
-        <button
-          type="button"
-          className={styles.copyBtn}
-          onClick={handleCopyClick}
-          onKeyDown={handleCopyKeyDown}
-        >
-          {copied ? "已复制" : "复制代码"}
-        </button>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={`${styles.iconBtn} ${styles.collapseBtn}`}
+            aria-expanded={!collapsed}
+            aria-label={collapsed ? "展开代码" : "收起代码"}
+            onClick={() => setCollapsed((prev) => !prev)}
+          >
+            <CollapseIcon collapsed={collapsed} />
+          </button>
+          <button
+            type="button"
+            className={styles.iconBtn}
+            aria-label={copied ? "已复制" : "复制代码"}
+            onClick={() => void handleCopy()}
+          >
+            {copied ? <CopiedIcon /> : <CopyIcon />}
+          </button>
+        </div>
       </div>
       <div className={bodyClassName} aria-hidden={collapsed}>
         <div className={styles.bodyInner}>

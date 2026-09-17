@@ -21,29 +21,12 @@
   border-bottom: 1px solid rgba(var(--accent-rgb), 0.16);
   background: transparent;
   box-shadow: inset 0 -1px 0 rgba(var(--accent-rgb), 0.16);
-  padding: 0 14px;
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
+  padding: 0 10px 0 14px;
   -webkit-user-select: none;
   user-select: none;
-  touch-action: manipulation;
   transition:
     border-bottom-color 0.22s ease,
     box-shadow 0.22s ease;
-}
-
-.header *,
-.header *::before,
-.header *::after {
-  -webkit-tap-highlight-color: transparent;
-}
-
-.header:focus-visible {
-  outline: 1px solid rgba(var(--accent-rgb), 0.7);
-  outline-offset: -3px;
 }
 
 .meta {
@@ -51,10 +34,7 @@
   min-width: 0;
   align-items: center;
   gap: 10px;
-  cursor: default;
   background: transparent;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
 }
@@ -78,8 +58,6 @@
   letter-spacing: 0.06em;
   line-height: 1.2;
   text-shadow: 0 0 6px rgba(var(--accent-rgb), 0.35);
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
   transition:
@@ -92,7 +70,7 @@
   color: inherit;
 }
 
-.header:hover .lang {
+.block:hover .lang {
   color: rgba(var(--accent-rgb), 1);
   text-shadow:
     0 0 10px rgba(var(--accent-rgb), 0.7),
@@ -121,19 +99,23 @@
   box-shadow: 0 0 8px rgba(40, 200, 64, 0.45);
 }
 
-.copyBtn {
+.actions {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
+  gap: 2px;
+}
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  width: 32px;
   height: 40px;
   border: none;
   background: transparent;
   padding: 0;
   color: rgba(var(--accent-rgb), 0.7);
-  font-family: inherit;
-  font-size: 12px;
-  line-height: 1.2;
   cursor: pointer;
   text-shadow: 0 0 6px rgba(var(--accent-rgb), 0.35);
   -webkit-appearance: none;
@@ -144,14 +126,42 @@
   touch-action: manipulation;
   transition:
     color 0.15s ease,
-    text-shadow 0.15s ease;
+    text-shadow 0.15s ease,
+    opacity 0.15s ease;
 }
 
-.copyBtn:hover {
+.iconBtn:hover,
+.iconBtn:focus-visible {
   color: rgba(var(--accent-rgb), 1);
   text-shadow:
     0 0 10px rgba(var(--accent-rgb), 0.7),
     0 0 18px rgba(var(--accent-2-rgb), 0.35);
+}
+
+.iconBtn:focus-visible {
+  outline: 1px solid rgba(var(--accent-rgb), 0.7);
+  outline-offset: -3px;
+}
+
+.icon {
+  display: block;
+  width: 15px;
+  height: 15px;
+}
+
+.collapseBtn {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .collapseBtn {
+    opacity: 0;
+  }
+
+  .block:hover .collapseBtn,
+  .block:focus-within .collapseBtn {
+    opacity: 1;
+  }
 }
 
 .body {
@@ -195,7 +205,7 @@
 @media (prefers-reduced-motion: reduce) {
   .header,
   .lang,
-  .copyBtn,
+  .iconBtn,
   .body {
     transition: none;
   }
@@ -221,9 +231,9 @@
   .lang:hover,
   .lang:focus,
   .lang:active,
-  .header:hover .lang,
-  .header:focus .lang,
-  .header:active .lang {
+  .block:hover .lang,
+  .block:focus .lang,
+  .block:active .lang {
     background: transparent;
     outline: none;
     box-shadow: none;
