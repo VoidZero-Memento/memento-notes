@@ -21,6 +21,7 @@ import { GalleryLink } from "@/components/gallery/GalleryLink";
 import { useAppBg } from "@/components/theme/AppBgProvider";
 import { BgTransitionOverlay } from "@/components/theme/BgTransitionOverlay";
 import { ImmersiveEnter, ImmersiveLayer } from "@/components/theme/ImmersiveLayer";
+import { SidebarBgCarousel } from "@/components/theme/SidebarBgCarousel";
 import { SidebarBgToggle } from "@/components/theme/SidebarBgToggle";
 import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import { FileTree } from "./FileTree";
@@ -92,6 +93,7 @@ export const NotesWorkspace = ({
   const mobileBgCarousel = isMobile && sidebarBgEnabled;
   const pcBgCarousel = !isMobile && sidebarBgEnabled;
   const pageBgCarousel = mobileBgCarousel || pcBgCarousel;
+  const sidebarPhotoCarousel = sidebarBgEnabled && (isMobile || bgBlurEnabled);
   const mobileBgCovering = mobileBgCarousel && !pageBgReady;
   const viewerBodyRef = useRef<HTMLDivElement>(null);
   const { content, loading, pending, error, selectNote, retry } = useNoteContent(
@@ -287,6 +289,9 @@ export const NotesWorkspace = ({
         onClick={() => setMobileNavOpen(false)}
       />
       <aside ref={sidebarRef} className={sidebarClassName} aria-hidden={sidebarHidden}>
+        {sidebarPhotoCarousel ? (
+          <SidebarBgCarousel looping={sidebarBgLooping && (!isMobile || mobileNavOpen)} />
+        ) : null}
         <div className={styles.sidebarHeader}>
           <div className={styles.sidebarTitleRow}>
             <h2 className={styles.sidebarTitle}>{workspaceTitle}</h2>

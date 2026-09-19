@@ -9,7 +9,7 @@ import styles from "./ImmersiveLayer.module.css";
 import type { CSSProperties, MouseEvent, ReactNode } from "react";
 
 export const IMMERSIVE_MS = 640;
-const PC_IMMERSIVE_MS = 420;
+export const PC_IMMERSIVE_MS = 420;
 
 const HINT_KEY = "memento.immersive-hint";
 

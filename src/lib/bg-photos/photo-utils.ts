@@ -1,5 +1,6 @@
 const OSS_HOST_RE = /\.aliyuncs\.com/i;
 const OSS_BG_PROCESS = "x-oss-process=image/resize,w_720/quality,q_55";
+const OSS_PC_STRIP_PROCESS = "x-oss-process=image/resize,w_1440/quality,q_70/format,webp";
 const OSS_IMMERSE_PROCESS = "x-oss-process=image/resize,l_2560/quality,q_90/format,webp";
 const OSS_GALLERY_PROCESS = "x-oss-process=image/resize,w_1440/quality,q_78/format,webp";
 const OSS_SAT_PROCESS = "x-oss-process=image/resize,w_320/quality,q_58/format,webp";
@@ -27,6 +28,25 @@ const stripOssProcess = (url: string): string => {
 
 /** 背景轮播用低清 OSS 参数，非 OSS 原样返回 */
 export const toBgPhotoUrl = (url: string): string => withOssProcess(url, OSS_BG_PROCESS);
+
+/** PC 并排竖图：约 1/3 屏宽、2x 清晰度 */
+export const toPcStripBgUrl = (url: string): string => withOssProcess(url, OSS_PC_STRIP_PROCESS);
+
+/** 从 start 起取 size 张，清单不足时取全部，绕回不重复 */
+export const takePhotoStrip = (urls: string[], start: number, size: number): string[] => {
+  if (!urls.length || size <= 0) return [];
+  const take = Math.min(size, urls.length);
+  const origin = ((start % urls.length) + urls.length) % urls.length;
+  return Array.from({ length: take }, (_, i) => urls[(origin + i) % urls.length]).filter((url): url is string => !!url);
+};
+
+/** 下一条带起始下标：图多于列数则整组前进，否则每次挪 1 张 */
+export const nextStripStartIndex = (length: number, lastStart: number, size: number): number => {
+  if (length <= 0) return -1;
+  if (lastStart < 0) return 0;
+  const step = length > size ? size : 1;
+  return (lastStart + step) % length;
+};
 
 /** 手机沉浸看图：去掉背景用的低清/模糊参数，按长边 2560 接近原图 */
 export const toImmersiveBgUrl = (url: string): string => withOssProcess(stripOssProcess(url), OSS_IMMERSE_PROCESS);

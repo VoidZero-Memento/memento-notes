@@ -4,11 +4,18 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
+  filter: saturate(1) brightness(0.96);
+  transition: filter var(--immersive-ms, 420ms) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.immersive {
+  filter: saturate(1) brightness(1);
 }
 
 .slot {
   position: absolute;
   inset: 0;
+  display: flex;
   opacity: 0;
   transition: opacity var(--pc-bg-fade-ms, 1400ms) cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity;
@@ -18,20 +25,13 @@
   opacity: 1;
 }
 
-.cover {
-  position: absolute;
-  inset: 0;
+.pane {
   display: block;
-  width: 100%;
+  flex: 1 1 0;
+  min-width: 0;
   height: 100%;
   object-fit: cover;
-  object-position: 40% 70%;
-  filter: saturate(1) brightness(0.96);
-  transition: filter var(--immersive-ms, 640ms) cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.cover[src*="notes-background1.png"] {
-  object-position: 40% 90%;
+  object-position: center 20%;
 }
 
 .veil {
@@ -45,11 +45,7 @@
     rgba(4, 7, 14, 0.08) 42%,
     rgba(4, 7, 14, 0.16) 100%
   );
-  transition: opacity var(--immersive-ms, 640ms) cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.immersive .cover {
-  filter: saturate(1) brightness(1);
+  transition: opacity var(--immersive-ms, 420ms) cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .immersive .veil {
@@ -57,10 +53,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .root,
   .slot,
-  .cover,
   .veil,
-  .immersive .cover {
+  .immersive {
     transition: none;
   }
 }

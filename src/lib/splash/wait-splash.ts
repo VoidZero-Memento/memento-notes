@@ -1,5 +1,3 @@
-import { PC_BG_URLS } from "@/lib/bg-photos/constants";
-
 /** 首屏占位最少展示时长（从页面导航起算） */
 export const SPLASH_MIN_MS = 3000;
 
@@ -61,7 +59,7 @@ const preparePageBg = () => {
   if (window.matchMedia("(max-width: 860px)").matches) {
     return import("@/lib/bg-photos/prepare-mobile-bg").then((m) => m.prepareMobileBgTransition());
   }
-  return import("@/lib/bg-photos/photo-utils").then((m) => m.preloadPhoto(PC_BG_URLS[0]));
+  return import("@/lib/bg-photos/prepare-pc-bg").then((m) => m.preparePcBgTransition());
 };
 
 /**

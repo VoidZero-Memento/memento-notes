@@ -266,20 +266,17 @@
     content: none;
   }
 
-  /* 模糊开：目录用手机侧栏同图，再叠一层灰黑蒙层衬白字 */
+  /* 模糊开：目录独立轮播底图，::before 只留灰黑蒙层衬白字 */
   .rootBgEnabled.pcBgBlur .sidebarBgEnabled::before {
     content: "";
     opacity: 1;
-    background:
-      linear-gradient(
-        180deg,
-        rgba(4, 7, 14, 0.38) 0%,
-        rgba(4, 7, 14, 0.32) 45%,
-        rgba(4, 7, 14, 0.46) 100%
-      ),
-      url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-slider-background.png")
-        30% bottom / auto 102% no-repeat;
-    filter: saturate(0.82) brightness(0.82);
+    filter: none;
+    background: linear-gradient(
+      180deg,
+      rgba(4, 7, 14, 0.38) 0%,
+      rgba(4, 7, 14, 0.32) 45%,
+      rgba(4, 7, 14, 0.46) 100%
+    );
   }
 
   .rootBgEnabled .ownerName {
@@ -320,7 +317,7 @@
     0 0 6px rgba(0, 0, 0, 0.25);
 }
 
-/* PC 左侧栏独立背景，与手机抽屉同图；盖住整页底图避免两图叠色 */
+/* 侧栏独立底图由 SidebarBgCarousel 绘制；::before 只留蒙层衬白字 */
 .sidebarBgEnabled::before {
   content: "";
   position: absolute;
@@ -329,16 +326,13 @@
   z-index: -1;
   border-radius: inherit;
   pointer-events: none;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(4, 7, 14, 0.48) 0%,
-      rgba(4, 7, 14, 0.4) 45%,
-      rgba(4, 7, 14, 0.58) 100%
-    ),
-    url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-slider-background.png")
-      30% bottom / auto 102% no-repeat;
-  filter: saturate(0.7) brightness(0.72);
+  filter: none;
+  background: linear-gradient(
+    180deg,
+    rgba(4, 7, 14, 0.48) 0%,
+    rgba(4, 7, 14, 0.4) 45%,
+    rgba(4, 7, 14, 0.58) 100%
+  );
 }
 
 .sidebarHeader {
@@ -1424,7 +1418,7 @@
     outline: none;
   }
 
-  /* 手机抽屉沿用独立背景图，叠在变暗遮罩上，透明度与 PC 不同 */
+  /* 手机抽屉独立轮播底图；::before 只留蒙层，透明度与 PC 不同 */
   .sidebarBgEnabled::before {
     content: "";
     position: absolute;
@@ -1434,16 +1428,13 @@
     border-radius: inherit;
     pointer-events: none;
     opacity: 1;
-    filter: saturate(0.7) brightness(0.72);
-    background:
-      linear-gradient(
-        180deg,
-        rgba(4, 7, 14, 0.48) 0%,
-        rgba(4, 7, 14, 0.4) 45%,
-        rgba(4, 7, 14, 0.58) 100%
-      ),
-      url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-slider-background.png")
-        left / cover no-repeat;
+    filter: none;
+    background: linear-gradient(
+      180deg,
+      rgba(4, 7, 14, 0.48) 0%,
+      rgba(4, 7, 14, 0.4) 45%,
+      rgba(4, 7, 14, 0.58) 100%
+    );
   }
 
   .sidebarHidden {
