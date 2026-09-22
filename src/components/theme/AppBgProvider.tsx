@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { MOBILE_BG_MQ } from "@/lib/bg-photos/constants";
 import { useMediaQuery } from "@/lib/dom/use-media-query";
 import { paneOfPath } from "@/lib/keep-alive/keep-alive";
+import { PC_BG_EXIT_MS } from "@/lib/prefs/sidebar-bg";
 import { useSidebarBg } from "@/lib/prefs/useSidebarBg";
 import { useSidebarBgLoop } from "@/lib/prefs/useSidebarBgLoop";
 import { notifyAppBgPainted } from "@/lib/splash/splash-gate";
@@ -11,7 +12,7 @@ import { notifyAppBgPainted } from "@/lib/splash/splash-gate";
 import styles from "./AppPageBackground.module.css";
 
 import type { AppBgContextValue } from "@/lib/bg-photos/app-bg.types";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { MobileBgCarouselHandle } from "./MobileBgCarousel";
 import type { PcBgCarouselHandle } from "./PcBgCarousel";
 
@@ -35,6 +36,8 @@ export const AppBgProvider = ({ children }: AppBgProviderProps) => {
   const notesActive = pane === "notes";
   const [immersive, setImmersive] = useState(false);
   const [ready, setReady] = useState(() => !enabled);
+  const [leaving, setLeaving] = useState(false);
+  const [trackedEnabled, setTrackedEnabled] = useState(enabled);
   const enabledRef = useRef(enabled);
   const isMobileRef = useRef(isMobile);
   const mobileRef = useRef<MobileBgCarouselHandle>(null);
@@ -59,6 +62,17 @@ export const AppBgProvider = ({ children }: AppBgProviderProps) => {
     if (ready) notifyAppBgPainted();
   }, [ready]);
 
+  if (enabled !== trackedEnabled || (isMobile && leaving)) {
+    setTrackedEnabled(enabled);
+    setLeaving(!enabled && !isMobile);
+  }
+
+  useEffect(() => {
+    if (!leaving) return;
+    const id = window.setTimeout(() => setLeaving(false), PC_BG_EXIT_MS + 40);
+    return () => window.clearTimeout(id);
+  }, [leaving]);
+
   const advance = useCallback(() => {
     mobileRef.current?.advance();
     pcRef.current?.advance();
@@ -70,11 +84,13 @@ export const AppBgProvider = ({ children }: AppBgProviderProps) => {
   );
 
   const loopingNow = enabled && looping && notesActive && !immersive;
+  const showLayer = enabled || (!isMobile && leaving);
+  const layerStyle = { "--bg-leave-ms": `${PC_BG_EXIT_MS}ms` } as CSSProperties;
 
   return (
     <AppBgContext.Provider value={value}>
-      {enabled ? (
-        <div className={styles.layer} aria-hidden>
+      {showLayer ? (
+        <div className={`${styles.layer}${leaving && !enabled ? ` ${styles.leave}` : ""}`} style={layerStyle} aria-hidden>
           <Suspense fallback={null}>
             {isMobile ? (
               <MobileBgCarousel
@@ -84,7 +100,7 @@ export const AppBgProvider = ({ children }: AppBgProviderProps) => {
                 onReady={() => setReady(true)}
               />
             ) : (
-              <PcBgCarousel ref={pcRef} looping={loopingNow} immersive={immersive} onReady={() => setReady(true)} />
+              <PcBgCarousel ref={pcRef} immersive={immersive} onReady={() => setReady(true)} />
             )}
           </Suspense>
         </div>

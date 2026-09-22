@@ -1,3 +1,5 @@
+import { PC_PAGE_BG_URL } from "@/lib/bg-photos/constants";
+
 /** 首屏占位最少展示时长（从页面导航起算） */
 export const SPLASH_MIN_MS = 3000;
 
@@ -6,8 +8,7 @@ export const SPLASH_BANNER_TIMEOUT_MS = 10000;
 
 const SPLASH_IMAGE_MOBILE =
   "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background1.png";
-const SPLASH_IMAGE_PC =
-  "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background2.png";
+const SPLASH_IMAGE_PC = PC_PAGE_BG_URL;
 
 type SplashBoot = {
   urls: string[];

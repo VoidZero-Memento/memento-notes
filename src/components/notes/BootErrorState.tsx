@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { describeGithubError } from "@/lib/github/describe-github-error";
 import { clearGithubToken, getGithubToken, hasGithubToken, setGithubToken } from "@/lib/github/github-token";
+import { useNotifyEntryPainted } from "@/lib/splash/use-notify-entry-painted";
 import { EmptyState } from "@/components/common/EmptyState";
 import styles from "./BootErrorState.module.css";
 import shellStyles from "./NotesShell.module.css";
@@ -14,6 +15,7 @@ type BootErrorStateProps = {
 const TOKEN_HELP_URL = "https://github.com/settings/tokens";
 
 export const BootErrorState = ({ message, onRetry }: BootErrorStateProps) => {
+  useNotifyEntryPainted();
   const described = describeGithubError(message);
   const [tokenFormOpen, setTokenFormOpen] = useState(false);
   const [tokenDraft, setTokenDraft] = useState(() => getGithubToken() ?? "");

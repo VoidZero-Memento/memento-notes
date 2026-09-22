@@ -1,5 +1,6 @@
 import { useSiteGate } from "@/lib/gate/use-site-gate";
 import { useSidebarBg } from "@/lib/prefs/useSidebarBg";
+import { useNotifyEntryPainted } from "@/lib/splash/use-notify-entry-painted";
 import { GalleryGateField } from "@/components/gallery/GalleryGateField";
 import { GateTitle } from "@/components/layout/GateTitle";
 import { useAppBg } from "@/components/theme/AppBgProvider";
@@ -17,6 +18,7 @@ export const SiteGate = ({ children }: SiteGateProps) => {
   const { unlocked, unlock } = useSiteGate();
   const { enabled: bgEnabled } = useSidebarBg();
   const { ready } = useAppBg();
+  useNotifyEntryPainted(!unlocked);
 
   if (!unlocked) {
     return (

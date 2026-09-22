@@ -18,10 +18,7 @@
         if (document.documentElement.dataset.splash !== "1") return;
         var pc = window.matchMedia("(min-width: 861px)").matches;
         var urls = pc
-          ? [
-              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background2.png",
-              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background1.png",
-            ]
+          ? ["https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background.png"]
           : [
               "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background1.png",
               "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background2.png",
@@ -88,6 +85,11 @@
         display: none !important;
       }
 
+      #app-splash.is-leave {
+        opacity: 0;
+        pointer-events: none;
+      }
+
       #app-splash {
         position: fixed;
         inset: 0;
@@ -96,6 +98,8 @@
         min-height: 100dvh;
         overflow: hidden;
         background: #04070e;
+        opacity: 1;
+        transition: opacity 0.28s ease;
         color: rgba(245, 240, 255, 0.95);
         font-family: "Geist", "LXGWWenKai", Arial, Helvetica, sans-serif;
         -webkit-font-smoothing: antialiased;
@@ -150,6 +154,20 @@
           rgba(4, 7, 14, 0.62) 82%,
           rgba(4, 7, 14, 0.92) 96%,
           rgba(4, 7, 14, 0.96) 100%
+        );
+      }
+
+      #app-splash .splash-veil-rest {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        opacity: 0;
+        pointer-events: none;
+        background: linear-gradient(
+          180deg,
+          rgba(4, 7, 14, 0.12) 0%,
+          rgba(4, 7, 14, 0.08) 42%,
+          rgba(4, 7, 14, 0.16) 100%
         );
       }
 
@@ -395,13 +413,10 @@
 
       @keyframes splashDriftPc {
         0% {
-          transform: scale(1.42) translateY(-12%);
-        }
-        50% {
-          transform: scale(1.45) translate(-0.2%, -13%);
+          transform: scale(1.06);
         }
         100% {
-          transform: scale(1.48) translate(0.2%, -14%);
+          transform: scale(1.12);
         }
       }
 
@@ -431,10 +446,20 @@
       }
 
       @media (min-width: 861px) {
+        #app-splash.is-leave {
+          opacity: 1;
+          transition: opacity 880ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        #app-splash.is-leave.is-dissolve {
+          opacity: 0;
+        }
+
         #app-splash .splash-banners {
           z-index: 0;
           transform-origin: 50% 50%;
-          animation: none;
+          animation: splashDriftPc 4.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+          will-change: transform;
         }
 
         #app-splash .splash-veil,
@@ -443,16 +468,33 @@
         }
 
         #app-splash .splash-banner {
-          object-position: center 90%;
-          transform-origin: 50% 50%;
-          animation: splashDriftPc 16s ease-in-out infinite alternate;
+          object-position: center center;
+          transform-origin: center center;
+          animation: none;
+          filter: saturate(1) brightness(0.96);
         }
 
-        /* 与正文底图同框，避免进页后跳变 */
-        #app-splash .splash-banner[src*="notes-background1.png"] {
-          object-position: 40% 90%;
+        #app-splash.is-leave .splash-stage,
+        #app-splash.is-leave .splash-banners {
           animation: none;
-          transform: none;
+        }
+
+        #app-splash.is-leave .splash-panel {
+          opacity: 0;
+          transform: translate3d(0, 12px, 0);
+          transition:
+            opacity 460ms cubic-bezier(0.4, 0, 0.2, 1),
+            transform 460ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #app-splash.is-leave .splash-veil {
+          opacity: 0;
+          transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #app-splash.is-leave .splash-veil-rest {
+          opacity: 1;
+          transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
         }
       }
 
@@ -504,10 +546,6 @@
         }
 
         #app-splash .splash-banner {
-          transform: scale(1.44) translateY(-13%);
-        }
-
-        #app-splash .splash-banner[src*="notes-background1.png"] {
           transform: none;
         }
       }
@@ -546,6 +584,7 @@
             })();
           </script>
           <div class="splash-veil" aria-hidden="true"></div>
+          <div class="splash-veil-rest" aria-hidden="true"></div>
           <div class="splash-panel">
             <div class="splash-card">
               <div class="splash-brand-row">

@@ -9,17 +9,8 @@ export const ossFolderJsonUrl = (folder: string): string =>
 /** 手机背景轮播间隔 */
 export const MOBILE_BG_INTERVAL_MS = 10_000;
 
-/** PC 清单失败时回退 */
-export const PC_BG_URLS = [
-  "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background1.png",
-  "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background3.png",
-] as const;
-
-/** PC 并排竖图列数 */
-export const PC_BG_STRIP_SIZE = 4;
-
-/** PC 正文底轮播间隔，与手机端一致 */
-export const PC_BG_INTERVAL_MS = MOBILE_BG_INTERVAL_MS;
+/** PC 加载页与正文底同一张 */
+export const PC_PAGE_BG_URL = "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background.png";
 
 /** 侧栏 / 手机菜单独立底图轮播间隔 */
 export const SIDEBAR_BG_INTERVAL_MS = 5_000;

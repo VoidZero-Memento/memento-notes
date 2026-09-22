@@ -4,6 +4,7 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { getRepoFileTree } from "@/lib/github/github.service";
 import { encodeNotePathForUrl } from "@/lib/github/repo-path";
 import { useRepos } from "@/lib/github/ReposContext";
+import { useNotifyEntryPainted } from "@/lib/splash/use-notify-entry-painted";
 import { NotesWorkspace } from "@/components/notes/NotesWorkspace";
 
 import type { GithubFileTreeNode } from "@/lib/github/github.types";
@@ -14,6 +15,7 @@ export const RepoPage = () => {
   const { getById } = useRepos();
   const config = getById(repoId);
   const selectedPath = splatPath ? splatPath : null;
+  useNotifyEntryPainted(!!config);
 
   const handleSelectPath = (path: string) => {
     navigate(`/${repoId}/${encodeNotePathForUrl(path)}`);

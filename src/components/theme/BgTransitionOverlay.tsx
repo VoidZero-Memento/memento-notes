@@ -1,7 +1,9 @@
 import { createPortal } from "react-dom";
 
+import { MOBILE_BG_MQ } from "@/lib/bg-photos/constants";
 import { useAnimatedOpen } from "@/lib/dom/use-animated-open";
-import { BG_TRANSITION_EXIT_MS, BG_TRANSITION_HOLD_MS } from "@/lib/prefs/sidebar-bg";
+import { useMediaQuery } from "@/lib/dom/use-media-query";
+import { BG_TRANSITION_EXIT_MS, BG_TRANSITION_HOLD_MS, PC_BG_ENTER_MS, PC_BG_EXIT_MS, PC_BG_HOLD_MS } from "@/lib/prefs/sidebar-bg";
 
 import styles from "./BgTransitionOverlay.module.css";
 
@@ -14,13 +16,18 @@ type BgTransitionOverlayProps = {
 };
 
 export const BgTransitionOverlay = ({ open, crawlProgress = false }: BgTransitionOverlayProps) => {
-  const { mounted, visible } = useAnimatedOpen(open, BG_TRANSITION_EXIT_MS);
+  const isMobile = useMediaQuery(MOBILE_BG_MQ);
+  const pcSettle = !isMobile && !crawlProgress;
+  const holdMs = pcSettle ? PC_BG_HOLD_MS : BG_TRANSITION_HOLD_MS;
+  const exitMs = pcSettle ? PC_BG_EXIT_MS : BG_TRANSITION_EXIT_MS;
+  const { mounted, visible } = useAnimatedOpen(open, exitMs);
 
   if (!mounted || typeof document === "undefined") return null;
 
   const overlayVars = {
-    "--bg-transition-hold-ms": `${BG_TRANSITION_HOLD_MS}ms`,
-    "--bg-transition-exit-ms": `${BG_TRANSITION_EXIT_MS}ms`,
+    "--bg-transition-enter-ms": `${pcSettle ? PC_BG_ENTER_MS : 220}ms`,
+    "--bg-transition-hold-ms": `${holdMs}ms`,
+    "--bg-transition-exit-ms": `${exitMs}ms`,
   } as CSSProperties;
 
   const progressClass = crawlProgress ? styles.progressBarCrawl : styles.progressBarActive;

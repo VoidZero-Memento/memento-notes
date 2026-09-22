@@ -1,6 +1,5 @@
 const OSS_HOST_RE = /\.aliyuncs\.com/i;
 const OSS_BG_PROCESS = "x-oss-process=image/resize,w_720/quality,q_55";
-const OSS_PC_STRIP_PROCESS = "x-oss-process=image/resize,w_1440/quality,q_70/format,webp";
 const OSS_IMMERSE_PROCESS = "x-oss-process=image/resize,l_2560/quality,q_90/format,webp";
 const OSS_GALLERY_PROCESS = "x-oss-process=image/resize,w_1440/quality,q_78/format,webp";
 const OSS_SAT_PROCESS = "x-oss-process=image/resize,w_320/quality,q_58/format,webp";
@@ -28,9 +27,6 @@ const stripOssProcess = (url: string): string => {
 
 /** 背景轮播用低清 OSS 参数，非 OSS 原样返回 */
 export const toBgPhotoUrl = (url: string): string => withOssProcess(url, OSS_BG_PROCESS);
-
-/** PC 并排竖图：约 1/3 屏宽、2x 清晰度 */
-export const toPcStripBgUrl = (url: string): string => withOssProcess(url, OSS_PC_STRIP_PROCESS);
 
 /** 从 start 起取 size 张，清单不足时取全部，绕回不重复 */
 export const takePhotoStrip = (urls: string[], start: number, size: number): string[] => {

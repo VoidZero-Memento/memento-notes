@@ -1,50 +1,28 @@
-import { MOBILE_BG_PREPARE_TIMEOUT_MS, MOBILE_BG_TRANSITION_MIN_MS, PC_BG_STRIP_SIZE, PC_BG_URLS } from "@/lib/bg-photos/constants";
-import { fetchGalleryBannerUrls } from "@/lib/bg-photos/images";
-import { pickNextPhotoIndex, preloadPhoto, sleep, takePhotoStrip, toPcStripBgUrl } from "@/lib/bg-photos/photo-utils";
+import { MOBILE_BG_PREPARE_TIMEOUT_MS, MOBILE_BG_TRANSITION_MIN_MS, PC_PAGE_BG_URL } from "@/lib/bg-photos/constants";
+import { preloadPhoto, sleep } from "@/lib/bg-photos/photo-utils";
 
-export type PreparedPcBg = {
-  urls: string[];
-  strip: string[];
-  index: number;
-};
+let prepared: string | null = null;
 
-let prepared: PreparedPcBg | null = null;
-
-export const takePreparedPcBg = (): PreparedPcBg | null => {
+export const takePreparedPcBg = (): string | null => {
   const next = prepared;
   prepared = null;
   return next;
 };
 
-const fallbackUrls = (): string[] => PC_BG_URLS.map(toPcStripBgUrl);
-
-/**
- * 拉取图集 + 预载首组并排图。PC 开启背景时由 splash 调用。
- */
-export const preparePcBgTransition = async (signal?: AbortSignal): Promise<PreparedPcBg | null> => {
+/** 预载 PC 固定底图。开启背景时由 splash 调用。 */
+export const preparePcBgTransition = async (signal?: AbortSignal): Promise<string | null> => {
   const started = performance.now();
 
   try {
-    const list = await Promise.race([
-      fetchGalleryBannerUrls(signal),
-      sleep(MOBILE_BG_PREPARE_TIMEOUT_MS, signal).then(() => null),
-    ]);
+    await Promise.race([preloadPhoto(PC_PAGE_BG_URL, signal), sleep(MOBILE_BG_PREPARE_TIMEOUT_MS, signal)]);
 
-    const urls = list?.length ? list.map(toPcStripBgUrl) : fallbackUrls();
-    if (signal?.aborted || !urls.length) {
+    if (signal?.aborted) {
       const remain = Math.max(0, MOBILE_BG_TRANSITION_MIN_MS - (performance.now() - started));
       if (remain > 0) await sleep(remain, signal);
       return null;
     }
 
-    const index = pickNextPhotoIndex(urls.length, -1);
-    const strip = takePhotoStrip(urls, index, PC_BG_STRIP_SIZE);
-    await Promise.race([
-      Promise.all(strip.map((url) => preloadPhoto(url, signal))),
-      sleep(MOBILE_BG_PREPARE_TIMEOUT_MS, signal),
-    ]);
-
-    prepared = { urls, strip, index };
+    prepared = PC_PAGE_BG_URL;
 
     const remain = Math.max(0, MOBILE_BG_TRANSITION_MIN_MS - (performance.now() - started));
     if (remain > 0) await sleep(remain, signal);

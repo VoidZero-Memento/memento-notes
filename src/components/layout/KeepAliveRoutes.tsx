@@ -42,9 +42,13 @@ const AlivePane = ({ active, children }: AlivePaneProps) => (
 const NotesRoutes = ({ active, location }: NotesRoutesProps) => {
   const { defaultRepoId, error, loading, retry } = useRepos();
 
-  if (loading) {
+  const redirectingHome = active && !error && !!defaultRepoId && location.pathname === "/";
+
+  if (loading || redirectingHome) {
+    const defaultTo = defaultRepoId ? `/${defaultRepoId}${location.search}` : "/";
     return (
       <NotesShellRoot>
+        {redirectingHome ? <Navigate to={defaultTo} replace /> : null}
         <LoadingState label="加载仓库列表" />
       </NotesShellRoot>
     );

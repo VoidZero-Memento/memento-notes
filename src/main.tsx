@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 
 import { preloadUiCjkFonts } from "@/lib/fonts/preload-ui-cjk";
 import { readStoredSidebarBg } from "@/lib/prefs/sidebar-bg";
-import { dismissSplash, waitAppBgPainted } from "@/lib/splash/splash-gate";
+import { dismissSplash, waitAppBgPainted, waitEntryPainted } from "@/lib/splash/splash-gate";
 import { waitForSplash } from "@/lib/splash/wait-splash";
 import { applyTheme, readStoredTheme } from "@/lib/theme/theme";
 import App from "./App";
@@ -26,7 +26,7 @@ const mount = () => {
 mount();
 
 if (readStoredSidebarBg()) {
-  void Promise.all([waitForSplash(), waitAppBgPainted()]).then(dismissSplash);
+  void Promise.all([waitForSplash(), waitAppBgPainted(), waitEntryPainted()]).then(dismissSplash);
 } else {
   dismissSplash();
 }

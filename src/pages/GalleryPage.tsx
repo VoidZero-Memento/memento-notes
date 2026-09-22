@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 import { useGalleryGate } from "@/lib/gallery/use-gallery-gate";
 import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
+import { useNotifyEntryPainted } from "@/lib/splash/use-notify-entry-painted";
 
 import { GalleryGate } from "@/components/gallery/GalleryGate";
 import { GalleryHall } from "@/components/gallery/GalleryHall";
@@ -9,6 +10,7 @@ import { GalleryHall } from "@/components/gallery/GalleryHall";
 export const GalleryPage = () => {
   const { unlocked, unlock } = useGalleryGate();
   const alive = useKeepAliveActive();
+  useNotifyEntryPainted();
 
   useEffect(() => {
     if (!alive) return;

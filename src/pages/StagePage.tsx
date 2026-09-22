@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 import { useStageGate } from "@/lib/gallery/use-gallery-gate";
 import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
+import { useNotifyEntryPainted } from "@/lib/splash/use-notify-entry-painted";
 
 import { GalleryGate } from "@/components/gallery/GalleryGate";
 import { GalleryStage } from "@/components/gallery/GalleryStage";
@@ -9,6 +10,7 @@ import { GalleryStage } from "@/components/gallery/GalleryStage";
 export const StagePage = () => {
   const { unlocked, unlock } = useStageGate();
   const alive = useKeepAliveActive();
+  useNotifyEntryPainted();
 
   useEffect(() => {
     if (!alive) return;

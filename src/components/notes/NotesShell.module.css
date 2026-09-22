@@ -168,13 +168,11 @@
     gap 0.36s ease,
     opacity 0.24s ease,
     box-shadow 0.4s ease,
-    background 0.32s ease,
-    backdrop-filter 0.4s ease,
-    -webkit-backdrop-filter 0.4s ease,
+    background 0.45s cubic-bezier(0.4, 0, 0.2, 1),
     visibility 0s linear 0s;
 }
 
-/* 桌面：整页正文底图（滑板人物略偏左下）；侧栏另铺独立背景图 */
+/* 桌面：整页正文底图，与加载页同一张、同一裁切 */
 .rootBgEnabled::before {
   content: "";
   position: absolute;
@@ -188,8 +186,8 @@
       rgba(4, 7, 14, 0.08) 42%,
       rgba(4, 7, 14, 0.16) 100%
     ),
-    url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background1.png")
-      40% 90% / cover no-repeat;
+    url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background.png")
+      center center / cover no-repeat;
   filter: saturate(1) brightness(0.96);
 }
 
