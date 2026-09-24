@@ -100,7 +100,12 @@ export const AppBgProvider = ({ children }: AppBgProviderProps) => {
                 onReady={() => setReady(true)}
               />
             ) : (
-              <PcBgCarousel ref={pcRef} immersive={immersive} onReady={() => setReady(true)} />
+              <PcBgCarousel
+                ref={pcRef}
+                looping={loopingNow}
+                immersive={immersive}
+                onReady={() => setReady(true)}
+              />
             )}
           </Suspense>
         </div>

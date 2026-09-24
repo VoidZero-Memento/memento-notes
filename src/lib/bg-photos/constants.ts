@@ -9,7 +9,7 @@ export const ossFolderJsonUrl = (folder: string): string =>
 /** 手机背景轮播间隔 */
 export const MOBILE_BG_INTERVAL_MS = 10_000;
 
-/** PC 加载页与正文底同一张 */
+/** PC 加载页 / 开启过渡蒙层；正文底改为图集循环，不再用这张 */
 export const PC_PAGE_BG_URL = "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background.png";
 
 /** 侧栏 / 手机菜单独立底图轮播间隔 */

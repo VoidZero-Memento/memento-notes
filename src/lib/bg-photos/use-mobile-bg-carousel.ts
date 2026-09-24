@@ -22,7 +22,8 @@ type UseMobileBgCarouselOptions = {
 };
 
 /**
- * 仅应在手机端且背景开启时挂载本 hook（由父组件条件渲染保证）。
+ * 图集轮播。手机全屏与 PC 居中模糊两侧共用切图，展示各自负责。
+ * 仅在对应端背景层挂载时调用。
  */
 export const useMobileBgCarousel = ({ looping, preloadSharp = false }: UseMobileBgCarouselOptions) => {
   const { folder } = useOssFolder();

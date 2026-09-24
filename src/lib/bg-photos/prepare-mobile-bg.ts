@@ -22,7 +22,7 @@ export const takePreparedMobileBg = (): { url: string; index: number } | null =>
 
 /**
  * 拉取当前图集清单 + 预加载首张图，总耗时不少于 MIN_MS。
- * 仅应在手机端、开启背景时调用。
+ * 手机全屏与 PC 居中模糊两侧共用这份首图；展示各自负责。
  */
 export const prepareMobileBgTransition = async (signal?: AbortSignal): Promise<PreparedMobileBg | null> => {
   const started = performance.now();
