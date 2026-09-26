@@ -22,7 +22,7 @@ type UseMobileBgCarouselOptions = {
 };
 
 /**
- * 图集轮播。手机全屏与 PC 居中模糊两侧共用切图，展示各自负责。
+ * 图集轮播。手机全屏与 PC 羽化竖幅共用切图，展示各自负责。
  * 仅在对应端背景层挂载时调用。
  */
 export const useMobileBgCarousel = ({ looping, preloadSharp = false }: UseMobileBgCarouselOptions) => {

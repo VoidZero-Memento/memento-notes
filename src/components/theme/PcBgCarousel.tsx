@@ -29,15 +29,16 @@ type CarouselSlotProps = {
 
 const CarouselSlot = ({ url, visible, onPainted }: CarouselSlotProps) => {
   const fillRef = useRef<HTMLImageElement>(null);
+  const portraitRef = useRef<HTMLImageElement>(null);
   const sharpUrl = toImmersiveBgUrl(url);
   const showSharp = sharpUrl !== url;
 
   useLayoutEffect(() => {
     if (!visible) return;
-    const img = fillRef.current;
-    if (!img) return;
+    const imgs = [fillRef.current, portraitRef.current].filter((img) => img != null);
+    if (!imgs.length) return;
     let cancelled = false;
-    void waitImgElementPainted(img).then(() => {
+    void Promise.all(imgs.map((img) => waitImgElementPainted(img))).then(() => {
       if (!cancelled) onPainted?.();
     });
     return () => {
@@ -48,14 +49,18 @@ const CarouselSlot = ({ url, visible, onPainted }: CarouselSlotProps) => {
   return (
     <div className={`${styles.slot}${visible ? ` ${styles.slotVisible}` : ""}`}>
       <img ref={fillRef} className={styles.fill} src={url} alt="" decoding="async" />
-      <img className={styles.portrait} src={url} alt="" decoding="async" />
-      {showSharp ? <img className={styles.portraitSharp} src={sharpUrl} alt="" decoding="async" /> : null}
+      <div className={styles.portraitFrame}>
+        <div className={styles.portraitMask}>
+          <img ref={portraitRef} className={styles.portrait} src={url} alt="" decoding="async" />
+          {showSharp ? <img className={styles.portraitSharp} src={sharpUrl} alt="" decoding="async" /> : null}
+        </div>
+      </div>
       <div className={styles.veil} />
     </div>
   );
 };
 
-/** PC 正文底：与手机同一图集循环。中间保持原比例，左右同图放大模糊铺满。 */
+/** PC 正文底：视口居中的清晰竖图，左右羽化进同图轻模糊，两侧等宽。 */
 export const PcBgCarousel = ({ looping, immersive, onReady, ref }: PcBgCarouselProps) => {
   const { slotA, slotB, advance, ready, skipBoot } = useMobileBgCarousel({ looping, preloadSharp: true });
   const onReadyRef = useRef(onReady);
