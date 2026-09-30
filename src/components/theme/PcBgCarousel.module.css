@@ -4,12 +4,9 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  filter: saturate(1) brightness(0.96);
-  transition: filter var(--immersive-ms, 420ms) cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.immersive {
-  filter: saturate(1) brightness(1);
+  /* 清屏只让遮罩退场，避免给整张大图插值 filter 而触发重绘。 */
+  contain: paint;
+  transform: translateZ(0);
 }
 
 .slot {
@@ -36,8 +33,9 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-  transform: translate(-50%, -50%) scale(1.12);
-  filter: blur(28px) saturate(1.06) brightness(0.86);
+  transform: translate3d(-50%, -50%, 0) scale(1.12);
+  filter: blur(24px) saturate(1.06) brightness(0.86);
+  backface-visibility: hidden;
 }
 
 /* 视口正中的清晰海报，投影贴在模糊底上，左右羽化 */
@@ -47,8 +45,9 @@
   bottom: 0;
   left: 50%;
   z-index: 2;
-  transform: translateX(-50%);
+  transform: translate3d(-50%, 0, 0);
   filter: drop-shadow(0 18px 48px rgba(0, 0, 0, 0.42));
+  backface-visibility: hidden;
 }
 
 .portraitMask {
@@ -84,6 +83,7 @@
     rgba(4, 7, 14, 0.16) 100%
   );
   transition: opacity var(--immersive-ms, 420ms) cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity;
 }
 
 .immersive .veil {
@@ -93,8 +93,7 @@
 @media (prefers-reduced-motion: reduce) {
   .root,
   .slot,
-  .veil,
-  .immersive {
+  .veil {
     transition: none;
   }
 }
