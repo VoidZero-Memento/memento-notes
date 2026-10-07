@@ -1,3 +1,6 @@
+import { dismissSplashDomino } from "@/lib/splash/splash-domino";
+import { requestSplashHandoff } from "@/lib/splash/splash-handoff";
+
 let painted = false;
 const waiters: Array<() => void> = [];
 
@@ -39,40 +42,31 @@ const removeSplash = () => {
   document.getElementById("app-splash")?.remove();
 };
 
-/** 与 index.html PC 退场时长一致：先收回漂移，再把整层淡进正文 */
-const PC_SPLASH_SETTLE_MS = 760;
+/** 与 index.html 退场时长一致 */
 const PC_SPLASH_DISSOLVE_DELAY_MS = 700;
 const PC_SPLASH_DISSOLVE_MS = 880;
-
-const identityOf = (frozen: string) =>
-  frozen.includes("matrix3d")
-    ? "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)"
-    : "matrix(1, 0, 0, 1, 0, 0)";
+const MOBILE_SPLASH_FADE_MS = 520;
 
 const freezeMotion = (el: Element | null) => {
-  if (!(el instanceof HTMLElement)) return null;
+  if (!(el instanceof HTMLElement)) return;
   const computed = getComputedStyle(el);
-  const frozen = computed.transform;
-  const opacity = computed.opacity;
+  const { transform, opacity } = computed;
   el.style.animation = "none";
   el.style.opacity = opacity;
-  el.style.transform = frozen;
-  return el;
+  el.style.transform = transform;
 };
 
-const dismissSplashPc = (splash: HTMLElement) => {
-  const stage = freezeMotion(splash.querySelector(".splash-stage"));
-  const motion = freezeMotion(splash.querySelector(".splash-banners"));
-  void splash.offsetWidth;
-  const transition = `transform ${PC_SPLASH_SETTLE_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`;
-  for (const el of [stage, motion]) {
-    if (!el) continue;
-    const frozen = el.style.transform;
-    if (!frozen || frozen === "none") continue;
-    el.style.transition = transition;
-    el.style.transform = identityOf(frozen);
-  }
+const watchOpacityEnd = (splash: HTMLElement, finish: () => void) => {
+  splash.addEventListener("transitionend", (event) => {
+    if (event.target !== splash || event.propertyName !== "opacity") return;
+    finish();
+  });
+};
 
+const dismissSplashPcFallback = (splash: HTMLElement) => {
+  freezeMotion(splash.querySelector(".splash-stage"));
+  freezeMotion(splash.querySelector(".splash-banners"));
+  void splash.offsetWidth;
   splash.classList.add("is-leave");
 
   let settled = false;
@@ -87,11 +81,32 @@ const dismissSplashPc = (splash: HTMLElement) => {
     splash.classList.add("is-dissolve");
   }, PC_SPLASH_DISSOLVE_DELAY_MS);
 
-  splash.addEventListener("transitionend", (event) => {
-    if (event.target !== splash || event.propertyName !== "opacity") return;
-    finish();
-  });
+  watchOpacityEnd(splash, finish);
   window.setTimeout(finish, PC_SPLASH_DISSOLVE_DELAY_MS + PC_SPLASH_DISSOLVE_MS + 120);
+};
+
+const dismissSplashPc = (splash: HTMLElement) => {
+  if (dismissSplashDomino(splash, removeSplash)) return;
+  dismissSplashPcFallback(splash);
+};
+
+const dismissSplashMobile = async (splash: HTMLElement) => {
+  splash.dataset.leaving = "1";
+  const banner = splash.querySelector<HTMLImageElement>(".splash-banner.is-on");
+  const url = banner?.currentSrc || banner?.src;
+  if (url) await requestSplashHandoff(url);
+  if (!splash.isConnected) return;
+
+  let settled = false;
+  const finish = () => {
+    if (settled) return;
+    settled = true;
+    removeSplash();
+  };
+  splash.style.transitionDuration = `${MOBILE_SPLASH_FADE_MS}ms`;
+  splash.classList.add("is-leave");
+  watchOpacityEnd(splash, finish);
+  window.setTimeout(finish, MOBILE_SPLASH_FADE_MS + 80);
 };
 
 export const dismissSplash = () => {
@@ -109,16 +124,5 @@ export const dismissSplash = () => {
     dismissSplashPc(splash);
     return;
   }
-  let settled = false;
-  const finish = () => {
-    if (settled) return;
-    settled = true;
-    removeSplash();
-  };
-  splash.classList.add("is-leave");
-  splash.addEventListener("transitionend", (event) => {
-    if (event.target !== splash || event.propertyName !== "opacity") return;
-    finish();
-  });
-  window.setTimeout(finish, 360);
+  void dismissSplashMobile(splash);
 };

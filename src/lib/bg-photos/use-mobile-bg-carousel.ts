@@ -6,6 +6,7 @@ import { pickNextPhotoIndex, preloadPhoto, toBgPhotoUrl, toImmersiveBgUrl } from
 import { takePreparedMobileBg } from "@/lib/bg-photos/prepare-mobile-bg";
 import { runBgCrossfade } from "@/lib/bg-photos/run-bg-crossfade";
 import { useOssFolder } from "@/lib/bg-photos/useOssFolder";
+import { subscribeSplashHandoff } from "@/lib/splash/splash-handoff";
 
 import type { BgPhotoSlot } from "@/lib/bg-photos/bg-photos.types";
 import type { BgCrossfadeRefs } from "@/lib/bg-photos/run-bg-crossfade";
@@ -47,6 +48,7 @@ export const useMobileBgCarousel = ({ looping, preloadSharp = false }: UseMobile
   const intervalRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
   const hadPreparedRef = useRef(!!prepared);
+  const handedOffRef = useRef(false);
   const folderRef = useRef(folder);
   const reducedRef = useRef(false);
   const preloadSharpRef = useRef(preloadSharp);
@@ -107,6 +109,11 @@ export const useMobileBgCarousel = ({ looping, preloadSharp = false }: UseMobile
       const urls = photoUrls.length ? photoUrls : [MOBILE_BG_FALLBACK_URL];
       urlsRef.current = urls;
 
+      if (handedOffRef.current && !folderChanged) {
+        armInterval();
+        return;
+      }
+
       if (!shouldReveal) {
         if (lastIndexRef.current < 0) lastIndexRef.current = 0;
         armInterval();
@@ -158,6 +165,28 @@ export const useMobileBgCarousel = ({ looping, preloadSharp = false }: UseMobile
       abort.abort();
     };
   }, [armInterval, folder]);
+
+  useEffect(() => {
+    const abort = new AbortController();
+    const unsubscribe = subscribeSplashHandoff((url, done) => {
+      void preloadPhoto(url, abort.signal).then(() => {
+        if (abort.signal.aborted) {
+          done();
+          return;
+        }
+        handedOffRef.current = true;
+        lastIndexRef.current = -1;
+        activeIsARef.current = true;
+        setSlotA({ url, visible: true });
+        setSlotB(emptySlot());
+        requestAnimationFrame(() => requestAnimationFrame(done));
+      });
+    });
+    return () => {
+      abort.abort();
+      unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     if (!looping) {

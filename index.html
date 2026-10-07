@@ -18,7 +18,7 @@
         if (document.documentElement.dataset.splash !== "1") return;
         var pc = window.matchMedia("(min-width: 861px)").matches;
         var urls = pc
-          ? ["https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background.png"]
+          ? ["https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background2.png"]
           : [
               "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background1.png",
               "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background2.png",
@@ -115,6 +115,7 @@
       #app-splash .splash-banners {
         position: absolute;
         inset: 0;
+        z-index: 0;
         overflow: hidden;
         transform-origin: 50% 40%;
         animation: splashDrift 16s ease-in-out infinite alternate;
@@ -145,6 +146,7 @@
       #app-splash .splash-veil {
         position: absolute;
         inset: 0;
+        z-index: 2;
         pointer-events: none;
         background: linear-gradient(
           180deg,
@@ -176,6 +178,7 @@
         left: 0;
         right: 0;
         bottom: 0;
+        z-index: 2;
         display: flex;
         justify-content: center;
         padding: max(40px, 8svh) 20px
@@ -413,10 +416,10 @@
 
       @keyframes splashDriftPc {
         0% {
-          transform: scale(1.06);
+          transform: scale(1.5) translate(0, -14%);
         }
         100% {
-          transform: scale(1.12);
+          transform: scale(1.58) translate(0, -14%);
         }
       }
 
@@ -457,7 +460,7 @@
 
         #app-splash .splash-banners {
           z-index: 0;
-          transform-origin: 50% 50%;
+          transform-origin: 42% 60%;
           animation: splashDriftPc 4.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
           will-change: transform;
         }
@@ -496,11 +499,21 @@
           opacity: 1;
           transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
         }
+
+        #app-splash.is-domino .splash-veil-rest {
+          display: none;
+        }
       }
 
       @media (max-width: 860px) {
+        #app-splash .splash-banners {
+          animation: none;
+          transform: none;
+        }
+
         #app-splash .splash-banner {
-          object-position: center top;
+          object-position: center center;
+          filter: saturate(1) brightness(0.96);
         }
 
         #app-splash .splash-panel {
@@ -758,7 +771,8 @@
             preloadUrl(urls[(index + 1) % urls.length]);
 
             var alive = function () {
-              return !!document.getElementById("app-splash");
+              var splash = document.getElementById("app-splash");
+              return !!splash && !splash.hasAttribute("data-leaving");
             };
 
             var loop = function () {

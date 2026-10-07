@@ -1,1 +1,1 @@
-export type OssFolderId = "all" | "fav" | "boots" | "heels" | "sneakers" | "cutes" | "misc" | "xiamo";
+export type OssFolderId = "all" | "fav" | "boots" | "heels" | "effex" | "sneakers" | "cutes" | "misc" | "xiamo";

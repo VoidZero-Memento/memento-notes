@@ -5,6 +5,10 @@
   overflow: hidden;
   border-radius: inherit;
   pointer-events: none;
+  /* 供前景图用 cqw / cqh 按容器尺寸计算宽度 */
+  container-type: size;
+  /* 竖图允许左右各裁掉 (1 - 1/zoom)/2 以内，换取更少的模糊留白 */
+  --photo-max-zoom: 1.25;
 }
 
 .slot {
@@ -19,20 +23,50 @@
   opacity: 1;
 }
 
-.photo {
+/* 模糊底图：同图 cover 铺满，只负责填充前景图之外的留白 */
+.backdrop {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 30% 100%;
-  filter: saturate(0.82) brightness(0.82);
+  object-position: center;
+  transform: scale(1.2);
+  filter: blur(20px) saturate(1) brightness(0.8);
 }
 
-@media (max-width: 860px) {
-  .photo {
-    object-position: left center;
-    filter: saturate(0.7) brightness(0.72);
-  }
+/* 前景图：宽度 = min(最多放大 1.25 倍填满容器宽, 刚好完整放进容器高)；
+   既不比 contain 更窄，也不会超出容器高度，靠上居中，下沿渐隐融入模糊底图 */
+.photoContain {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: block;
+  width: min(calc(100cqw * var(--photo-max-zoom)), calc(100cqh * var(--photo-ratio)));
+  height: auto;
+  max-width: none;
+  transform: translateX(-50%);
+  mask-image: linear-gradient(to bottom, #000 0, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 92%, transparent 100%);
+}
+
+/* 尺寸未知前先隐藏，避免按原始大小闪一帧 */
+.photoPending {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+}
+
+/* 方图 / 横图回退：整幅 cover 居中 */
+.photoCover {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -24,7 +24,8 @@ type ImmersiveLayerProps = {
   /** 右上角「背景」入口；仅笔记空态需要，展台/画廊关掉 */
   showEnter?: boolean;
   onImmersiveChange?: (immersive: boolean) => void;
-  onClearTap?: () => void;
+  /** 清屏状态下点击空白；clientX 供 PC 图墙定位被点中的那一格 */
+  onClearTap?: (clientX: number) => void;
   className?: string;
   style?: CSSProperties;
   background?: ReactNode;
@@ -155,7 +156,7 @@ export const ImmersiveLayer = ({
               tabIndex={immersive ? 0 : -1}
               aria-hidden={!immersive}
               aria-label="切换背景图"
-              onClick={(event) => stopAnd(event, () => onClearTap?.())}
+              onClick={(event) => stopAnd(event, () => onClearTap?.(event.clientX))}
             />
             <button
               type="button"

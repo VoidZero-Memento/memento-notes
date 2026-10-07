@@ -1,9 +1,13 @@
+/* PC 图墙：N 列等分铺满，交界处渐隐重叠，无模糊 / 阴影底层 */
 .root {
+  /* 图未加载时的兜底底色：偏暖的灰蓝渐变，不用纯黑；倒牌过程中底层始终是图，不会露出 */
+  --pc-wall-seam: linear-gradient(160deg, #6b7287 0%, #4a5166 48%, #343a4d 100%);
   position: absolute;
   inset: 0;
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
+  background: var(--pc-wall-seam);
   filter: saturate(1) brightness(0.96);
   transition: filter var(--immersive-ms, 420ms) cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -12,70 +16,100 @@
   filter: saturate(1) brightness(1);
 }
 
+.wall {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+ * 交界柔化：名义等分格宽 w = 100% / cols。第 i 格（i ≥ 1）左边向左多铺 f（--pc-wall-feather，
+ * 由 tsx 按 min(格宽 × 0.22, 96px) 算出）：left = i·w - f，width = w + f，后一格在 DOM 里靠后、盖在前一格上。
+ * 前一格保持完全不透明；后一格左边 f 宽度用 mask 从透明缓动渐显到不透明，形成交叉渐隐，
+ * 下面始终是前一格的图，所以不露底色、没有硬线。第 0 格 f = 0、无 mask；最右格右边 = 屏幕边缘（直边）。
+ * mask 静态，不随 immersive 变化，不过渡。
+ */
+.tile {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--pc-wall-i, 0) * 100% / var(--pc-wall-cols, 1) - var(--pc-wall-feather, 0px));
+  width: calc(100% / var(--pc-wall-cols, 1) + var(--pc-wall-feather, 0px));
+  overflow: hidden;
+  /* 每格独立层叠：第 0 格没有 mask，不加这行时它内部 slot 的 z-index 会漏出来盖住第 1 格的渐隐区 */
+  isolation: isolate;
+  background: var(--pc-wall-seam);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    rgba(0, 0, 0, 0.25) calc(var(--pc-wall-feather, 0px) * 0.35),
+    rgba(0, 0, 0, 0.75) calc(var(--pc-wall-feather, 0px) * 0.65),
+    #000 var(--pc-wall-feather, 0px)
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    rgba(0, 0, 0, 0.25) calc(var(--pc-wall-feather, 0px) * 0.35),
+    rgba(0, 0, 0, 0.75) calc(var(--pc-wall-feather, 0px) * 0.65),
+    #000 var(--pc-wall-feather, 0px)
+  );
+}
+
+.tile:first-child {
+  --pc-wall-feather: 0px;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/*
+ * 倒牌：每格两层，底层是已就位的新图（静止），上层是旧图这块「牌」。
+ * 旧牌以底边中点为轴，顶部向屏幕里倒下（rotateX 为正 = 顶部远离观看者，只缩小不放大，不会溢出到邻格），
+ * 倒下时变暗（brightness）增加立体感；角度过 90° 后 backface-visibility 使其消失，底层新图全程在格子里，不露底色。
+ * perspective 写在每个 slot 的 transform 里，不放整墙，避免整墙透视歪斜；will-change 常驻，不随 immersive 切换。
+ *
+ * 相位：wait = 底层（z 低、静止，被上层牌盖住）；front = 上层牌（0°）；
+ * gone = 倒下中/倒下后（z 最高、rotateX 到头）。wait 与 front 的 transform/filter 完全相同，
+ * 倒完后「新图 wait → front」换相位无任何视觉变化，也无过渡。
+ */
 .slot {
   position: absolute;
   inset: 0;
-  opacity: 0;
-  background: #12151c;
-  transition: opacity var(--pc-bg-fade-ms, 1400ms) cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity;
-}
-
-.slotVisible {
-  opacity: 1;
-}
-
-/* 同图铺满，轻模糊，外扩挡住发白边缘 */
-.fill {
-  position: absolute;
-  top: 50%;
-  left: 50%;
   z-index: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-origin: 50% 100%;
+  transform: perspective(1200px) rotateX(0deg);
+  filter: brightness(1);
+  will-change: transform;
+}
+
+.slotFront {
+  z-index: 1;
+}
+
+.slotGone {
+  z-index: 2;
+  transform: perspective(1200px) rotateX(100deg);
+  filter: brightness(0.55);
+  /* 前慢后快，像重力倒下 */
+  transition:
+    transform var(--pc-wall-flip-ms, 650ms) cubic-bezier(0.55, 0, 0.8, 0.4),
+    filter var(--pc-wall-flip-ms, 650ms) cubic-bezier(0.55, 0, 0.8, 0.4);
+}
+
+.img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
-  transform: translate(-50%, -50%) scale(1.12);
-  filter: blur(28px) saturate(1.06) brightness(0.86);
+  user-select: none;
 }
 
-/* 视口正中的清晰海报，投影贴在模糊底上，左右羽化 */
-.portraitFrame {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  z-index: 2;
-  transform: translateX(-50%);
-  filter: drop-shadow(0 18px 48px rgba(0, 0, 0, 0.42));
-}
-
-.portraitMask {
-  position: relative;
-  height: 100%;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 16%, #000 84%, transparent 100%);
-  mask-image: linear-gradient(90deg, transparent 0%, #000 16%, #000 84%, transparent 100%);
-}
-
-.portrait,
-.portraitSharp {
-  display: block;
-  height: 100%;
-  width: auto;
-  max-width: none;
-}
-
-.portraitSharp {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-
+/* 平时压暗让界面可读；清屏时淡出，与 filter / 磨砂 / 界面同时长同曲线 */
 .veil {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   opacity: 1;
   background: linear-gradient(
     180deg,
@@ -92,7 +126,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .root,
-  .slot,
+  .slotGone,
   .veil,
   .immersive {
     transition: none;

@@ -73,9 +73,9 @@ export const AppBgProvider = ({ children }: AppBgProviderProps) => {
     return () => window.clearTimeout(id);
   }, [leaving]);
 
-  const advance = useCallback(() => {
+  const advance = useCallback((clientX?: number) => {
     mobileRef.current?.advance();
-    pcRef.current?.advance();
+    pcRef.current?.advance(clientX);
   }, []);
 
   const value = useMemo<AppBgContextValue>(

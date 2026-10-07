@@ -5,8 +5,10 @@
 }
 
 .chip {
-  flex: 1 1 calc(25% - 6px);
+  flex: 1 1 calc(33.333% - 6px);
   min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   border: none;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.04);

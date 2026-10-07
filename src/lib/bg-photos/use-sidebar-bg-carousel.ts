@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { MOBILE_BG_FADE_MS, MOBILE_BG_FALLBACK_URL, SIDEBAR_BG_INTERVAL_MS } from "@/lib/bg-photos/constants";
 import { fetchGalleryBannerUrls, getCachedGalleryBannerUrls } from "@/lib/bg-photos/images";
-import { pickNextPhotoIndex, preloadPhoto, toBgPhotoUrl } from "@/lib/bg-photos/photo-utils";
+import { pickNextPhotoIndex, preloadPhoto, toSidebarPhotoUrl } from "@/lib/bg-photos/photo-utils";
 import { runBgCrossfade } from "@/lib/bg-photos/run-bg-crossfade";
 import { useOssFolder } from "@/lib/bg-photos/useOssFolder";
 
@@ -74,7 +74,7 @@ export const useSidebarBgCarousel = ({ looping }: UseSidebarBgCarouselOptions) =
 
     const startCarousel = (photoUrls: string[]) => {
       if (gen !== generationRef.current) return;
-      const urls = photoUrls.length ? photoUrls : [toBgPhotoUrl(MOBILE_BG_FALLBACK_URL)];
+      const urls = photoUrls.length ? photoUrls : [toSidebarPhotoUrl(MOBILE_BG_FALLBACK_URL)];
       urlsRef.current = urls;
 
       if (folderChanged && lastIndexRef.current >= 0) {
@@ -104,12 +104,12 @@ export const useSidebarBgCarousel = ({ looping }: UseSidebarBgCarouselOptions) =
 
     const cached = getCachedGalleryBannerUrls();
     if (cached?.length) {
-      startCarousel(cached.map(toBgPhotoUrl));
+      startCarousel(cached.map(toSidebarPhotoUrl));
     } else {
       void fetchGalleryBannerUrls(abort.signal)
         .then((list) => {
           if (abort.signal.aborted || gen !== generationRef.current) return;
-          startCarousel(list.map(toBgPhotoUrl));
+          startCarousel(list.map(toSidebarPhotoUrl));
         })
         .catch(() => {
           if (abort.signal.aborted || gen !== generationRef.current) return;
