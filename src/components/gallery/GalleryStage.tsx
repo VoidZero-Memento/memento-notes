@@ -2,7 +2,7 @@ import { useCallback, useLayoutEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { waitImgElementPainted } from "@/lib/bg-photos/photo-utils";
-import { GALLERY_BACKDROP_MS, GALLERY_FADE_MS, GALLERY_MAT_GAP } from "@/lib/gallery/constants";
+import { GALLERY_BACKDROP_MS, GALLERY_EFFECT_MS, GALLERY_MAT_GAP } from "@/lib/gallery/constants";
 import { fitFrameSize } from "@/lib/gallery/fit-frame";
 import { useGalleryArtBox } from "@/lib/gallery/use-gallery-art-box";
 import { useGalleryChrome } from "@/lib/gallery/use-gallery-chrome";
@@ -145,6 +145,7 @@ export const GalleryStage = () => {
   const {
     status,
     error,
+    effect,
     slotA,
     slotB,
     backdropA,
@@ -174,10 +175,13 @@ export const GalleryStage = () => {
   );
 
   const fadeVars = {
-    "--gallery-fade-ms": `${GALLERY_FADE_MS}ms`,
+    "--gallery-fade-ms": `${GALLERY_EFFECT_MS[effect]}ms`,
     "--gallery-backdrop-ms": `${GALLERY_BACKDROP_MS}ms`,
     "--gallery-mat": `${GALLERY_MAT_GAP}px`,
   } as CSSProperties;
+
+  /** 位移 / 立方体翻转以画布整宽为基准，与左侧背景图的整面切换一致 */
+  const canvasVars = { "--gallery-w": `${maxBox.width + GALLERY_MAT_GAP * 2}px` } as CSSProperties;
 
   const handleTap = () => {
     if (status === "error") {
@@ -220,7 +224,7 @@ export const GalleryStage = () => {
       }
     >
       <div className={styles.well}>
-        <div className={styles.canvas} ref={canvasRef}>
+        <div className={styles.canvas} ref={canvasRef} data-effect={effect} style={canvasVars}>
           {maxBox.width > 0 ? (
             <>
               <ShotCard slot={slotA} maxBox={maxBox} onPainted={onSlotPainted} />

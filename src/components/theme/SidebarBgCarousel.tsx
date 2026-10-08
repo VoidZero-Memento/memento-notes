@@ -54,14 +54,11 @@ const CarouselSlot = ({ url, visible, token }: CarouselSlotProps) => {
 
   return (
     <div className={`${styles.slot} ${phaseClass}`} style={slotStyle}>
-      {ratio === null || isCover ? (
-        <img ref={imgRef} className={photoClass} src={url} alt="" decoding="async" onLoad={syncRatio} />
-      ) : (
-        <>
-          <img className={styles.backdrop} src={toSidebarBackdropUrl(url)} alt="" decoding="async" />
-          <img ref={imgRef} className={photoClass} src={url} alt="" decoding="async" onLoad={syncRatio} />
-        </>
+      {/* 前景图固定 key：ratio 就绪后只改 class，不卸载重建，避免原图二次解码造成抖动 */}
+      {ratio === null || isCover ? null : (
+        <img key="backdrop" className={styles.backdrop} src={toSidebarBackdropUrl(url)} alt="" decoding="async" />
       )}
+      <img key="photo" ref={imgRef} className={photoClass} src={url} alt="" decoding="async" onLoad={syncRatio} />
     </div>
   );
 };

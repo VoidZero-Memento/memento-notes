@@ -126,7 +126,7 @@
   transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  will-change: opacity;
+  will-change: opacity, transform;
   transition: opacity var(--gallery-fade-ms, 720ms) linear;
 }
 
@@ -143,6 +143,113 @@
 .cardShow {
   z-index: 2;
   opacity: 1;
+}
+
+/* ---- 切换动画：与左侧菜单「切换动画」同款，由 canvas 的 data-effect 决定，fade 即上面的默认溶解 ----
+   待入场（cardEnter）一律 transition: none，复用卡槽时不会把上一次离场动画倒放出来 */
+
+/* 左右滑动：相框（rim / mark）原地不动，只在框内推入新图、推出旧图；
+   尺寸不同的新旧相框原地交叉淡化，图片被 .stage 的 overflow: hidden 裁在框内 */
+.canvas[data-effect="slide"] .card {
+  opacity: 1;
+  transition: none;
+}
+
+.canvas[data-effect="slide"] .rim,
+.canvas[data-effect="slide"] .mark {
+  transition: opacity var(--gallery-fade-ms) ease;
+}
+
+.canvas[data-effect="slide"] .photo {
+  transition: transform var(--gallery-fade-ms) cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.canvas[data-effect="slide"] .cardEnter .rim,
+.canvas[data-effect="slide"] .cardEnter .mark {
+  opacity: 0;
+  transition: none;
+}
+
+.canvas[data-effect="slide"] .cardEnter .photo {
+  transform: translate3d(100%, 0, 0);
+  transition: none;
+}
+
+.canvas[data-effect="slide"] .cardShow .rim,
+.canvas[data-effect="slide"] .cardShow .mark {
+  opacity: 1;
+}
+
+.canvas[data-effect="slide"] .cardShow .photo {
+  transform: translate3d(0, 0, 0);
+}
+
+.canvas[data-effect="slide"] .cardLeave .rim,
+.canvas[data-effect="slide"] .cardLeave .mark {
+  opacity: 0;
+}
+
+.canvas[data-effect="slide"] .cardLeave .photo {
+  transform: translate3d(-100%, 0, 0);
+}
+
+/* 3D 立方体翻转：新旧图是立方体相邻两面，绕深度 -½ 画布宽的竖轴同步转 90° */
+.canvas[data-effect="flip"] {
+  perspective: calc(var(--gallery-w, 900px) * 1.6);
+}
+
+.canvas[data-effect="flip"] .card {
+  transition:
+    transform var(--gallery-fade-ms) cubic-bezier(0.65, 0, 0.35, 1),
+    opacity var(--gallery-fade-ms) cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* 侧着的面（待入场 / 离场完成）必须 visibility: hidden，否则透视下会在两侧露出一条窄边 */
+.canvas[data-effect="flip"] .cardEnter {
+  visibility: hidden;
+  opacity: 0.25;
+  transform: translateZ(calc(var(--gallery-w, 0px) / -2)) rotateY(90deg) translateZ(calc(var(--gallery-w, 0px) / 2));
+  transition: none;
+}
+
+.canvas[data-effect="flip"] .cardShow {
+  visibility: visible;
+  opacity: 1;
+  transform: translateZ(calc(var(--gallery-w, 0px) / -2)) rotateY(0deg) translateZ(calc(var(--gallery-w, 0px) / 2));
+}
+
+.canvas[data-effect="flip"] .cardLeave {
+  /* 动画期间保持可见，结束瞬间再隐藏 */
+  visibility: hidden;
+  opacity: 0.25;
+  transform: translateZ(calc(var(--gallery-w, 0px) / -2)) rotateY(-90deg) translateZ(calc(var(--gallery-w, 0px) / 2));
+  transition:
+    transform var(--gallery-fade-ms) cubic-bezier(0.65, 0, 0.35, 1),
+    opacity var(--gallery-fade-ms) cubic-bezier(0.65, 0, 0.35, 1),
+    visibility 0s linear var(--gallery-fade-ms);
+}
+
+/* 旋转缩放：新图从放大 + 倾斜处旋转落位并溶入，旧图反向旋转溶出 */
+.canvas[data-effect="spin"] .card {
+  transition:
+    transform var(--gallery-fade-ms) cubic-bezier(0.22, 1, 0.36, 1),
+    opacity var(--gallery-fade-ms) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.canvas[data-effect="spin"] .cardEnter {
+  opacity: 0.001;
+  transform: rotate(-14deg) scale(1.4);
+  transition: none;
+}
+
+.canvas[data-effect="spin"] .cardShow {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.canvas[data-effect="spin"] .cardLeave {
+  opacity: 0;
+  transform: rotate(14deg) scale(1.4);
 }
 
 .rim {
@@ -340,6 +447,11 @@
 @media (prefers-reduced-motion: reduce) {
   .rimFlow {
     animation: none !important;
+  }
+
+  .canvas[data-effect] .card {
+    transition-duration: 200ms !important;
+    transition-delay: 0s !important;
   }
 
   .card,

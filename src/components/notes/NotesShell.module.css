@@ -1436,6 +1436,9 @@
   /* 抽屉有底图时去掉面板底色，避免蓝黑色罩在原图上 */
   .rootBgEnabled .sidebar.sidebarBgEnabled {
     background: transparent;
+    /* 独立底图已铺满抽屉，背后的磨砂完全被盖住；抽屉滑入/滑出时逐帧重算 blur 只会拖慢合成 */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   .sidebarHidden {

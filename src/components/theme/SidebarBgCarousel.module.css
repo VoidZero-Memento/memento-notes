@@ -21,7 +21,7 @@
   inset: 0;
   opacity: 0;
   transition: opacity var(--ms) cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 
 .slotVisible {
@@ -33,6 +33,13 @@
 }
 
 /* ---- 切换动画：由 root 的 data-effect 决定，fade 即上面的默认溶解 ---- */
+
+/* 仅位移类动画才提升 transform 图层；默认溶解只需 opacity，多挂一个会让整幅原图常驻独立栅格层 */
+.root[data-effect="slide"] .slot,
+.root[data-effect="flip"] .slot,
+.root[data-effect="spin"] .slot {
+  will-change: opacity, transform;
+}
 
 /* 左右滑动：新图从右推入，旧图向左推出，整体连续滚动 */
 .root[data-effect="slide"] .slot {

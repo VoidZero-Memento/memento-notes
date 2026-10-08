@@ -8,6 +8,7 @@ import { afterPaint, emptySlot, loadShot, nextShotIndex, prefetchShots, upcoming
 import { startGalleryStage } from "@/lib/gallery/start-gallery-stage";
 import { useGalleryBackdrop } from "@/lib/gallery/use-gallery-backdrop";
 import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
+import { useSidebarBgEffect } from "@/lib/prefs/useSidebarBgEffect";
 import { useSidebarBgLoop } from "@/lib/prefs/useSidebarBgLoop";
 
 import type { OssImageMeta } from "@/lib/bg-photos/bg-photos.types";
@@ -17,6 +18,9 @@ export const useGalleryStage = () => {
   const alive = useKeepAliveActive();
   const { folder } = useOssFolder();
   const { looping } = useSidebarBgLoop();
+  const { effect } = useSidebarBgEffect();
+  const effectRef = useRef(effect);
+  effectRef.current = effect;
   const [status, setStatus] = useState<GalleryStageStatus>("loading");
   const [error, setError] = useState<string | null>(null);
   const [slotA, setSlotA] = useState<GallerySlot>(emptySlot);
@@ -104,7 +108,7 @@ export const useGalleryStage = () => {
           busyRef.current = false;
           setBusy(false);
           queueNext(lastIndexRef.current, runGen);
-        }, fadeLockMs());
+        }, fadeLockMs(effectRef.current));
       });
     },
     [queueNext],
@@ -277,6 +281,7 @@ export const useGalleryStage = () => {
   return {
     status,
     error,
+    effect,
     slotA,
     slotB,
     backdropA: backdrop.slotA,

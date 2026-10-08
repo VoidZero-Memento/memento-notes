@@ -1,10 +1,12 @@
-import { GALLERY_FADE_MS, GALLERY_FADE_REDUCED_MS, GALLERY_FADE_TAIL_MS } from "@/lib/gallery/constants";
+import { GALLERY_EFFECT_MS, GALLERY_FADE_REDUCED_MS, GALLERY_FADE_TAIL_MS } from "@/lib/gallery/constants";
+
+import type { SidebarBgEffect } from "@/lib/prefs/sidebar-bg-effect.types";
 
 export const PAINT_WAIT_MS = 1800;
 
-export const fadeLockMs = () => {
+export const fadeLockMs = (effect: SidebarBgEffect = "fade") => {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  return (reduced ? GALLERY_FADE_REDUCED_MS : GALLERY_FADE_MS) + GALLERY_FADE_TAIL_MS;
+  return (reduced ? GALLERY_FADE_REDUCED_MS : GALLERY_EFFECT_MS[effect]) + GALLERY_FADE_TAIL_MS;
 };
 
 export const createPaintGate = () => {

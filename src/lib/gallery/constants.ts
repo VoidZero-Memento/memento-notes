@@ -1,8 +1,18 @@
+import type { SidebarBgEffect } from "@/lib/prefs/sidebar-bg-effect.types";
+
 /** 循环播放时自动切图间隔 */
 export const GALLERY_AUTO_INTERVAL_MS = 5_000;
 
 /** 切图交叉淡化时长 */
 export const GALLERY_FADE_MS = 720;
+
+/** 各切换动画（与左侧菜单「切换动画」一致）的切图时长 */
+export const GALLERY_EFFECT_MS: Record<SidebarBgEffect, number> = {
+  fade: GALLERY_FADE_MS,
+  slide: 800,
+  flip: 1000,
+  spin: 900,
+};
 
 /** 系统要求减弱动效时的切图时长 */
 export const GALLERY_FADE_REDUCED_MS = 200;
