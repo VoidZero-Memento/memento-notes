@@ -456,3 +456,99 @@
     transform: scaleX(1);
   }
 }
+
+/*
+ * 点击切换后的真实等待蒙层：与 index.html 开屏同款。
+ * PC：底图放大占满并缓慢漂移；收尾时漂移停在当前帧，文案下沉淡出、遮罩褪去，再整体溶解。
+ * 手机：底图不动，收尾直接淡出。
+ */
+.rootCrawl {
+  transition: opacity var(--bg-transition-exit-ms, 880ms)
+    cubic-bezier(0.22, 1, 0.36, 1) var(--bg-transition-leave-delay, 0ms);
+}
+
+.rootCrawl.rootVisible {
+  transition: opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rootCrawl .backdrop,
+.rootCrawl.rootVisible .backdrop {
+  animation: none;
+  transform: none;
+}
+
+.rootCrawl .panel {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 460ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 460ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rootCrawl:not(.rootVisible) .panel {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+}
+
+/* 子元素入场仍由 rootVisible 的 animation 负责，收尾时交给 .panel 整体淡出，避免回到 opacity: 0 瞬间消失 */
+.rootCrawl .title,
+.rootCrawl .desc,
+.rootCrawl .progressTrack {
+  opacity: 1;
+  transform: none;
+}
+
+.rootCrawl .veil {
+  opacity: 0.55;
+  transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.rootCrawl:not(.rootVisible) .veil {
+  opacity: 0;
+}
+
+@keyframes bgTransitionDriftPc {
+  from {
+    transform: scale(1.5) translate(0, -14%);
+  }
+
+  to {
+    transform: scale(1.58) translate(0, -14%);
+  }
+}
+
+@media (min-width: 861px) {
+  .rootCrawl .backdrop,
+  .rootCrawl.rootVisible .backdrop {
+    transform-origin: 42% 60%;
+    will-change: transform;
+    animation: bgTransitionDriftPc 4.6s cubic-bezier(0.45, 0.05, 0.55, 0.95)
+      infinite alternate;
+  }
+
+  /* 收尾：暂停在当前帧，与开屏 freezeMotion 一致 */
+  .rootCrawl:not(.rootVisible) .backdrop {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rootCrawl,
+  .rootCrawl.rootVisible,
+  .rootCrawl .panel,
+  .rootCrawl .veil {
+    transition: none;
+  }
+
+  .rootCrawl .backdrop,
+  .rootCrawl.rootVisible .backdrop {
+    animation: none;
+    transform: none;
+  }
+}
+
+/* PC 收尾走多米诺：蒙层保持不透明，由倒牌列逐列露出下面的图墙 */
+.rootCrawl.rootDomino {
+  opacity: 1;
+  transition: none;
+}

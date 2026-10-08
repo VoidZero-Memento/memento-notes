@@ -13,6 +13,7 @@ import { useSidebarDesktopSlide } from "@/lib/notes/use-sidebar-desktop-slide";
 import { useBgBlur } from "@/lib/prefs/useBgBlur";
 import { useBorderFlow } from "@/lib/prefs/useBorderFlow";
 import { useGalleryLink } from "@/lib/prefs/useGalleryLink";
+import { useSidebarBgEffect } from "@/lib/prefs/useSidebarBgEffect";
 import { useSidebarBgLoop } from "@/lib/prefs/useSidebarBgLoop";
 import { useSidebarBgTransition } from "@/lib/prefs/useSidebarBgTransition";
 import { toast } from "@/lib/toast/toast";
@@ -80,6 +81,7 @@ export const NotesWorkspace = ({
   const { unlocked: galleryBgUnlocked, unlock: unlockGalleryBg } = useGalleryBgGate();
   const { ready: pageBgReady, advance: advancePageBg, setImmersive: setBgImmersive } = useAppBg();
   const { looping: sidebarBgLooping, setLooping: setSidebarBgLooping } = useSidebarBgLoop();
+  const { effect: sidebarBgEffect, setEffect: setSidebarBgEffect } = useSidebarBgEffect();
   const { enabled: borderFlowEnabled, setEnabled: setBorderFlowEnabled } = useBorderFlow();
   const { enabled: bgBlurEnabled, setEnabled: setBgBlurEnabled } = useBgBlur();
   const { enabled: galleryLinkEnabled, setEnabled: setGalleryLinkEnabled } = useGalleryLink();
@@ -95,6 +97,8 @@ export const NotesWorkspace = ({
   const pageBgCarousel = mobileBgCarousel || pcBgCarousel;
   const sidebarPhotoCarousel = sidebarBgEnabled && (isMobile || bgBlurEnabled);
   const mobileBgCovering = mobileBgCarousel && !pageBgReady;
+  /** 点击开启后蒙层等图墙首帧就位，再倒牌揭开；首屏加载由开屏页负责，不在此盖 */
+  const pcBgCovering = pcBgCarousel && !pageBgReady && bgTransitionBusy;
   const viewerBodyRef = useRef<HTMLDivElement>(null);
   const { content, loading, pending, error, selectNote, retry } = useNoteContent(
     config,
@@ -399,6 +403,8 @@ export const NotesWorkspace = ({
                   setSidebarBgLooping(next);
                   toast.success(next ? "已开启循环播放" : "已固定当前背景");
                 }}
+                effect={sidebarBgEffect}
+                onEffectChange={setSidebarBgEffect}
                 onBorderFlowChange={(next) => {
                   setBorderFlowEnabled(next);
                   toast.success(next ? "已开启边框流光" : "已关闭边框流光");
@@ -418,7 +424,7 @@ export const NotesWorkspace = ({
           {sidebarBgEnabled && galleryLinkEnabled ? <GalleryLink /> : null}
         </div>
       </aside>
-      <BgTransitionOverlay open={bgOverlayOpen || mobileBgCovering} crawlProgress={bgOverlayCrawl} />
+      <BgTransitionOverlay open={bgOverlayOpen || mobileBgCovering || pcBgCovering} crawlProgress={bgOverlayCrawl} />
       <main ref={viewerRef} className={styles.viewer}>
         {showViewerGlass ? <div className={styles.viewerGlass} aria-hidden /> : null}
         <div className={styles.viewerContent}>

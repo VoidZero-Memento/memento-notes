@@ -21,6 +21,9 @@ const pickStripStart = (length: number, lastIndex: number, take: number, sequent
   return sequential ? nextStripStartIndex(length, lastIndex, take) : pickNextPhotoIndex(length, lastIndex);
 };
 
+/** 每次装入新图递增，供槽区分“新一轮入场”与“原图离场” */
+let slotToken = 0;
+
 export type RunBgCrossfadeOptions = {
   /** 允许清单仅 1 张时仍溶解（刷新首图） */
   allowSingle?: boolean;
@@ -68,13 +71,16 @@ export const runBgCrossfade = async (
 
   refs.lastIndexRef.current = idx;
 
+  slotToken += 1;
+  const token = slotToken;
+
   const swapped = await new Promise<boolean>((resolve) => {
     const apply = () => {
       if (signal?.aborted || runGen !== refs.generationRef.current) {
         resolve(false);
         return;
       }
-      const nextSlot = take > 1 ? { url: nextUrl, urls: strip, visible: true } : { url: nextUrl, visible: true };
+      const nextSlot = take > 1 ? { url: nextUrl, urls: strip, visible: true, token } : { url: nextUrl, visible: true, token };
       if (refs.activeIsARef.current) {
         refs.setSlotA((prev) => ({ ...prev, visible: false }));
         refs.setSlotB(nextSlot);
@@ -87,7 +93,8 @@ export const runBgCrossfade = async (
       resolve(true);
     };
 
-    const hiddenSlot = take > 1 ? { url: nextUrl, urls: strip, visible: false } : { url: nextUrl, visible: false };
+    const hiddenSlot =
+      take > 1 ? { url: nextUrl, urls: strip, visible: false, token } : { url: nextUrl, visible: false, token };
     if (refs.activeIsARef.current) {
       refs.setSlotB(hiddenSlot);
     } else {

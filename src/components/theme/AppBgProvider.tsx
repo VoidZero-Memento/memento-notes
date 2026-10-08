@@ -65,6 +65,8 @@ export const AppBgProvider = ({ children }: AppBgProviderProps) => {
   if (enabled !== trackedEnabled || (isMobile && leaving)) {
     setTrackedEnabled(enabled);
     setLeaving(!enabled && !isMobile);
+    // 渲染期就置为未就绪，避免开启当帧沿用旧 ready 导致过渡蒙层提前收尾
+    if (enabled && !trackedEnabled) setReady(false);
   }
 
   useEffect(() => {

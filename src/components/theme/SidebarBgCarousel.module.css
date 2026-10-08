@@ -7,23 +7,117 @@
   pointer-events: none;
   /* 供前景图用 cqw / cqh 按容器尺寸计算宽度 */
   container-type: size;
-  /* 竖图允许左右各裁掉 (1 - 1/zoom)/2 以内，换取更少的模糊留白 */
-  --photo-max-zoom: 1.25;
+  --ms: var(--sidebar-bg-fade-ms, 1400ms);
+  /* 优先放大铺满：宽度最多放大到容器宽的该倍数（左右各裁掉 (1 - 1/zoom)/2），超出的留白再用磨砂补 */
+  --photo-max-zoom: 1.4;
+  /* 前景图与磨砂底交界处的羽化宽度上限 */
+  --seam-feather: 200px;
 }
 
+/* 槽三态：slotWaiting 待入场（新图已就位）→ slotVisible 展示中 → slotLeaving 离场。
+   待入场态一律 transition: none，复用槽时不会把上一次离场动画倒放出来 */
 .slot {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity var(--sidebar-bg-fade-ms, 1400ms) cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity;
+  transition: opacity var(--ms) cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
 }
 
 .slotVisible {
   opacity: 1;
 }
 
-/* 模糊底图：同图 cover 铺满，只负责填充前景图之外的留白 */
+.slotWaiting {
+  transition: none;
+}
+
+/* ---- 切换动画：由 root 的 data-effect 决定，fade 即上面的默认溶解 ---- */
+
+/* 左右滑动：新图从右推入，旧图向左推出，整体连续滚动 */
+.root[data-effect="slide"] .slot {
+  opacity: 1;
+  transition: transform calc(var(--ms) * 0.75) cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.root[data-effect="slide"] .slotWaiting {
+  transform: translate3d(100%, 0, 0);
+  transition: none;
+}
+
+.root[data-effect="slide"] .slotVisible {
+  transform: translate3d(0, 0, 0);
+}
+
+.root[data-effect="slide"] .slotLeaving {
+  transform: translate3d(-100%, 0, 0);
+}
+
+/* 3D 立方体翻转：新旧图是立方体相邻两面，绕深度 -½ 容器宽的竖轴同步转 90°，
+   全程两张图同时可见（不会出现空背景）；旋转中的面压暗一点来表现明暗 */
+.root[data-effect="flip"] {
+  perspective: 900px;
+}
+
+.root[data-effect="flip"] .slot {
+  /* 与真实立方体一致：背对镜头的面不绘制，侧着的面不会在边缘露出背面窄条 */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition:
+    transform calc(var(--ms) * 0.9) cubic-bezier(0.65, 0, 0.35, 1),
+    opacity calc(var(--ms) * 0.9) cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* 侧着的面（待入场 / 离场完成）必须 visibility: hidden，否则透视下会在两侧露出一条窄边 */
+.root[data-effect="flip"] .slotWaiting {
+  visibility: hidden;
+  opacity: 0.25;
+  transform: translateZ(-50cqw) rotateY(90deg) translateZ(50cqw);
+  transition: none;
+}
+
+.root[data-effect="flip"] .slotVisible {
+  visibility: visible;
+  opacity: 1;
+  transform: translateZ(-50cqw) rotateY(0deg) translateZ(50cqw);
+}
+
+.root[data-effect="flip"] .slotLeaving {
+  /* 动画期间保持可见，结束瞬间再隐藏 */
+  visibility: hidden;
+  opacity: 0.25;
+  transform: translateZ(-50cqw) rotateY(-90deg) translateZ(50cqw);
+  transition:
+    transform calc(var(--ms) * 0.9) cubic-bezier(0.65, 0, 0.35, 1),
+    opacity calc(var(--ms) * 0.9) cubic-bezier(0.65, 0, 0.35, 1),
+    visibility 0s linear calc(var(--ms) * 0.9);
+}
+
+/* 旋转缩放：新图从放大 + 倾斜处旋转落位并溶入，旧图反向旋转溶出 */
+.root[data-effect="spin"] .slot {
+  transition:
+    transform var(--ms) cubic-bezier(0.22, 1, 0.36, 1),
+    opacity var(--ms) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.root[data-effect="spin"] .slotWaiting {
+  opacity: 0;
+  transform: rotate(-14deg) scale(1.4);
+  transition: none;
+}
+
+.root[data-effect="spin"] .slotVisible {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.root[data-effect="spin"] .slotLeaving {
+  opacity: 0;
+  transform: rotate(14deg) scale(1.4);
+}
+
+/* 磨砂底：同图 cover 铺满，只负责填充前景图之外的留白；
+   模糊由 OSS 服务端预先处理好，这里不再用 CSS blur，避免动画期间大面积滤镜重绘 */
 .backdrop {
   position: absolute;
   inset: 0;
@@ -33,22 +127,47 @@
   object-fit: cover;
   object-position: center;
   transform: scale(1.2);
-  filter: blur(20px) saturate(1) brightness(0.8);
+  filter: saturate(1.15) brightness(0.82);
 }
 
-/* 前景图：宽度 = min(最多放大 1.25 倍填满容器宽, 刚好完整放进容器高)；
-   既不比 contain 更窄，也不会超出容器高度，靠上居中，下沿渐隐融入模糊底图 */
-.photoContain {
+/* 前景图：宽度 = min(最多放大 max-zoom 倍容器宽, 刚好放满容器高)；
+   贴底，横向超出时居中裁切、不足时靠右；上 / 左边缘羽化融入磨砂底 */
+.photo {
+  --photo-w: min(calc(100cqw * var(--photo-max-zoom)), calc(100cqh * var(--photo-ratio)));
+  /* 羽化宽度 = min(上限, 该方向实际留白)，没有留白的方向不羽化 */
+  --feather-top: min(var(--seam-feather), max(0px, calc(100cqh - var(--photo-w) / var(--photo-ratio))));
+  --feather-left: min(var(--seam-feather), max(0px, calc(100cqw - var(--photo-w))));
   position: absolute;
-  top: 0;
-  left: 50%;
+  right: min(0px, calc((100cqw - var(--photo-w)) / 2));
+  bottom: 0;
   display: block;
-  width: min(calc(100cqw * var(--photo-max-zoom)), calc(100cqh * var(--photo-ratio)));
+  width: var(--photo-w);
   height: auto;
   max-width: none;
-  transform: translateX(-50%);
-  mask-image: linear-gradient(to bottom, #000 0, #000 92%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 92%, transparent 100%);
+  aspect-ratio: var(--photo-ratio);
+  /* 多段缓动渐变，比线性渐隐更柔和，没有明显的"边" */
+  --mask-top: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgb(0 0 0 / 0.04) calc(var(--feather-top) * 0.1),
+    rgb(0 0 0 / 0.16) calc(var(--feather-top) * 0.3),
+    rgb(0 0 0 / 0.42) calc(var(--feather-top) * 0.5),
+    rgb(0 0 0 / 0.74) calc(var(--feather-top) * 0.72),
+    rgb(0 0 0 / 0.94) calc(var(--feather-top) * 0.9),
+    #000 var(--feather-top)
+  );
+  --mask-left: linear-gradient(
+    to right,
+    transparent 0,
+    rgb(0 0 0 / 0.16) calc(var(--feather-left) * 0.3),
+    rgb(0 0 0 / 0.5) calc(var(--feather-left) * 0.55),
+    rgb(0 0 0 / 0.88) calc(var(--feather-left) * 0.85),
+    #000 var(--feather-left)
+  );
+  mask-image: var(--mask-top), var(--mask-left);
+  mask-composite: intersect;
+  -webkit-mask-image: var(--mask-top), var(--mask-left);
+  -webkit-mask-composite: source-in;
 }
 
 /* 尺寸未知前先隐藏，避免按原始大小闪一帧 */
@@ -70,7 +189,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .slot {
-    transition: none;
+  .root .slot {
+    transition: none !important;
   }
 }

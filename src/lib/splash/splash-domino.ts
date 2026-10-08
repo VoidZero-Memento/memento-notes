@@ -2,9 +2,9 @@ import { PC_WALL_FLIP_MS, PC_WALL_STAGGER_MS } from "@/lib/bg-photos/constants";
 
 const FLIP_EASING = "cubic-bezier(0.55, 0, 0.8, 0.4)";
 const FLIP_PERSPECTIVE = "perspective(1200px)";
-const DONE_BUFFER_MS = 60;
+export const DONE_BUFFER_MS = 60;
 
-const freezeMotion = (el: Element | null) => {
+export const freezeMotion = (el: Element | null) => {
   if (!(el instanceof HTMLElement)) return null;
   const computed = getComputedStyle(el);
   const { transform, opacity } = computed;
@@ -22,7 +22,7 @@ const freezeBanners = (banners: HTMLElement) => {
   });
 };
 
-const createColumn = (banners: HTMLElement, index: number, count: number) => {
+export const createColumn = (banners: HTMLElement, index: number, count: number) => {
   const left = (index / count) * 100;
   const right = 100 - ((index + 1) / count) * 100;
   const clone = banners.cloneNode(true) as HTMLElement;
@@ -46,7 +46,7 @@ const createColumn = (banners: HTMLElement, index: number, count: number) => {
   return column;
 };
 
-const flipColumn = (column: HTMLElement, delay: number) => {
+export const flipColumn = (column: HTMLElement, delay: number) => {
   window.setTimeout(() => {
     column.style.transition = `transform ${PC_WALL_FLIP_MS}ms ${FLIP_EASING}, filter ${PC_WALL_FLIP_MS}ms ${FLIP_EASING}`;
     column.style.transform = `${FLIP_PERSPECTIVE} rotateX(100deg)`;

@@ -1,5 +1,5 @@
 const OSS_HOST_RE = /\.aliyuncs\.com/i;
-const OSS_SIDEBAR_BACKDROP_PROCESS = "x-oss-process=image/resize,w_200/quality,q_50/format,webp";
+const OSS_SIDEBAR_BACKDROP_PROCESS = "x-oss-process=image/resize,w_120/blur,r_20,s_12/quality,q_60/format,webp";
 const OSS_HALL_PROBE_PROCESS = "x-oss-process=image/resize,w_32/quality,q_30/format,webp";
 const OSS_HALL_BACKDROP_PROCESS = "x-oss-process=image/resize,w_720/blur,r_10,s_8/quality,q_55/format,webp";
 const OSS_STAGE_BACKDROP_PROCESS = "x-oss-process=image/resize,w_1920/blur,r_8,s_6/quality,q_70/format,webp";
@@ -29,7 +29,7 @@ export const toBgPhotoUrl = toOriginalPhotoUrl;
 /** 侧栏前景图：原图 */
 export const toSidebarPhotoUrl = toOriginalPhotoUrl;
 
-/** 侧栏模糊底图：本来就要糊掉，用极小图省流量 */
+/** 侧栏模糊底图：极小图 + OSS 服务端预模糊，前端不再跑 CSS blur（动画期间滤镜重绘很卡） */
 export const toSidebarBackdropUrl = (url: string): string =>
   OSS_HOST_RE.test(url) ? withOssProcess(stripOssProcess(url), OSS_SIDEBAR_BACKDROP_PROCESS) : url;
 

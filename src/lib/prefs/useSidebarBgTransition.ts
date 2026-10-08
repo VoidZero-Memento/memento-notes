@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { BG_TRANSITION_EXIT_MS, PC_BG_EXIT_MS } from "@/lib/prefs/sidebar-bg";
+import { getCrawlExitMs, PC_BG_EXIT_MS } from "@/lib/prefs/sidebar-bg";
 import { useSidebarBg } from "@/lib/prefs/useSidebarBg";
 import { toast } from "@/lib/toast/toast";
 
@@ -28,7 +28,8 @@ export const useSidebarBgTransition = ({ isMobile }: UseSidebarBgTransitionOptio
     };
   }, []);
 
-  const finishEnable = (exitMs = BG_TRANSITION_EXIT_MS) => {
+  const finishEnable = () => {
+    const exitMs = getCrawlExitMs(isMobileRef.current);
     setOverlayOpen(false);
     const exitId = window.setTimeout(() => {
       setBusy(false);

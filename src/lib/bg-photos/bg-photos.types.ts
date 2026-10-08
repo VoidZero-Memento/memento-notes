@@ -11,6 +11,8 @@ export type BgPhotoSlot = {
   /** PC 并排竖图；缺省时按单张 `url` 渲染 */
   urls?: string[];
   visible: boolean;
+  /** 每次“装入新图”递增；同一张图被再次装入同一个槽时，靠它区分是新一轮入场，而不是原来的离场状态 */
+  token?: number;
 };
 
 /**

@@ -4,31 +4,26 @@ import { OSS_FOLDER_LABELS } from "@/lib/bg-photos/oss-folder";
 import { useOssFolder } from "@/lib/bg-photos/useOssFolder";
 import { blurActiveInside } from "@/lib/dom/blur-active-inside";
 import { useAnimatedOpen } from "@/lib/dom/use-animated-open";
+import { nextSidebarBgEffect, SIDEBAR_BG_EFFECT_LABELS } from "@/lib/prefs/sidebar-bg-effect";
 import { GalleryGateField } from "@/components/gallery/GalleryGateField";
 import { OssFolderPanel } from "@/components/theme/OssFolderPanel";
 
 import styles from "./SidebarBgToggle.module.css";
 
-const ImageIcon = () => (
+import type { SidebarBgEffect } from "@/lib/prefs/sidebar-bg-effect.types";
+
+const SlidersIcon = () => (
   <svg className={styles.icon} viewBox="0 0 16 16" aria-hidden>
-    <rect
-      x="1.75"
-      y="2.75"
-      width="12.5"
-      height="10.5"
-      rx="2"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.2"
-    />
-    <circle cx="5.4" cy="6.2" r="1.15" fill="currentColor" />
     <path
       fill="none"
       stroke="currentColor"
       strokeWidth="1.2"
-      strokeLinejoin="round"
-      d="M2.6 11.4 6.1 8.2l2.1 2.1 2.2-2.6 2.9 3.7"
+      strokeLinecap="round"
+      d="M2 3.75h12M2 8h12M2 12.25h12"
     />
+    <circle cx="10.5" cy="3.75" r="1.7" fill="rgba(8, 14, 28, 0.9)" stroke="currentColor" strokeWidth="1.2" />
+    <circle cx="5.5" cy="8" r="1.7" fill="rgba(8, 14, 28, 0.9)" stroke="currentColor" strokeWidth="1.2" />
+    <circle cx="9.5" cy="12.25" r="1.7" fill="rgba(8, 14, 28, 0.9)" stroke="currentColor" strokeWidth="1.2" />
   </svg>
 );
 
@@ -51,6 +46,9 @@ type SidebarBgToggleProps = {
   unlock?: (raw: string) => Promise<boolean>;
   onEnabledChange: (enabled: boolean) => void;
   onLoopingChange: (looping: boolean) => void;
+  /** 切换动画：传入 effect + onEffectChange 才显示该菜单项，点击按顺序循环 */
+  effect?: SidebarBgEffect;
+  onEffectChange?: (effect: SidebarBgEffect) => void;
   onBorderFlowChange: (enabled: boolean) => void;
   onBgBlurChange: (enabled: boolean) => void;
   onGalleryLinkChange: (enabled: boolean) => void;
@@ -71,6 +69,8 @@ export const SidebarBgToggle = ({
   unlock,
   onEnabledChange,
   onLoopingChange,
+  effect,
+  onEffectChange,
   onBorderFlowChange,
   onBgBlurChange,
   onGalleryLinkChange,
@@ -171,6 +171,12 @@ export const SidebarBgToggle = ({
     setOpen(false);
   };
 
+  /** 循环切换动画，菜单保持展开方便连续点选 */
+  const handleCycleEffect = () => {
+    if (disabled || !enabled || !effect || !onEffectChange) return;
+    onEffectChange(nextSidebarBgEffect(effect));
+  };
+
   const handleToggleBorderFlow = () => {
     if (!borderFlowAvailable) return;
     onBorderFlowChange(!borderFlowEnabled);
@@ -218,7 +224,7 @@ export const SidebarBgToggle = ({
         disabled={disabled}
         onClick={handleTriggerClick}
       >
-        <ImageIcon />
+        <SlidersIcon />
       </button>
 
       {mounted ? (
@@ -231,19 +237,8 @@ export const SidebarBgToggle = ({
           aria-hidden={!visible}
           inert={!visible || undefined}
         >
-          <li role="presentation">
-            <button
-              type="button"
-              role="menuitemcheckbox"
-              aria-checked={borderFlowEnabled}
-              tabIndex={visible && borderFlowAvailable ? 0 : -1}
-              className={`${styles.option}${borderFlowEnabled && borderFlowAvailable ? ` ${styles.optionSelected}` : ""}`}
-              disabled={!borderFlowAvailable}
-              onClick={handleToggleBorderFlow}
-            >
-              <span className={styles.optionLabel}>边框流光</span>
-              <span className={styles.optionState}>{borderFlowEnabled && borderFlowAvailable ? "开" : "关"}</span>
-            </button>
+          <li role="presentation" className={styles.groupLabel}>
+            背景
           </li>
           <li role="presentation">
             <button
@@ -259,19 +254,18 @@ export const SidebarBgToggle = ({
               <span className={styles.optionState}>{enabled ? "开" : "关"}</span>
             </button>
           </li>
-          {showBgBlurOption ? (
+          {showFolderOption ? (
             <li role="presentation">
               <button
                 type="button"
-                role="menuitemcheckbox"
-                aria-checked={bgBlurEnabled}
+                role="menuitem"
                 tabIndex={visible && enabled ? 0 : -1}
-                className={`${styles.option}${bgBlurEnabled && enabled ? ` ${styles.optionSelected}` : ""}`}
-                disabled={!enabled}
-                onClick={handleToggleBgBlur}
+                className={styles.option}
+                disabled={disabled || !enabled}
+                onClick={handleOpenFolders}
               >
-                <span className={styles.optionLabel}>背景模糊</span>
-                <span className={styles.optionState}>{bgBlurEnabled ? "开" : "关"}</span>
+                <span className={styles.optionLabel}>主题图集</span>
+                <span className={styles.optionState}>{OSS_FOLDER_LABELS[folder]}</span>
               </button>
             </li>
           ) : null}
@@ -291,6 +285,54 @@ export const SidebarBgToggle = ({
               </button>
             </li>
           ) : null}
+          {effect && onEffectChange ? (
+            <li role="presentation">
+              <button
+                type="button"
+                role="menuitem"
+                tabIndex={visible && enabled ? 0 : -1}
+                className={styles.option}
+                disabled={disabled || !enabled}
+                onClick={handleCycleEffect}
+              >
+                <span className={styles.optionLabel}>切换动画</span>
+                <span className={styles.optionState}>{SIDEBAR_BG_EFFECT_LABELS[effect]}</span>
+              </button>
+            </li>
+          ) : null}
+          <li role="presentation" className={`${styles.groupLabel} ${styles.groupLabelDivider}`}>
+            效果
+          </li>
+          {showBgBlurOption ? (
+            <li role="presentation">
+              <button
+                type="button"
+                role="menuitemcheckbox"
+                aria-checked={bgBlurEnabled}
+                tabIndex={visible && enabled ? 0 : -1}
+                className={`${styles.option}${bgBlurEnabled && enabled ? ` ${styles.optionSelected}` : ""}`}
+                disabled={!enabled}
+                onClick={handleToggleBgBlur}
+              >
+                <span className={styles.optionLabel}>背景模糊</span>
+                <span className={styles.optionState}>{bgBlurEnabled ? "开" : "关"}</span>
+              </button>
+            </li>
+          ) : null}
+          <li role="presentation">
+            <button
+              type="button"
+              role="menuitemcheckbox"
+              aria-checked={borderFlowEnabled}
+              tabIndex={visible && borderFlowAvailable ? 0 : -1}
+              className={`${styles.option}${borderFlowEnabled && borderFlowAvailable ? ` ${styles.optionSelected}` : ""}`}
+              disabled={!borderFlowAvailable}
+              onClick={handleToggleBorderFlow}
+            >
+              <span className={styles.optionLabel}>边框流光</span>
+              <span className={styles.optionState}>{borderFlowEnabled && borderFlowAvailable ? "开" : "关"}</span>
+            </button>
+          </li>
           <li role="presentation">
             <button
               type="button"
@@ -305,21 +347,6 @@ export const SidebarBgToggle = ({
               <span className={styles.optionState}>{galleryLinkEnabled ? "开" : "关"}</span>
             </button>
           </li>
-          {showFolderOption ? (
-            <li role="presentation">
-              <button
-                type="button"
-                role="menuitem"
-                tabIndex={visible && enabled ? 0 : -1}
-                className={styles.option}
-                disabled={disabled || !enabled}
-                onClick={handleOpenFolders}
-              >
-                <span className={styles.optionLabel}>主题图集</span>
-                <span className={styles.optionState}>{OSS_FOLDER_LABELS[folder]}</span>
-              </button>
-            </li>
-          ) : null}
         </ul>
       ) : null}
 

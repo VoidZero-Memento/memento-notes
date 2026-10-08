@@ -17,6 +17,23 @@ export const PC_BG_ENTER_MS = 880;
 export const PC_BG_HOLD_MS = 1040;
 export const PC_BG_EXIT_MS = 920;
 
+/**
+ * 点击切换后的真实等待蒙层，收尾与 index.html 开屏一致：
+ * PC 先收文案（停住缓动）再整体溶解；手机直接淡出。
+ */
+export const CRAWL_PC_LEAVE_DELAY_MS = 700;
+export const CRAWL_PC_DISSOLVE_MS = 880;
+export const CRAWL_MOBILE_FADE_MS = 520;
+
+export const getCrawlLeaveDelayMs = (isMobile: boolean) => (isMobile ? 0 : CRAWL_PC_LEAVE_DELAY_MS);
+export const getCrawlDissolveMs = (isMobile: boolean) =>
+  isMobile ? CRAWL_MOBILE_FADE_MS : CRAWL_PC_DISSOLVE_MS;
+/** PC 优先走多米诺倒牌（时长随图墙列数变化），挂载上限留足余量；溶解兜底只用其中一部分 */
+export const CRAWL_PC_MOUNT_MS = 2400;
+
+export const getCrawlExitMs = (isMobile: boolean) =>
+  isMobile ? CRAWL_MOBILE_FADE_MS : CRAWL_PC_MOUNT_MS;
+
 export const readStoredSidebarBg = (): boolean => {
   try {
     const value = window.localStorage.getItem(SIDEBAR_BG_STORAGE_KEY);
