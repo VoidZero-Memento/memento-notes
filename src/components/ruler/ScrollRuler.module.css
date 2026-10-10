@@ -1,0 +1,176 @@
+/* 标尺 rail：absolute 贴 .viewerBodyWrap 右缘；z-index 高于 scrollFade(2)、低于 backToTop(4) */
+.rail {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  overflow: hidden;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 手机：按下即缩放+拖拽 scrub，必须禁掉浏览器的纵向手势 */
+.railLite {
+  cursor: default;
+  touch-action: none;
+}
+
+.layer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.tickWrap {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 0;
+  will-change: transform;
+}
+
+/* 默认全透明：入场动画前不闪一帧终态 */
+.tick {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: block;
+  height: 1px;
+  background: rgb(var(--fg-rgb));
+  opacity: 0;
+  transform-origin: right center;
+}
+
+.num {
+  position: absolute;
+  top: 0;
+  color: rgb(var(--fg-rgb));
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateY(-50%);
+}
+
+.bracket {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, height, opacity;
+}
+
+.bracketFill {
+  position: absolute;
+  inset: 0;
+  background: rgb(var(--fg-rgb));
+}
+
+.bracket::before,
+.bracket::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--accent-3);
+  opacity: 0.5;
+}
+
+.bracket::before {
+  top: 0;
+}
+
+.bracket::after {
+  bottom: 0;
+}
+
+.needle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.needleLine {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: block;
+  height: 1px;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+}
+
+.readout {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  display: inline-flex;
+  color: var(--accent);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.digits {
+  display: inline-flex;
+  overflow: hidden;
+  height: 1em;
+  line-height: 1;
+}
+
+/* 里程表：每位一列 0-9 竖排，translateY(-digit em) 切换 */
+.digitCol {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.digitCol > span {
+  display: block;
+  height: 1em;
+}
+
+.percent {
+  margin-left: 2px;
+}
+
+.ghost {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.ghostLine {
+  position: absolute;
+  right: 0;
+  left: 0;
+  display: block;
+  background: var(--accent-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .digitCol {
+    transition: none;
+  }
+}

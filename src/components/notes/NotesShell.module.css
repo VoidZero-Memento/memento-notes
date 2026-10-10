@@ -993,6 +993,28 @@
   pointer-events: none;
 }
 
+/* 标尺式滚动条：--ruler-rail 由 ScrollRuler 写在 .viewerBodyWrap / .viewerContent 上。
+   .viewerContent 与 .viewerBodyWrap 同时带 .rulerOn，回到顶部按钮是 wrap 的兄弟，只能靠外层读变量 */
+.rulerOn {
+  position: relative;
+}
+
+/* 双类名提高优先级，盖过手机断点里 .viewerBody 的 padding 简写 */
+.rulerOn .viewerBodyRuler {
+  padding-right: calc(var(--ruler-rail, 0px) + 12px);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.rulerOn .viewerBodyRuler::-webkit-scrollbar {
+  display: none;
+}
+
+/* 双类名同样为盖过手机断点里 .backToTop 的 right */
+.rulerOn .backToTop {
+  right: calc(var(--ruler-rail, 0px) + 14px);
+}
+
 .scrollFadeTop,
 .scrollFadeBottom {
   position: absolute;

@@ -19,6 +19,7 @@ import { useSidebarBgTransition } from "@/lib/prefs/useSidebarBgTransition";
 import { toast } from "@/lib/toast/toast";
 import { EmptyState } from "@/components/common/EmptyState";
 import { GalleryLink } from "@/components/gallery/GalleryLink";
+import { ScrollRuler } from "@/components/ruler/ScrollRuler";
 import { useAppBg } from "@/components/theme/AppBgProvider";
 import { BgTransitionOverlay } from "@/components/theme/BgTransitionOverlay";
 import { ImmersiveEnter, ImmersiveLayer } from "@/components/theme/ImmersiveLayer";
@@ -36,6 +37,7 @@ import styles from "./NotesShell.module.css";
 
 import type { GithubRepoConfig } from "@/config/github.types";
 import type { GithubFileTreeNode } from "@/lib/github/github.types";
+import type { RulerMode } from "@/lib/ruler/ruler.types";
 
 type SidebarMode = "files" | "outline";
 
@@ -111,6 +113,7 @@ export const NotesWorkspace = ({
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [scrollAtTop, setScrollAtTop] = useState(true);
   const [scrollAtBottom, setScrollAtBottom] = useState(true);
+  const [rulerMode, setRulerMode] = useState<RulerMode | null>(null);
   const sidebarFxTimerRef = useRef<number | null>(null);
   const { sidebarRef, viewerRef, hidden: sidebarHidden, collapsing, expanding, slideCollapse, slideExpand, reveal } =
     useSidebarDesktopSlide(!isMobile);
@@ -427,7 +430,7 @@ export const NotesWorkspace = ({
       <BgTransitionOverlay open={bgOverlayOpen || mobileBgCovering || pcBgCovering} crawlProgress={bgOverlayCrawl} />
       <main ref={viewerRef} className={styles.viewer}>
         {showViewerGlass ? <div className={styles.viewerGlass} aria-hidden /> : null}
-        <div className={styles.viewerContent}>
+        <div className={`${styles.viewerContent}${rulerMode ? ` ${styles.rulerOn}` : ""}`}>
           {immersiveBgEmpty ? null : (
             <div className={styles.mobileBar}>
               <h2 className={styles.mobileBarTitle}>{workspaceTitle}</h2>
@@ -457,13 +460,13 @@ export const NotesWorkspace = ({
               <p className={styles.viewerPath}>{selectedPath}</p>
             </div>
           ) : null}
-          <div className={styles.viewerBodyWrap}>
+          <div className={`${styles.viewerBodyWrap}${rulerMode ? ` ${styles.rulerOn}` : ""}`}>
             <div
               className={`${styles.scrollFadeTop}${!scrollAtTop ? ` ${styles.scrollFadeVisible}` : ""}`}
               aria-hidden
             />
             <div
-              className={`${styles.viewerBody}${pending ? ` ${styles.viewerBodyPending}` : ""}`}
+              className={`${styles.viewerBody}${pending ? ` ${styles.viewerBodyPending}` : ""}${rulerMode ? ` ${styles.viewerBodyRuler}` : ""}`}
               ref={viewerBodyRef}
             >
               {treeLoading ? <LoadingState label="加载文件树" /> : null}
@@ -489,6 +492,13 @@ export const NotesWorkspace = ({
                 </NoteEnter>
               ) : null}
             </div>
+            <ScrollRuler
+              scrollRef={viewerBodyRef}
+              active={alive}
+              enabled={Boolean(!treeLoading && selectedPath && content && !loading)}
+              contentKey={selectedPath}
+              onModeChange={setRulerMode}
+            />
             <div
               className={`${styles.scrollFadeBottom}${!scrollAtBottom ? ` ${styles.scrollFadeVisible}` : ""}`}
               aria-hidden

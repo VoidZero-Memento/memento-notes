@@ -1,0 +1,68 @@
+/* 字母层：DOM 顺序在 rail 之后且同为 z-index 3，所以骑行字与命中区压在 rail 上；
+   字体/字重由组件内联自 measure-letters 的常量，保证与量字宽时一致 */
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* 起始透明：首帧写入姿态前不在左上角闪现 */
+.letter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: rgb(var(--fg-rgb));
+  line-height: 1;
+  white-space: pre;
+  opacity: 0;
+  /* 不加 text-shadow：阴影不随字母透明度变化，半透明灰字下会露出一层黑边，看起来比统一灰色更暗 */
+  will-change: transform, opacity;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 隐形命中区：尺寸与位置每帧由 JS 跟随字母包围盒，指针事件也由 JS 按可见度开关 */
+.hit {
+  position: absolute;
+  display: block;
+  width: 0;
+  height: 0;
+  cursor: pointer;
+  pointer-events: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* lite：缩放地图小字，不可交互 */
+.mapLabel {
+  position: absolute;
+  top: 0;
+  color: rgb(var(--fg-rgb));
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  text-shadow:
+    0 0 4px rgba(4, 7, 14, 0.9),
+    0 0 10px rgba(4, 7, 14, 0.7);
+  will-change: transform, opacity;
+}
+
+/* lite：指针处“当前章节”气泡，纵向由 JS 夹紧在容器内 */
+.bubble {
+  position: absolute;
+  top: 0;
+  max-width: 70%;
+  padding: 5px 10px;
+  border: 1px solid rgba(var(--fg-rgb), 0.25);
+  border-radius: 8px;
+  background: rgba(4, 7, 14, 0.88);
+  color: rgb(var(--fg-rgb));
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  opacity: 0;
+  will-change: transform, opacity;
+}
