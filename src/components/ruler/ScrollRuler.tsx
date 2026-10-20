@@ -56,7 +56,9 @@ export const ScrollRuler = ({ scrollRef, active, enabled, contentKey, onModeChan
     if (!nextOpen) return;
     const wrap = scrollRef.current?.parentElement;
     const scopes = [wrap, wrap?.parentElement];
-    for (const scope of scopes) scope?.style.setProperty("--ruler-rail", `${railW}px`);
+    // 手机标尺是覆盖层，不占正文宽度；4px 让 padding-right 回到手机原本的 16px
+    const reserve = mode === "lite" ? 4 : railW;
+    for (const scope of scopes) scope?.style.setProperty("--ruler-rail", `${reserve}px`);
     onModeChange?.(mode);
     return () => {
       for (const scope of scopes) scope?.style.removeProperty("--ruler-rail");
@@ -70,7 +72,7 @@ export const ScrollRuler = ({ scrollRef, active, enabled, contentKey, onModeChan
 
   return (
     <>
-      <RulerRail mode={mode} config={config} geom={geom} shared={shared} animator={animator} scrollRef={scrollRef} active={active} />
+      <RulerRail mode={mode} config={config} geom={geom} shared={shared} animator={animator} scrollRef={scrollRef} active={active} sections={sections} />
       <RulerLabels {...labelsProps} />
     </>
   );

@@ -26,11 +26,16 @@ const updateNeedle = (ctx: RailFrameCtx, f: Frame) => {
   st.prevPct = pct;
   refs.rail?.setAttribute("aria-valuenow", String(pct));
   const text = String(pct).padStart(3, "0");
+  // 不补零：高位的前导 0 列直接隐藏（PC / 手机通用）
+  const lead = 3 - String(pct).length;
+  // 进度为 0 时不显示百分号（样式见 .readout[data-zero]）
+  if (refs.readout) refs.readout.dataset.zero = pct === 0 ? "1" : "0";
   for (let i = 0; i < 3; i++) {
+    const col = refs.digits[i];
+    if (col) col.style.display = i < lead ? "none" : "";
     const digit = text.charCodeAt(i) - 48;
     if (digit === st.prevDigits[i]) continue;
     st.prevDigits[i] = digit;
-    const col = refs.digits[i];
     if (col) col.style.transform = `translateY(${-digit}em)`;
   }
 };

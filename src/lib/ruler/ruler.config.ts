@@ -6,7 +6,7 @@
  */
 export const RULER_LAYOUT: RulerLayoutConfig = {
   edgePad: 12,
-  railW: 60,
+  railW: 32,
   minorPct: 1,
   labelPct: 5,
   thresholdPct: 12,
@@ -46,8 +46,8 @@ export const RULER_LOOK: RulerLookConfig = {
   minorAlpha: 0.4,
   majorAlpha: 0.8,
   labelAlpha: 0.5,
-  minorLen: 10,
-  majorLen: 20,
+  minorLen: 6,
+  majorLen: 10,
   ghostAlpha: 1,
   ghostThick: 3,
   // 非当前章节（上一章 / 下一章 / 骑行字）统一的透明度，只有当前章节是 1

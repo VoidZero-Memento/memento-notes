@@ -15,6 +15,8 @@ export type RailRefs = {
   bracket: HTMLDivElement | null;
   needle: HTMLDivElement | null;
   readout: HTMLSpanElement | null;
+  /** 手机：滚动条中部的「下一章」标题容器 */
+  nextTitle: HTMLSpanElement | null;
   ghost: HTMLDivElement | null;
   ghostLine: HTMLSpanElement | null;
   digits: (HTMLSpanElement | null)[];
