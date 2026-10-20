@@ -39,7 +39,7 @@ const createRefs = (): RailRefs => ({
   bracket: null,
   needle: null,
   readout: null,
-  title: null,
+  nextTitle: null,
   ghost: null,
   ghostLine: null,
   digits: [],
