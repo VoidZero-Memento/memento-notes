@@ -18,7 +18,7 @@ export const PC_BG_HOLD_MS = 1040;
 export const PC_BG_EXIT_MS = 920;
 
 /**
- * 点击切换后的真实等待蒙层，收尾与 index.html 开屏一致：
+ * 点击切换后的真实等待蒙层。
  * PC 先收文案（停住缓动）再整体溶解；手机直接淡出。
  */
 export const CRAWL_PC_LEAVE_DELAY_MS = 700;

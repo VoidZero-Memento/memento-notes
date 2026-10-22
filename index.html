@@ -6,60 +6,30 @@
       name="viewport"
       content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,viewport-fit=cover"
     />
+    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/Geist-Variable.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/GeistMono-Variable.woff2" crossorigin />
+    <link rel="preconnect" href="https://memento-static.oss-cn-shenzhen.aliyuncs.com" />
     <script>
       (function () {
-        try {
-          var v = localStorage.getItem("memento-notes:sidebar-bg");
-          if (v === null || v === "1")
-            document.documentElement.dataset.splash = "1";
-        } catch (e) {
-          document.documentElement.dataset.splash = "1";
-        }
-        if (document.documentElement.dataset.splash !== "1") return;
-        var pc = window.matchMedia("(min-width: 861px)").matches;
-        var urls = pc
-          ? ["https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background2.png"]
-          : [
-              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background1.png",
-              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background2.png",
-              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background3.png",
-              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background4.png",
-              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background5.png",
-              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background6.png",
-              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background7.png",
-              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background8.png",
-              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background9.png",
-              "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background10.png",
-            ];
-        var index = Math.floor(Math.random() * urls.length);
-        window.__MEMENTO_SPLASH__ = { urls: urls, index: index };
-        var preload = function (href) {
-          var link = document.createElement("link");
-          link.rel = "preload";
-          link.as = "image";
-          link.href = href;
-          document.head.appendChild(link);
-        };
-        preload(urls[index]);
-        if (urls.length > 1) preload(urls[(index + 1) % urls.length]);
+        var month = new Date().getMonth();
+        var start = month === 11 || month < 2 ? 3 : month < 5 ? 0 : month < 8 ? 1 : 2;
+        var name = ["spring", "summer", "autumn", "winter"][start];
+        document.documentElement.setAttribute("data-splash-season", String(start));
+        var link = document.createElement("link");
+        link.rel = "preload";
+        link.as = "image";
+        link.setAttribute("fetchpriority", "high");
+        link.href = "https://memento-static.oss-cn-shenzhen.aliyuncs.com/common-images/" + name + ".jpg";
+        document.head.appendChild(link);
       })();
     </script>
-    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="preload"
-      as="font"
-      type="font/woff2"
-      href="/fonts/Geist-Variable.woff2"
-      crossorigin
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500&family=Shippori+Mincho+B1:wght@400;600;800&display=swap"
+      rel="stylesheet"
     />
-    <link
-      rel="preload"
-      as="font"
-      type="font/woff2"
-      href="/fonts/GeistMono-Variable.woff2"
-      crossorigin
-    />
-    <!-- LXGW 分段字体：相对路径 + unicode-range，勿 preload 整包 -->
     <link rel="stylesheet" href="/fonts/lxgw/result.css" />
     <link rel="stylesheet" href="/fonts/lxgw-mono/result.css" />
     <meta name="description" content="浏览 GitHub 仓库中的 Markdown 笔记" />
@@ -81,8 +51,30 @@
         src: url("/fonts/GeistMono-Variable.woff2") format("woff2");
       }
 
-      html:not([data-splash="1"]) #app-splash {
-        display: none !important;
+      #app-splash {
+        --paper: #f3ede2;
+        --paper-dim: rgba(243, 237, 226, 0.72);
+        --paper-faint: rgba(243, 237, 226, 0.46);
+        --jp: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+        --en: "Cormorant Garamond", "Times New Roman", serif;
+        --ease-ink: cubic-bezier(0.22, 0.8, 0.2, 1);
+        --petal-a: 0.82;
+        --petal-c1: #ffe3ea;
+        --petal-c2: #f2a9bb;
+        --petal-r: 60% 60% 60% 10%;
+        --drift: -18vw;
+        --spin: 680deg;
+        --fade: 900ms;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        overflow: hidden;
+        background: #12181c;
+        color: var(--paper);
+        font-family: var(--jp);
+        -webkit-font-smoothing: antialiased;
+        opacity: 1;
+        transition: opacity var(--fade) var(--ease-ink);
       }
 
       #app-splash.is-leave {
@@ -90,717 +82,353 @@
         pointer-events: none;
       }
 
-      #app-splash {
-        position: fixed;
-        inset: 0;
-        z-index: 9999;
-        min-height: 100svh;
-        min-height: 100dvh;
-        overflow: hidden;
-        background: #04070e;
-        opacity: 1;
-        transition: opacity 0.28s ease;
-        color: rgba(245, 240, 255, 0.95);
-        font-family: "Geist", "LXGWWenKai", Arial, Helvetica, sans-serif;
-        -webkit-font-smoothing: antialiased;
-      }
-
-      #app-splash .splash-stage {
-        position: absolute;
-        inset: 0;
-        overflow: hidden;
-        animation: splashRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-      }
-
-      #app-splash .splash-banners {
+      #splash-bg {
         position: absolute;
         inset: 0;
         z-index: 0;
-        overflow: hidden;
-        transform-origin: 50% 40%;
-        animation: splashDrift 16s ease-in-out infinite alternate;
       }
 
-      #app-splash .splash-banner {
+      #splash-bg img {
         position: absolute;
         inset: 0;
-        display: block;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        object-position: center 28%;
+        object-position: center;
         opacity: 0;
-        filter: saturate(1.08) contrast(1.03);
-        transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1);
-        will-change: opacity;
-        pointer-events: none;
-        backface-visibility: hidden;
-        z-index: 0;
       }
 
-      #app-splash .splash-banner.is-on {
+      #splash-bg img.on {
         opacity: 1;
-        z-index: 1;
       }
 
-      #app-splash .splash-veil {
+      #splash-load {
+        --gap: clamp(14px, 3.6vmin, 40px);
+        --foot: calc(var(--gap) + 72px);
+        --s: max(150px, min(520px, 64vmin, 100svh - var(--foot) - 2 * clamp(20px, 6svh, 64px)));
         position: absolute;
         inset: 0;
-        z-index: 2;
+        z-index: 5;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+
+      #splash-load::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
         pointer-events: none;
-        background: linear-gradient(
-          180deg,
-          transparent 0%,
-          transparent 50%,
-          rgba(4, 7, 14, 0.22) 68%,
-          rgba(4, 7, 14, 0.62) 82%,
-          rgba(4, 7, 14, 0.92) 96%,
-          rgba(4, 7, 14, 0.96) 100%
-        );
+        background: radial-gradient(ellipse 44% 50% at 50% 42%, rgba(6, 7, 9, 0.62) 0%, rgba(6, 7, 9, 0.28) 46%, rgba(6, 7, 9, 0.05) 68%, transparent 78%);
       }
 
-      #app-splash .splash-veil-rest {
-        position: absolute;
-        inset: 0;
+      #splash-load[data-season="summer"] { --petal-a: 0; }
+      #splash-load[data-season="autumn"] { --petal-a: 0.9; --petal-c1: #f0c14a; --petal-c2: #c25a16; --petal-r: 74% 8% 68% 14%; --drift: -14vw; --spin: 480deg; }
+      #splash-load[data-season="winter"] { --petal-a: 0.92; --petal-c1: #fff; --petal-c2: #e7f2f8; --petal-r: 50%; --drift: -4vw; --spin: 120deg; }
+
+      #splash-load .stage {
+        position: relative;
         z-index: 1;
+        width: var(--s);
+        aspect-ratio: 1;
+        margin-bottom: var(--foot);
+        display: grid;
+        place-items: center;
+        transition: transform var(--fade) var(--ease-ink), filter var(--fade) var(--ease-ink);
+      }
+
+      #app-splash.is-leave .stage {
+        transform: scale(1.04);
+        filter: blur(8px);
+      }
+
+      #splash-load svg.enso { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+      #splash-load .enso .ink { fill: var(--paper); opacity: 0.94; }
+
+      #splash-load .title {
+        writing-mode: vertical-rl;
+        font-size: clamp(24px, calc(var(--s) * 0.123), 64px);
+        font-weight: 800;
+        letter-spacing: 0.24em;
+        line-height: 1;
+        text-shadow: 0 0 40px rgba(255, 210, 220, 0.14);
+        display: flex;
+        gap: 0.06em;
+      }
+
+      #splash-load .title span {
         opacity: 0;
-        pointer-events: none;
-        background: linear-gradient(
-          180deg,
-          rgba(4, 7, 14, 0.12) 0%,
-          rgba(4, 7, 14, 0.08) 42%,
-          rgba(4, 7, 14, 0.16) 100%
-        );
+        filter: blur(14px);
+        transform: translateY(-0.18em) scale(1.08);
+        animation: splash-glyph 1.6s var(--ease-ink) 0.65s forwards;
       }
 
-      #app-splash .splash-panel {
+      #splash-load .title span:nth-child(2) { animation-delay: 1.22s; }
+
+      #splash-load .foot {
         position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 2;
+        top: calc(100% + var(--gap));
+        left: 50%;
+        transform: translateX(-50%);
         display: flex;
-        justify-content: center;
-        padding: max(40px, 8svh) 20px
-          max(28px, calc(5svh + env(safe-area-inset-bottom, 0px)));
-      }
-
-      #app-splash .splash-card {
-        position: relative;
-        width: min(320px, 100%);
-        text-align: center;
-        animation: splashCardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
-      }
-
-      #app-splash .splash-brand-row {
-        display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;
-        gap: 8px;
+        gap: 14px;
+        white-space: nowrap;
+        text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
       }
 
-      #app-splash .splash-mark {
-        position: relative;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        flex: none;
-        background: conic-gradient(
-          from 0deg,
-          #00f0ff,
-          #7c5cff,
-          #ff2d95,
-          #ffb86c,
-          #00f0ff
-        );
-        box-shadow: 0 0 10px rgba(124, 92, 255, 0.55);
-        -webkit-mask: radial-gradient(
-          farthest-side,
-          transparent calc(100% - 3.5px),
-          #000 calc(100% - 3px)
-        );
-        mask: radial-gradient(
-          farthest-side,
-          transparent calc(100% - 3.5px),
-          #000 calc(100% - 3px)
-        );
-        animation: splashSpin 2.6s linear infinite;
-      }
-
-      #app-splash .splash-brand {
-        margin: 0;
-        color: rgba(245, 240, 255, 0.78);
-        font-family: "GeistMono", "LXGWWenKaiMono", ui-monospace, monospace;
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 0.28em;
+      #splash-load .sub {
+        font-family: var(--en);
+        font-style: italic;
+        font-size: 16px;
+        letter-spacing: 0.56em;
+        margin-right: -0.56em;
         text-transform: uppercase;
-        text-shadow: 0 1px 18px rgba(0, 0, 0, 0.45);
+        color: var(--paper-dim);
       }
 
-      #app-splash .splash-title {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        margin: 10px 0 0;
-        font-size: 19px;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        line-height: 1.35;
+      #splash-load .motto {
+        font-size: 14px;
+        letter-spacing: 0.9em;
+        margin-right: -0.9em;
+        color: var(--paper-faint);
       }
 
-      #app-splash .splash-heading {
-        background: linear-gradient(
-          92deg,
-          #f5f0ff 0%,
-          #cdeeff 45%,
-          #ffd6ea 100%
-        );
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        text-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
-      }
-
-      #app-splash .splash-dots {
-        display: inline-flex;
-        gap: 4px;
-        min-width: 1.2em;
-      }
-
-      #app-splash .splash-dots span {
-        width: 4px;
-        height: 4px;
-        border-radius: 50%;
-        background: rgba(255, 182, 210, 0.95);
-        box-shadow: 0 0 10px rgba(255, 154, 196, 0.55);
-        animation: splashDot 1.2s ease-in-out infinite;
-      }
-
-      #app-splash .splash-dots span:nth-child(2) {
-        animation-delay: 0.18s;
-      }
-
-      #app-splash .splash-dots span:nth-child(3) {
-        animation-delay: 0.36s;
-      }
-
-      #app-splash .splash-progress-row {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        margin: 16px 0 0;
-      }
-
-      #app-splash .splash-track {
-        position: relative;
-        flex: none;
-        width: min(200px, 60%);
-        height: 7px;
-        overflow: hidden;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.14);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        box-shadow:
-          inset 0 1px 3px rgba(0, 0, 0, 0.5),
-          0 2px 10px rgba(0, 0, 0, 0.35);
-      }
-
-      #app-splash .splash-fill {
-        position: relative;
-        display: block;
-        height: 100%;
-        width: 0%;
-        overflow: hidden;
-        border-radius: inherit;
-        background: linear-gradient(
-          90deg,
-          #00f0ff 0%,
-          #7c5cff 32%,
-          #ff2d95 64%,
-          #ffb86c 100%
-        );
-        box-shadow:
-          0 0 10px rgba(0, 240, 255, 0.4),
-          0 0 18px rgba(255, 45, 149, 0.32);
-        transition: width 0.35s ease;
-        animation: splashGlowPulse 2.2s ease-in-out infinite;
-      }
-
-      #app-splash .splash-fill-sheen {
+      #splash-load .petal {
         position: absolute;
-        top: 0;
-        bottom: 0;
-        left: -60%;
-        width: 45%;
-        background: linear-gradient(
-          100deg,
-          transparent,
-          rgba(255, 255, 255, 0.75),
-          transparent
-        );
-        animation: splashSheen 1.8s ease-in-out infinite;
+        z-index: 2;
+        width: 10px;
+        height: 7px;
+        border-radius: var(--petal-r);
+        background: linear-gradient(140deg, var(--petal-c1), var(--petal-c2));
+        opacity: 0;
+        animation: splash-petal linear infinite;
+        pointer-events: none;
       }
 
-      #app-splash .splash-percent {
-        flex: none;
-        min-width: 2.6em;
-        margin: 0;
-        color: rgba(245, 240, 255, 0.75);
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: 0.04em;
-        text-align: right;
-        font-variant-numeric: tabular-nums;
-        text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+      #splash-load[data-season="autumn"] .petal { width: 12px; height: 7px; }
+      #splash-load[data-season="winter"] .petal { width: 5px; height: 5px; box-shadow: 0 0 6px rgba(255, 255, 255, 0.65); }
+
+      @keyframes splash-petal {
+        0% { transform: translate3d(0, -12vh, 0) rotate(0deg); opacity: 0; }
+        12% { opacity: var(--petal-a); }
+        100% { transform: translate3d(var(--drift), 112vh, 0) rotate(var(--spin)); opacity: 0; }
       }
 
-      #app-splash .splash-label {
-        margin: 12px 0 0;
-        color: rgba(245, 240, 255, 0.68);
-        font-size: 12.5px;
-        font-weight: 500;
-        letter-spacing: 0.02em;
-        line-height: 1.5;
-        text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55);
+      @keyframes splash-glyph {
+        to { opacity: 1; filter: blur(0); transform: none; }
       }
 
-      @keyframes splashDot {
-        0%,
-        80%,
-        100% {
-          opacity: 0.25;
-          transform: translateY(0);
-        }
-        40% {
-          opacity: 1;
-          transform: translateY(-2px);
-        }
-      }
-
-      @keyframes splashRise {
-        from {
-          opacity: 0;
-          transform: translateY(18px) scale(0.97);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-      }
-
-      @keyframes splashCardIn {
-        from {
-          opacity: 0;
-          transform: translateY(14px) scale(0.96);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-      }
-
-      @keyframes splashDrift {
-        0% {
-          transform: scale(1.05) translate(0, 0);
-        }
-        50% {
-          transform: scale(1.1) translate(-1.2%, -1.8%);
-        }
-        100% {
-          transform: scale(1.16) translate(1%, -2.6%);
-        }
-      }
-
-      @keyframes splashDriftPc {
-        0% {
-          transform: scale(1.5) translate(0, -14%);
-        }
-        100% {
-          transform: scale(1.58) translate(0, -14%);
-        }
-      }
-
-      @keyframes splashSpin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
-      @keyframes splashSheen {
-        from {
-          transform: translateX(0);
-        }
-        to {
-          transform: translateX(280%);
-        }
-      }
-
-      @keyframes splashGlowPulse {
-        0%,
-        100% {
-          filter: brightness(1);
-        }
-        50% {
-          filter: brightness(1.18);
-        }
-      }
-
-      @media (min-width: 861px) {
-        #app-splash.is-leave {
-          opacity: 1;
-          transition: opacity 880ms cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        #app-splash.is-leave.is-dissolve {
-          opacity: 0;
-        }
-
-        #app-splash .splash-banners {
-          z-index: 0;
-          transform-origin: 42% 60%;
-          animation: splashDriftPc 4.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
-          will-change: transform;
-        }
-
-        #app-splash .splash-veil,
-        #app-splash .splash-panel {
-          z-index: 2;
-        }
-
-        #app-splash .splash-banner {
-          object-position: center center;
-          transform-origin: center center;
-          animation: none;
-          filter: saturate(1) brightness(0.96);
-        }
-
-        #app-splash.is-leave .splash-stage,
-        #app-splash.is-leave .splash-banners {
-          animation: none;
-        }
-
-        #app-splash.is-leave .splash-panel {
-          opacity: 0;
-          transform: translate3d(0, 12px, 0);
-          transition:
-            opacity 460ms cubic-bezier(0.4, 0, 0.2, 1),
-            transform 460ms cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        #app-splash.is-leave .splash-veil {
-          opacity: 0;
-          transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        #app-splash.is-leave .splash-veil-rest {
-          opacity: 1;
-          transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        #app-splash.is-domino .splash-veil-rest {
-          display: none;
-        }
-      }
-
-      @media (max-width: 860px) {
-        #app-splash .splash-banners {
-          animation: none;
-          transform: none;
-        }
-
-        #app-splash .splash-banner {
-          object-position: center center;
-          filter: saturate(1) brightness(0.96);
-        }
-
-        #app-splash .splash-panel {
-          padding: max(32px, 6svh) 18px
-            max(24px, calc(4svh + env(safe-area-inset-bottom, 0px)));
-        }
-
-        #app-splash .splash-title {
-          font-size: 17px;
-        }
-
-        #app-splash .splash-label {
-          font-size: 12px;
-          line-height: 1.45;
-        }
-
-        #app-splash .splash-track {
-          width: min(260px, 70%);
-        }
+      @keyframes splash-enso {
+        from { stroke-dashoffset: var(--enso-len); }
+        to { stroke-dashoffset: 0; }
       }
 
       @media (prefers-reduced-motion: reduce) {
-        #app-splash .splash-stage,
-        #app-splash .splash-banners,
-        #app-splash .splash-banner,
-        #app-splash .splash-card,
-        #app-splash .splash-mark,
-        #app-splash .splash-dots span,
-        #app-splash .splash-fill,
-        #app-splash .splash-fill-sheen {
+        #app-splash,
+        #app-splash .stage,
+        #splash-load .title span,
+        #splash-load .petal {
           animation: none;
           transition: none;
         }
 
-        #app-splash .splash-banners {
-          transform: none;
-        }
-      }
+        #splash-load .petal { display: none; }
 
-      @media (prefers-reduced-motion: reduce) and (min-width: 861px) {
-        #app-splash .splash-banners {
-          transform: none;
-        }
-
-        #app-splash .splash-banner {
+        #splash-load .title span {
+          opacity: 1;
+          filter: none;
           transform: none;
         }
       }
     </style>
   </head>
   <body>
-    <div id="app-splash" role="status" aria-live="polite" aria-busy="true">
-        <div class="splash-stage">
-          <div class="splash-banners">
-            <img
-              class="splash-banner is-on"
-              id="splash-banner-a"
-              alt=""
-              decoding="async"
-              fetchpriority="high"
-              loading="eager"
-            />
-            <img
-              class="splash-banner"
-              id="splash-banner-b"
-              alt=""
-              decoding="async"
-              loading="eager"
-            />
-          </div>
-          <script>
-            (function () {
-              var boot = window.__MEMENTO_SPLASH__;
-              if (!boot || !boot.urls || !boot.urls.length) return;
-              var a = document.getElementById("splash-banner-a");
-              var b = document.getElementById("splash-banner-b");
-              var first = boot.urls[boot.index];
-              if (a && first) a.src = first;
-              if (b && boot.urls.length > 1)
-                b.src = boot.urls[(boot.index + 1) % boot.urls.length];
-            })();
-          </script>
-          <div class="splash-veil" aria-hidden="true"></div>
-          <div class="splash-veil-rest" aria-hidden="true"></div>
-          <div class="splash-panel">
-            <div class="splash-card">
-              <div class="splash-brand-row">
-                <span class="splash-mark" aria-hidden="true"></span>
-                <p class="splash-brand">Memento</p>
-              </div>
-              <p class="splash-title">
-                <span class="splash-heading">资源加载中</span>
-                <span class="splash-dots" aria-hidden="true">
-                  <span></span><span></span><span></span>
-                </span>
-              </p>
-              <div class="splash-progress-row">
-                <div class="splash-track" aria-hidden="true">
-                  <span class="splash-fill" id="splash-fill">
-                    <span class="splash-fill-sheen"></span>
-                  </span>
-                </div>
-                <p class="splash-percent" id="splash-percent">0%</p>
-              </div>
-              <p class="splash-label" id="splash-label">
-                宝宝耐性等等，正在准备札记空间哦~
-              </p>
-            </div>
-          </div>
-        </div>
+    <div id="app-splash" role="status" aria-live="polite" aria-busy="true" aria-label="加载中">
+      <div id="splash-bg">
+        <img src="https://memento-static.oss-cn-shenzhen.aliyuncs.com/common-images/spring.jpg" alt="" decoding="async" />
+        <img src="https://memento-static.oss-cn-shenzhen.aliyuncs.com/common-images/summer.jpg" alt="" decoding="async" />
+        <img src="https://memento-static.oss-cn-shenzhen.aliyuncs.com/common-images/autumn.jpg" alt="" decoding="async" />
+        <img src="https://memento-static.oss-cn-shenzhen.aliyuncs.com/common-images/winter.jpg" alt="" decoding="async" />
       </div>
-      <script>
-        (function () {
-          if (document.documentElement.dataset.splash !== "1") return;
-          var fill = document.getElementById("splash-fill");
-          var pctEl = document.getElementById("splash-percent");
-          var labelEl = document.getElementById("splash-label");
-          if (!fill || !pctEl) return;
+      <div id="splash-load"></div>
+    </div>
+    <script>
+      (function () {
+        var HOLD = 5.6;
+        var BLEND = 2;
+        var SPAN = HOLD + BLEND;
+        var NAMES = ["spring", "summer", "autumn", "winter"];
+        var start = Number(document.documentElement.getAttribute("data-splash-season"));
+        if (!(start >= 0 && start < 4)) {
+          var month = new Date().getMonth();
+          start = month === 11 || month < 2 ? 3 : month < 5 ? 0 : month < 8 ? 1 : 2;
+        }
+        var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var L = document.getElementById("splash-load");
+        var splash = document.getElementById("app-splash");
+        if (!L || !splash) return;
+        var bgImgs = document.querySelectorAll("#splash-bg img");
+        for (var s = 0; s < bgImgs.length; s++) bgImgs[s].classList.toggle("on", s === start);
+        L.dataset.season = NAMES[start];
 
-          var reduce =
-            window.matchMedia &&
-            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-          var doneLabels = [
-            "宝宝准备好啦！即将翻开札记哦…",
-            "亲爱的 札记已经就绪，这就为你打开啦…",
-          ];
-          var pickDone = function () {
-            return doneLabels[Math.floor(Math.random() * doneLabels.length)];
+        var seasonAt = function (t) {
+          var i = Math.floor(t / SPAN);
+          var f = t / SPAN - i;
+          var u = f <= HOLD / SPAN ? 0 : (f - HOLD / SPAN) / (BLEND / SPAN);
+          var e = u * u * (3 - 2 * u);
+          return i + e;
+        };
+
+        var el = function (tag, cls, html) {
+          var node = document.createElement(tag);
+          if (cls) node.className = cls;
+          if (html != null) node.innerHTML = html;
+          return node;
+        };
+
+        var ensoSvg = function () {
+          var NS = "http://www.w3.org/2000/svg";
+          var svg = document.createElementNS(NS, "svg");
+          svg.setAttribute("viewBox", "0 0 200 200");
+          svg.setAttribute("class", "enso");
+          var seed = 7;
+          var rnd = function () {
+            seed = (seed * 16807) % 2147483647;
+            return seed / 2147483647;
           };
-
-          if (reduce) {
-            fill.style.width = "90%";
-            pctEl.textContent = "90%";
-            if (labelEl) labelEl.textContent = pickDone();
-            return;
+          var N = 260;
+          var a0 = (118 * Math.PI) / 180;
+          var sweep = (336 * Math.PI) / 180;
+          var ss = function (e0, e1, x) {
+            var t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
+            return t * t * (3 - 2 * t);
+          };
+          var centre = [];
+          var i;
+          for (i = 0; i <= N; i++) {
+            var t = i / N;
+            var a = a0 + t * sweep;
+            var r = 72 + 2.2 * Math.sin(a * 3 + 1.1) + 1.3 * Math.sin(a * 5 + 0.3) - 3 * ss(0.85, 1, t);
+            centre.push([100 + Math.cos(a) * r, 100 + Math.sin(a) * r, Math.cos(a), Math.sin(a)]);
           }
-
-          var CAP = 90;
-          var start = performance.now();
-          var lastShown = -1;
-          var doneText = pickDone();
-          var labels = [
-            [0, "宝宝耐性等等，正在准备札记空间哦~"],
-            [28, "亲爱的 核心资源正在飞奔过来啦…"],
-            [55, "小笨蛋 正在悄悄为你整理环境哦…"],
-            [78, "宝贝 马上就准备好啦，再等人家一秒秒…"],
-          ];
-
-          var tick = function (now) {
-            var t = (now - start) / 1000;
-            var p;
-            if (t < 0.45) p = (t / 0.45) * 18;
-            else if (t < 1.1) p = 18 + ((t - 0.45) / 0.65) * 24;
-            else if (t < 1.85) p = 42 + ((t - 1.1) / 0.75) * 22;
-            else if (t < 2.6) p = 64 + ((t - 1.85) / 0.75) * 14;
-            else p = 78 + (1 - Math.exp(-(t - 2.6) * 0.55)) * (CAP - 78);
-
-            p = Math.min(CAP, Math.round(p));
-            if (p !== lastShown) {
-              lastShown = p;
-              fill.style.width = p + "%";
-              pctEl.textContent = p + "%";
-              if (labelEl) {
-                if (p >= CAP) labelEl.textContent = doneText;
-                else {
-                  for (var i = labels.length - 1; i >= 0; i--) {
-                    if (p >= labels[i][0]) {
-                      labelEl.textContent = labels[i][1];
-                      break;
-                    }
-                  }
-                }
-              }
+          var width = function (pt) {
+            return 15 * (1 + 0.45 * Math.exp(-pt * 26)) * (1 - 0.62 * ss(0.45, 1, pt)) * (0.92 + 0.08 * Math.sin(pt * 19));
+          };
+          var d = "";
+          var K = 15;
+          var k;
+          for (k = 0; k < K; k++) {
+            var o = (k + 0.5) / K - 0.5;
+            var edge = Math.abs(o) * 2;
+            var tEnd = 1 - edge * edge * (0.18 + rnd() * 0.22) - rnd() * 0.04;
+            var tStart = 0.028 * (1 - Math.sqrt(Math.max(0, 1 - edge * edge))) + rnd() * 0.003;
+            var gap0 = edge > 0.5 && rnd() < 0.6 ? 0.55 + rnd() * 0.3 : 2;
+            var gapL = 0.02 + rnd() * 0.05;
+            var left = [];
+            var right = [];
+            for (i = 0; i <= N; i++) {
+              t = i / N;
+              if (t > tEnd) break;
+              if (t < tStart) continue;
+              var point = centre[i];
+              var w = width(t);
+              var hw = (w / K) * 0.95 * (0.35 + 0.65 * ss(tStart, tStart + 0.012, t)) * (1 - ss(tEnd - 0.06, tEnd, t));
+              if (t > gap0 && t < gap0 + gapL) hw *= 0.08;
+              var off = o * w + Math.sin(t * 40 + k) * 0.25;
+              left.push((point[0] + point[2] * (off - hw)).toFixed(2) + " " + (point[1] + point[3] * (off - hw)).toFixed(2));
+              right.push((point[0] + point[2] * (off + hw)).toFixed(2) + " " + (point[1] + point[3] * (off + hw)).toFixed(2));
             }
-            window.requestAnimationFrame(tick);
-          };
-          window.requestAnimationFrame(tick);
-        })();
-      </script>
-      <script>
-        (function () {
-          if (document.documentElement.dataset.splash !== "1") return;
-          var boot = window.__MEMENTO_SPLASH__;
-          var slotA = document.getElementById("splash-banner-a");
-          var slotB = document.getElementById("splash-banner-b");
-          if (!boot || !slotA || !slotB || !boot.urls || boot.urls.length < 2) return;
+            if (left.length > 2) d += "M" + left.join("L") + "L" + right.reverse().join("L") + "Z";
+          }
+          var line = centre
+            .map(function (point) {
+              return point[0].toFixed(2) + " " + point[1].toFixed(2);
+            })
+            .join("L");
+          svg.innerHTML =
+            '<defs><filter id="splash-ink" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="2" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.4"/></filter><mask id="splash-draw" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200"><path class="pen" d="M' +
+            line +
+            '" fill="none" stroke="#fff" stroke-width="40" stroke-linecap="round"/></mask></defs><g mask="url(#splash-draw)"><path class="ink" d="' +
+            d +
+            '"/></g>';
+          return svg;
+        };
 
-          var urls = boot.urls;
-          var index = boot.index;
-          var shown = slotA;
-          var hidden = slotB;
-          var INTERVAL = 3000;
-          var reduceMotion =
-            window.matchMedia &&
-            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-          var FADE_MS = reduceMotion ? 0 : 900;
+        var stage = el("div", "stage");
+        var svg = ensoSvg();
+        var pen = svg.querySelector(".pen");
+        stage.appendChild(svg);
+        var title = el("div", "title", "<span>雨</span><span>皇</span>");
+        stage.appendChild(title);
+        stage.appendChild(el("div", "foot", '<div class="sub">Sakura Fantasy</div><div class="motto">一舟　四季　千灯</div>'));
+        L.appendChild(stage);
 
-          var decodeEl = function (el) {
-            if (typeof el.decode === "function")
-              return el.decode().then(
-                function () {},
-                function () {},
-              );
-            return Promise.resolve();
-          };
+        if (!reduce) {
+          for (var n = 0; n < 22; n++) {
+            var petal = el("div", "petal");
+            petal.style.left = 4 + Math.random() * 92 + "vw";
+            petal.style.animationDuration = 7 + Math.random() * 11 + "s";
+            petal.style.animationDelay = -Math.random() * 16 + "s";
+            L.appendChild(petal);
+          }
+        }
 
-          var armSrc = function (el, src) {
-            return new Promise(function (resolve) {
-              var finish = function () {
-                el.onload = null;
-                el.onerror = null;
-                decodeEl(el).then(resolve);
-              };
-              if (el.getAttribute("src") === src && el.complete && el.naturalWidth > 0) {
-                finish();
+        var ink = svg.querySelector(".ink");
+        var revealInk = function () {
+          if (ink) ink.setAttribute("filter", "url(#splash-ink)");
+        };
+        if (!reduce && pen) {
+          var penLen = pen.getTotalLength();
+          pen.style.strokeDasharray = penLen + " " + penLen;
+          pen.style.setProperty("--enso-len", penLen + "px");
+          pen.style.strokeDashoffset = penLen + "px";
+          pen.style.animation = "splash-enso 2.6s cubic-bezier(0.455, 0.03, 0.515, 0.955) forwards";
+          pen.addEventListener("animationend", function (event) {
+            if (event.animationName !== "splash-enso") return;
+            revealInk();
+          });
+        } else {
+          revealInk();
+        }
+
+        if (!reduce) {
+          var imgs = Array.prototype.slice.call(document.querySelectorAll("#splash-bg img"));
+          var t0 = performance.now();
+          var lastOp = [];
+          window.setTimeout(function () {
+            var frame = function (now) {
+              if (!splash.isConnected) return;
+              var elapsed = (now - t0) / 1000;
+              var season = start + seasonAt(elapsed);
+              var idx = Math.floor(season) % 4;
+              var f = season - Math.floor(season);
+              var next = (idx + 1) % 4;
+              imgs.forEach(function (img, index) {
+                var opacity = index === idx ? 1 - f : index === next ? f : 0;
+                var nextOp = opacity > 0.001 ? opacity.toFixed(3) : "0";
+                if (lastOp[index] === nextOp) return;
+                lastOp[index] = nextOp;
+                img.style.opacity = nextOp;
+              });
+              var name = NAMES[Math.round(season) % 4];
+              if (L.dataset.season !== name) L.dataset.season = name;
+              var into = elapsed % SPAN;
+              if (into < HOLD - 0.03) {
+                window.setTimeout(function () {
+                  requestAnimationFrame(frame);
+                }, (HOLD - into) * 1000);
                 return;
               }
-              el.onload = finish;
-              el.onerror = function () {
-                el.onload = null;
-                el.onerror = null;
-                resolve();
-              };
-              el.src = src;
-            });
-          };
-
-          var preloadUrl = function (src) {
-            var img = new Image();
-            img.decoding = "async";
-            img.src = src;
-            if (typeof img.decode === "function")
-              void img.decode().then(
-                function () {},
-                function () {},
-              );
-          };
-
-          var sleepMs = function (ms) {
-            return new Promise(function (resolve) {
-              window.setTimeout(resolve, ms);
-            });
-          };
-
-          var raf2 = function () {
-            return new Promise(function (resolve) {
-              window.requestAnimationFrame(function () {
-                window.requestAnimationFrame(resolve);
-              });
-            });
-          };
-
-          void armSrc(shown, urls[index]).then(function () {
-            var lastSwitch = performance.now();
-            preloadUrl(urls[(index + 1) % urls.length]);
-
-            var alive = function () {
-              var splash = document.getElementById("app-splash");
-              return !!splash && !splash.hasAttribute("data-leaving");
+              requestAnimationFrame(frame);
             };
-
-            var loop = function () {
-              if (!alive()) return;
-              var next = (index + 1) % urls.length;
-              var remain = Math.max(0, INTERVAL - (performance.now() - lastSwitch));
-              Promise.all([armSrc(hidden, urls[next]), sleepMs(remain)])
-                .then(function () {
-                  return raf2();
-                })
-                .then(function () {
-                  if (!alive()) return;
-                  hidden.classList.add("is-on");
-                  shown.classList.remove("is-on");
-                  var outgoing = shown;
-                  shown = hidden;
-                  hidden = outgoing;
-                  index = next;
-                  lastSwitch = performance.now();
-                  preloadUrl(urls[(index + 1) % urls.length]);
-                  sleepMs(FADE_MS).then(loop);
-                });
-            };
-            loop();
-          });
-        })();
-      </script>
-    </div>
+            requestAnimationFrame(frame);
+          }, HOLD * 1000);
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

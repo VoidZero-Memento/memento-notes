@@ -1,33 +1,26 @@
-import { PC_PAGE_BG_URL } from "@/lib/bg-photos/constants";
+import { readStoredSidebarBg } from "@/lib/prefs/sidebar-bg";
 
 /** 首屏占位最少展示时长（从页面导航起算） */
-export const SPLASH_MIN_MS = 3000;
+export const SPLASH_MIN_MS = 8000;
 
-/** banner 等待上限，超时后不再阻塞挂载 */
+/** 四季底图等待上限，超时后不再阻塞退场 */
 export const SPLASH_BANNER_TIMEOUT_MS = 10000;
 
-const SPLASH_IMAGE_MOBILE =
-  "https://memento-static.oss-cn-shenzhen.aliyuncs.com/lite-loading-background1.png";
-const SPLASH_IMAGE_PC = PC_PAGE_BG_URL;
+const SEASONS = ["spring", "summer", "autumn", "winter"] as const;
 
-type SplashBoot = {
-  urls: string[];
-  index: number;
+const SEASON_IMAGE_BASE = "https://memento-static.oss-cn-shenzhen.aliyuncs.com/common-images";
+
+const seasonUrl = (name: (typeof SEASONS)[number]) => `${SEASON_IMAGE_BASE}/${name}.jpg`;
+
+/** 气象季节：3–5 春，6–8 夏，9–11 秋，12–2 冬。与 index.html 开屏首帧一致 */
+const seasonIndex = (month = new Date().getMonth()) => {
+  if (month === 11 || month < 2) return 3;
+  if (month < 5) return 0;
+  if (month < 8) return 1;
+  return 2;
 };
 
-const readSplashBoot = (): SplashBoot | undefined => {
-  const boot = (window as Window & { __MEMENTO_SPLASH__?: SplashBoot }).__MEMENTO_SPLASH__;
-  if (!boot?.urls?.length) return undefined;
-  return boot;
-};
-
-/** 与 index.html 首屏当前帧一致 */
-export const SPLASH_IMAGE_URL = () => {
-  const boot = readSplashBoot();
-  const url = boot?.urls[boot.index];
-  if (url) return url;
-  return window.matchMedia("(min-width: 861px)").matches ? SPLASH_IMAGE_PC : SPLASH_IMAGE_MOBILE;
-};
+export const SPLASH_IMAGE_URL = () => seasonUrl(SEASONS[seasonIndex()]);
 
 const loadImage = (src: string) =>
   new Promise<void>((resolve) => {
@@ -52,7 +45,7 @@ const sleep = (ms: number) =>
 
 const waitBanner = () =>
   Promise.race([
-    loadImage(SPLASH_IMAGE_URL()),
+    Promise.all(SEASONS.map((name) => loadImage(seasonUrl(name)))).then(() => undefined),
     sleep(SPLASH_BANNER_TIMEOUT_MS),
   ]);
 
@@ -64,11 +57,13 @@ const preparePageBg = () => {
 };
 
 /**
- * 等首屏 banner（含超时）与整页底图首帧预载就绪，且从导航起至少满 SPLASH_MIN_MS。
- * 不再阻塞 React 挂载；由 splash-gate 在底图画上后再摘掉 splash。
+ * 等四季底图（含超时），背景开启时再等整页底图首帧，且从导航起至少满 SPLASH_MIN_MS。
+ * 不再阻塞 React 挂载；由 splash-gate 在入口画上后再摘掉 splash。
  */
 export const waitForSplash = async () => {
-  await Promise.all([waitBanner(), preparePageBg()]);
+  const tasks: Array<Promise<unknown>> = [waitBanner()];
+  if (readStoredSidebarBg()) tasks.push(preparePageBg());
+  await Promise.all(tasks);
   const remain = Math.max(0, SPLASH_MIN_MS - performance.now());
   if (remain > 0) await sleep(remain);
 };

@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
 import { preloadUiCjkFonts } from "@/lib/fonts/preload-ui-cjk";
-import { readStoredSidebarBg } from "@/lib/prefs/sidebar-bg";
 import {
   dismissSplash,
   waitAppBgPainted,
@@ -29,12 +28,4 @@ const mount = () => {
 
 mount();
 
-if (readStoredSidebarBg()) {
-  void Promise.all([
-    waitForSplash(),
-    waitAppBgPainted(),
-    waitEntryPainted(),
-  ]).then(dismissSplash);
-} else {
-  dismissSplash();
-}
+void Promise.all([waitForSplash(), waitAppBgPainted(), waitEntryPainted()]).then(dismissSplash);

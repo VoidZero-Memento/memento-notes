@@ -1,6 +1,3 @@
-import { dismissSplashDomino } from "@/lib/splash/splash-domino";
-import { requestSplashHandoff } from "@/lib/splash/splash-handoff";
-
 let painted = false;
 const waiters: Array<() => void> = [];
 
@@ -38,23 +35,11 @@ export const waitEntryPainted = () => {
 };
 
 const removeSplash = () => {
-  delete document.documentElement.dataset.splash;
   document.getElementById("app-splash")?.remove();
 };
 
-/** 与 index.html 退场时长一致 */
-const PC_SPLASH_DISSOLVE_DELAY_MS = 700;
-const PC_SPLASH_DISSOLVE_MS = 880;
-const MOBILE_SPLASH_FADE_MS = 520;
-
-const freezeMotion = (el: Element | null) => {
-  if (!(el instanceof HTMLElement)) return;
-  const computed = getComputedStyle(el);
-  const { transform, opacity } = computed;
-  el.style.animation = "none";
-  el.style.opacity = opacity;
-  el.style.transform = transform;
-};
+/** 与 index.html #app-splash 的 opacity 过渡一致 */
+const SPLASH_FADE_MS = 900;
 
 const watchOpacityEnd = (splash: HTMLElement, finish: () => void) => {
   splash.addEventListener("transitionend", (event) => {
@@ -63,66 +48,26 @@ const watchOpacityEnd = (splash: HTMLElement, finish: () => void) => {
   });
 };
 
-const dismissSplashPcFallback = (splash: HTMLElement) => {
-  freezeMotion(splash.querySelector(".splash-stage"));
-  freezeMotion(splash.querySelector(".splash-banners"));
-  void splash.offsetWidth;
-  splash.classList.add("is-leave");
-
-  let settled = false;
-  const finish = () => {
-    if (settled) return;
-    settled = true;
-    removeSplash();
-  };
-
-  window.setTimeout(() => {
-    if (!splash.isConnected) return;
-    splash.classList.add("is-dissolve");
-  }, PC_SPLASH_DISSOLVE_DELAY_MS);
-
-  watchOpacityEnd(splash, finish);
-  window.setTimeout(finish, PC_SPLASH_DISSOLVE_DELAY_MS + PC_SPLASH_DISSOLVE_MS + 120);
-};
-
-const dismissSplashPc = (splash: HTMLElement) => {
-  if (dismissSplashDomino(splash, removeSplash)) return;
-  dismissSplashPcFallback(splash);
-};
-
-const dismissSplashMobile = async (splash: HTMLElement) => {
-  splash.dataset.leaving = "1";
-  const banner = splash.querySelector<HTMLImageElement>(".splash-banner.is-on");
-  const url = banner?.currentSrc || banner?.src;
-  if (url) await requestSplashHandoff(url);
-  if (!splash.isConnected) return;
-
-  let settled = false;
-  const finish = () => {
-    if (settled) return;
-    settled = true;
-    removeSplash();
-  };
-  splash.style.transitionDuration = `${MOBILE_SPLASH_FADE_MS}ms`;
-  splash.classList.add("is-leave");
-  watchOpacityEnd(splash, finish);
-  window.setTimeout(finish, MOBILE_SPLASH_FADE_MS + 80);
-};
-
+/** 四季开屏整层淡出，底下的正文已经画好 */
 export const dismissSplash = () => {
   const splash = document.getElementById("app-splash");
   if (!splash) {
     removeSplash();
     return;
   }
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduce) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     removeSplash();
     return;
   }
-  if (window.matchMedia("(min-width: 861px)").matches) {
-    dismissSplashPc(splash);
-    return;
-  }
-  void dismissSplashMobile(splash);
+
+  let settled = false;
+  const finish = () => {
+    if (settled) return;
+    settled = true;
+    removeSplash();
+  };
+
+  splash.classList.add("is-leave");
+  watchOpacityEnd(splash, finish);
+  window.setTimeout(finish, SPLASH_FADE_MS + 120);
 };
