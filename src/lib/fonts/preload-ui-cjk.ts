@@ -1,8 +1,6 @@
 import { OSS_FOLDER_LABELS } from "@/lib/bg-photos/oss-folder";
 import { THEME_LABELS } from "@/lib/theme/theme";
 
-const OVERLAY_COPY = ["氛围模式", "背景铺开中"] as const;
-
 const APPEARANCE_COPY = [
   "边框流光",
   "显示背景",
@@ -24,7 +22,7 @@ const APPEARANCE_COPY = [
 
 const UI_CJK_SAMPLE = [
   ...new Set(
-    [...Object.values(THEME_LABELS), ...Object.values(OSS_FOLDER_LABELS), ...OVERLAY_COPY, ...APPEARANCE_COPY].join(""),
+    [...Object.values(THEME_LABELS), ...Object.values(OSS_FOLDER_LABELS), ...APPEARANCE_COPY].join(""),
   ),
 ].join("");
 

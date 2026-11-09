@@ -34,40 +34,13 @@ export const waitEntryPainted = () => {
   });
 };
 
-const removeSplash = () => {
-  document.getElementById("app-splash")?.remove();
-};
-
-/** 与 index.html #app-splash 的 opacity 过渡一致 */
-const SPLASH_FADE_MS = 900;
-
-const watchOpacityEnd = (splash: HTMLElement, finish: () => void) => {
-  splash.addEventListener("transitionend", (event) => {
-    if (event.target !== splash || event.propertyName !== "opacity") return;
-    finish();
-  });
-};
-
-/** 四季开屏整层淡出，底下的正文已经画好 */
+/** 开屏在 index.html 里把进度补到 100% 后自行淡出；这里只通知它可以收尾 */
 export const dismissSplash = () => {
   const splash = document.getElementById("app-splash");
-  if (!splash) {
-    removeSplash();
+  if (!splash) return;
+  if (splash.dataset.armed === "1") {
+    splash.dispatchEvent(new Event("memento-splash-ready"));
     return;
   }
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    removeSplash();
-    return;
-  }
-
-  let settled = false;
-  const finish = () => {
-    if (settled) return;
-    settled = true;
-    removeSplash();
-  };
-
-  splash.classList.add("is-leave");
-  watchOpacityEnd(splash, finish);
-  window.setTimeout(finish, SPLASH_FADE_MS + 120);
+  splash.remove();
 };

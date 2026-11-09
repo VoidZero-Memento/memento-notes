@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { getCrawlExitMs, PC_BG_EXIT_MS } from "@/lib/prefs/sidebar-bg";
 import { useSidebarBg } from "@/lib/prefs/useSidebarBg";
+import { splashEdgeSettleMs } from "@/lib/splash/splash-loading";
 import { toast } from "@/lib/toast/toast";
 
 type UseSidebarBgTransitionOptions = {
@@ -29,7 +30,8 @@ export const useSidebarBgTransition = ({ isMobile }: UseSidebarBgTransitionOptio
   }, []);
 
   const finishEnable = () => {
-    const exitMs = getCrawlExitMs(isMobileRef.current);
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const exitMs = getCrawlExitMs(isMobileRef.current) + (reduce ? 0 : splashEdgeSettleMs());
     setOverlayOpen(false);
     const exitId = window.setTimeout(() => {
       setBusy(false);

@@ -3,11 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
 import { preloadUiCjkFonts } from "@/lib/fonts/preload-ui-cjk";
-import {
-  dismissSplash,
-  waitAppBgPainted,
-  waitEntryPainted,
-} from "@/lib/splash/splash-gate";
+import { dismissSplash, waitAppBgPainted, waitEntryPainted } from "@/lib/splash/splash-gate";
 import { waitForSplash } from "@/lib/splash/wait-splash";
 import { applyTheme, readStoredTheme } from "@/lib/theme/theme";
 import App from "./App";

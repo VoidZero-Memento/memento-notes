@@ -2,14 +2,12 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  display: grid;
-  place-items: center;
   overflow: hidden;
+  background: #04070e;
   opacity: 0;
   pointer-events: none;
   cursor: none;
-  transition: opacity var(--bg-transition-exit-ms, 720ms)
-    cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity var(--bg-transition-exit-ms, 720ms) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .rootVisible {
@@ -18,537 +16,123 @@
   transition: opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/*
- * 收束到与正文底图同框。放大在蒙层可见的整段里匀速走完，退场叠在这段运动上，避免停住再淡出。
- */
-.backdrop {
+.stage {
   position: absolute;
   inset: 0;
-  z-index: 0;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(4, 7, 14, 0.12) 0%,
-      rgba(4, 7, 14, 0.08) 42%,
-      rgba(4, 7, 14, 0.16) 100%
-    ),
-    url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-background2.png")
-      center center / cover no-repeat;
-  filter: saturate(1) brightness(0.96);
-  transform: scale(1) translate3d(0, 0, 0);
-  transform-origin: center center;
-}
-
-.rootVisible .backdrop {
-  will-change: transform;
-  animation: bgTransitionSettle
-    calc(
-      var(--bg-transition-hold-ms, 1680ms) + var(--bg-transition-exit-ms, 720ms)
-    )
-    cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
-}
-
-.veil {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background:
-    radial-gradient(
-      ellipse 72% 58% at 50% 42%,
-      rgba(4, 7, 14, 0.02),
-      rgba(4, 7, 14, 0.22) 72%
-    ),
-    linear-gradient(180deg, rgba(4, 7, 14, 0.1) 0%, rgba(4, 7, 14, 0.2) 100%);
-  opacity: 0;
-}
-
-.rootVisible .veil {
-  animation: bgTransitionVeilOut
-    calc(
-      var(--bg-transition-hold-ms, 1680ms) + var(--bg-transition-exit-ms, 720ms)
-    )
-    linear forwards;
-}
-
-.panel {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  width: min(300px, calc(100vw - 48px));
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 0;
-  text-align: center;
-}
-
-.title,
-.desc,
-.progressTrack {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-.rootVisible .title {
-  animation:
-    bgTransitionCopyIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both,
-    bgTransitionCopyOut 0.7s cubic-bezier(0.4, 0, 0.2, 1)
-      calc(var(--bg-transition-hold-ms, 1680ms) - 280ms) forwards;
-}
-
-.rootVisible .desc {
-  animation:
-    bgTransitionCopyIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both,
-    bgTransitionCopyOut 0.7s cubic-bezier(0.4, 0, 0.2, 1)
-      calc(var(--bg-transition-hold-ms, 1680ms) - 240ms) forwards;
-}
-
-.rootVisible .progressTrack {
-  animation:
-    bgTransitionCopyIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both,
-    bgTransitionCopyOut 0.7s cubic-bezier(0.4, 0, 0.2, 1)
-      calc(var(--bg-transition-hold-ms, 1680ms) - 200ms) forwards;
-}
-
-.title {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.94);
-  font-family: "LXGWWenKai", var(--font-geist-sans);
-  font-size: 22px;
-  font-weight: 400;
-  letter-spacing: 0.28em;
-  line-height: 1.35;
-  text-indent: 0.28em;
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
-}
-
-.desc {
-  margin: 0;
-  max-width: 22em;
-  color: rgba(255, 255, 255, 0.58);
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 0.18em;
-  line-height: 1.5;
-  text-indent: 0.18em;
-  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.4);
-}
-
-.progressTrack {
-  position: relative;
-  width: min(132px, 52%);
-  height: 3px;
-  margin-top: 14px;
   overflow: hidden;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  animation: splashRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.progressBar {
+.banner {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.bannerActive {
+  opacity: 1;
+}
+
+.banner img {
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(
-    90deg,
-    rgba(var(--accent-rgb), 0.65),
-    rgba(var(--accent-2-rgb), 0.9),
-    rgba(var(--accent-3-rgb), 0.95)
-  );
-  background-size: 200% 100%;
-  box-shadow:
-    0 0 10px rgba(var(--accent-rgb), 0.45),
-    0 0 18px rgba(var(--accent-2-rgb), 0.28);
-  transform: scaleX(0);
-  transform-origin: left center;
+  object-fit: cover;
+  transform-origin: 50% 40%;
+  filter: saturate(1.08) contrast(1.03);
+  animation: splashDrift 16s ease-in-out infinite alternate;
 }
 
-.progressBarActive {
-  animation:
-    bgTransitionProgress var(--bg-transition-hold-ms, 3000ms) linear forwards,
-    bgTransitionShimmer 1.6s ease-in-out infinite;
-}
-
-/* 真实资源等待：缓爬到 90%，时长未知时不提前收束 */
-.progressBarCrawl {
-  animation:
-    bgTransitionProgressCrawl 10s cubic-bezier(0.22, 1, 0.36, 1) forwards,
-    bgTransitionShimmer 1.6s ease-in-out infinite;
-}
-
-.rootCrawl.rootVisible .title,
-.rootCrawl.rootVisible .desc,
-.rootCrawl.rootVisible .progressTrack {
-  animation: bgTransitionCopyIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.08s
-    forwards;
-}
-
-.rootCrawl.rootVisible .veil {
+.banner img.fill {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  filter: blur(10px) saturate(1.2) brightness(0.4);
+  transform: translate(-50%, -50%) scale(30);
   animation: none;
-  opacity: 0.55;
 }
 
-@keyframes bgTransitionSettle {
-  from {
-    transform: scale(1.05) translate3d(0, 0.35%, 0);
-  }
-
-  to {
-    transform: scale(1) translate3d(0, 0, 0);
-  }
+.banner img.portrait {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  object-fit: cover;
+  object-position: center;
+  filter: none;
+  transform: none;
+  animation: none;
 }
 
-@keyframes bgTransitionVeilOut {
-  from {
-    opacity: 0.55;
-  }
+.edge {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
 
-  to {
+@keyframes splashRise {
+  from {
     opacity: 0;
-  }
-}
-
-@keyframes bgTransitionCopyIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(18px) scale(0.97);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-@keyframes bgTransitionCopyOut {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  to {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes bgTransitionProgress {
-  from {
-    transform: scaleX(0);
-  }
-
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes bgTransitionProgressCrawl {
-  from {
-    transform: scaleX(0);
-  }
-
-  to {
-    transform: scaleX(0.9);
-  }
-}
-
-@keyframes bgTransitionShimmer {
-  0%,
-  100% {
-    background-position: 0% 50%;
+@keyframes splashDrift {
+  0% {
+    transform: scale(1.05) translate(0, 0);
   }
 
   50% {
-    background-position: 100% 50%;
+    transform: scale(1.1) translate(-1.2%, -1.8%);
+  }
+
+  100% {
+    transform: scale(1.16) translate(1%, -2.6%);
   }
 }
 
-@media (max-width: 860px) {
-  .backdrop {
-    background:
-      linear-gradient(
-        180deg,
-        rgba(4, 7, 14, 0.12) 0%,
-        rgba(4, 7, 14, 0.08) 42%,
-        rgba(4, 7, 14, 0.16) 100%
-      ),
-      url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes-mobile-background3.png")
-        center / cover no-repeat;
-    transform-origin: center;
-  }
-
-  .panel {
-    width: min(260px, calc(100vw - 32px));
-  }
-
-  .title {
-    font-size: 18px;
-    letter-spacing: 0.22em;
-    text-indent: 0.22em;
-  }
-
-  .desc {
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-indent: 0.14em;
-  }
-
-  .progressTrack {
-    width: min(108px, 46%);
-    margin-top: 12px;
-  }
-}
-
-/*
- * PC：图从略放大淡入，在揭开前收到与正文底图同一帧（scale 1）。
- * 30.99% = ENTER / (ENTER+HOLD+EXIT)，67.61% = (ENTER+HOLD) / 总时长。
- */
 @media (min-width: 861px) {
   .root:not(.rootCrawl).rootVisible {
-    transition: opacity var(--bg-transition-enter-ms, 880ms)
-      cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .root:not(.rootCrawl) .backdrop {
-    transform: scale(1.035) translate3d(0.18%, 0.22%, 0);
-  }
-
-  .root:not(.rootCrawl).rootVisible .backdrop {
-    animation: bgTransitionSettlePc
-      calc(
-        var(--bg-transition-enter-ms, 880ms) +
-          var(--bg-transition-hold-ms, 1040ms) +
-          var(--bg-transition-exit-ms, 920ms)
-      )
-      linear both;
-  }
-
-  .root:not(.rootCrawl).rootVisible .veil {
-    animation: bgTransitionVeilOutPc
-      calc(
-        var(--bg-transition-enter-ms, 880ms) +
-          var(--bg-transition-hold-ms, 1040ms) +
-          var(--bg-transition-exit-ms, 920ms)
-      )
-      linear both;
-  }
-
-  .root:not(.rootCrawl).rootVisible .title {
-    animation:
-      bgTransitionCopyIn 0.52s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both,
-      bgTransitionCopyOut 0.48s cubic-bezier(0.4, 0, 0.2, 1)
-        calc(
-          var(--bg-transition-enter-ms, 880ms) +
-            var(--bg-transition-hold-ms, 1040ms) - 600ms
-        )
-        forwards;
-  }
-
-  .root:not(.rootCrawl).rootVisible .desc {
-    animation:
-      bgTransitionCopyIn 0.52s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both,
-      bgTransitionCopyOut 0.48s cubic-bezier(0.4, 0, 0.2, 1)
-        calc(
-          var(--bg-transition-enter-ms, 880ms) +
-            var(--bg-transition-hold-ms, 1040ms) - 560ms
-        )
-        forwards;
-  }
-
-  .root:not(.rootCrawl).rootVisible .progressTrack {
-    animation:
-      bgTransitionCopyIn 0.52s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both,
-      bgTransitionCopyOut 0.48s cubic-bezier(0.4, 0, 0.2, 1)
-        calc(
-          var(--bg-transition-enter-ms, 880ms) +
-            var(--bg-transition-hold-ms, 1040ms) - 520ms
-        )
-        forwards;
-  }
-
-  .root:not(.rootCrawl) .progressBarActive {
-    animation:
-      bgTransitionProgress
-        calc(
-          var(--bg-transition-enter-ms, 880ms) +
-            var(--bg-transition-hold-ms, 1040ms)
-        )
-        linear forwards,
-      bgTransitionShimmer 1.6s ease-in-out infinite;
+    transition: opacity var(--bg-transition-enter-ms, 880ms) cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
 
-@keyframes bgTransitionSettlePc {
-  0% {
-    transform: scale(1.035) translate3d(0.18%, 0.22%, 0);
-  }
-
-  16% {
-    transform: scale(1.018) translate3d(0.08%, 0.1%, 0);
-  }
-
-  30.99% {
-    transform: scale(1.006) translate3d(0.02%, 0.03%, 0);
-  }
-
-  42% {
-    transform: scale(1) translate3d(0, 0, 0);
-  }
-
-  100% {
-    transform: scale(1) translate3d(0, 0, 0);
-  }
-}
-
-@keyframes bgTransitionVeilOutPc {
-  0% {
-    opacity: 0.22;
-  }
-
-  30.99% {
-    opacity: 0.06;
-  }
-
-  46%,
-  100% {
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .root,
-  .root:not(.rootCrawl),
-  .root:not(.rootCrawl).rootVisible {
-    transition: none;
-  }
-
-  .root:not(.rootCrawl) .backdrop {
-    transform: none;
-  }
-
-  .rootVisible .backdrop,
-  .rootVisible .veil,
-  .root:not(.rootCrawl).rootVisible .backdrop,
-  .root:not(.rootCrawl).rootVisible .veil {
-    animation: none;
-  }
-
-  .title,
-  .desc,
-  .progressTrack {
-    opacity: 1;
-    transform: none;
-  }
-
-  .rootVisible .title,
-  .rootVisible .desc,
-  .rootVisible .progressTrack,
-  .root:not(.rootCrawl).rootVisible .title,
-  .root:not(.rootCrawl).rootVisible .desc,
-  .root:not(.rootCrawl).rootVisible .progressTrack {
-    animation: none;
-  }
-
-  .progressBarActive,
-  .root:not(.rootCrawl) .progressBarActive {
-    animation: none;
-    transform: scaleX(1);
-  }
-}
-
-/*
- * 点击切换后的真实等待蒙层：与 index.html 开屏同款。
- * PC：底图放大占满并缓慢漂移；收尾时漂移停在当前帧，文案下沉淡出、遮罩褪去，再整体溶解。
- * 手机：底图不动，收尾直接淡出。
- */
 .rootCrawl {
-  transition: opacity var(--bg-transition-exit-ms, 880ms)
-    cubic-bezier(0.22, 1, 0.36, 1) var(--bg-transition-leave-delay, 0ms);
+  transition: opacity var(--bg-transition-exit-ms, 880ms) cubic-bezier(0.22, 1, 0.36, 1)
+    var(--bg-transition-leave-delay, 0ms);
 }
 
 .rootCrawl.rootVisible {
   transition: opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.rootCrawl .backdrop,
-.rootCrawl.rootVisible .backdrop {
-  animation: none;
-  transform: none;
-}
-
-.rootCrawl .panel {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-  transition:
-    opacity 460ms cubic-bezier(0.4, 0, 0.2, 1),
-    transform 460ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.rootCrawl:not(.rootVisible) .panel {
-  opacity: 0;
-  transform: translate3d(0, 12px, 0);
-}
-
-/* 子元素入场仍由 rootVisible 的 animation 负责，收尾时交给 .panel 整体淡出，避免回到 opacity: 0 瞬间消失 */
-.rootCrawl .title,
-.rootCrawl .desc,
-.rootCrawl .progressTrack {
-  opacity: 1;
-  transform: none;
-}
-
-.rootCrawl .veil {
-  opacity: 0.55;
-  transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.rootCrawl:not(.rootVisible) .veil {
-  opacity: 0;
-}
-
-@keyframes bgTransitionDriftPc {
-  from {
-    transform: scale(1.5) translate(0, -14%);
-  }
-
-  to {
-    transform: scale(1.58) translate(0, -14%);
-  }
-}
-
-@media (min-width: 861px) {
-  .rootCrawl .backdrop,
-  .rootCrawl.rootVisible .backdrop {
-    transform-origin: 42% 60%;
-    will-change: transform;
-    animation: bgTransitionDriftPc 4.6s cubic-bezier(0.45, 0.05, 0.55, 0.95)
-      infinite alternate;
-  }
-
-  /* 收尾：暂停在当前帧，与开屏 freezeMotion 一致 */
-  .rootCrawl:not(.rootVisible) .backdrop {
-    animation-play-state: paused;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .rootCrawl,
-  .rootCrawl.rootVisible,
-  .rootCrawl .panel,
-  .rootCrawl .veil {
-    transition: none;
-  }
-
-  .rootCrawl .backdrop,
-  .rootCrawl.rootVisible .backdrop {
-    animation: none;
-    transform: none;
-  }
-}
-
 /* PC 收尾走多米诺：蒙层保持不透明，由倒牌列逐列露出下面的图墙 */
 .rootCrawl.rootDomino {
   opacity: 1;
   transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .rootVisible,
+  .rootCrawl,
+  .rootCrawl.rootVisible,
+  .stage,
+  .banner,
+  .banner img {
+    animation: none;
+    transition: none;
+  }
 }

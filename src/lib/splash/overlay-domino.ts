@@ -13,6 +13,17 @@ export const runOverlayDomino = (backdrop: HTMLElement, onDone: () => void): (()
   const prevCss = backdrop.style.cssText;
   if (!freezeMotion(backdrop)) return null;
 
+  const restoreChildren = Array.from(backdrop.querySelectorAll("*")).flatMap((node) => {
+    if (!(node instanceof HTMLElement)) return [];
+    const css = node.style.cssText;
+    freezeMotion(node);
+    return [
+      () => {
+        node.style.cssText = css;
+      },
+    ];
+  });
+
   const columns = Array.from({ length: count }, (_, i) => createColumn(backdrop, i, count));
   let anchor: Element = backdrop;
   columns.forEach((column) => {
@@ -28,6 +39,7 @@ export const runOverlayDomino = (backdrop: HTMLElement, onDone: () => void): (()
   return () => {
     window.clearTimeout(doneId);
     columns.forEach((column) => column.remove());
+    restoreChildren.forEach((restore) => restore());
     backdrop.style.cssText = prevCss;
   };
 };

@@ -1,11 +1,14 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { MOBILE_BG_MQ } from "@/lib/bg-photos/constants";
+import { MOBILE_BG_MQ, PC_PAGE_BG_URL } from "@/lib/bg-photos/constants";
 import { useAnimatedOpen } from "@/lib/dom/use-animated-open";
 import { useMediaQuery } from "@/lib/dom/use-media-query";
-import { BG_TRANSITION_EXIT_MS, BG_TRANSITION_HOLD_MS, getCrawlDissolveMs, getCrawlExitMs, getCrawlLeaveDelayMs, PC_BG_ENTER_MS, PC_BG_EXIT_MS, PC_BG_HOLD_MS } from "@/lib/prefs/sidebar-bg";
+import { BG_TRANSITION_EXIT_MS, getCrawlDissolveMs, getCrawlExitMs, getCrawlLeaveDelayMs, PC_BG_ENTER_MS, PC_BG_EXIT_MS } from "@/lib/prefs/sidebar-bg";
 import { runOverlayDomino } from "@/lib/splash/overlay-domino";
+import { splashBannerSrc, splashEdgeSettleMs } from "@/lib/splash/splash-loading";
+import { useSplashBanners } from "@/lib/splash/use-splash-banners";
+import { useSplashEdge } from "@/lib/splash/use-splash-edge";
 
 import styles from "./BgTransitionOverlay.module.css";
 
@@ -13,29 +16,55 @@ import type { CSSProperties } from "react";
 
 type BgTransitionOverlayProps = {
   open: boolean;
-  /** 真实等待：进度爬到 90%，不按固定 3s 收束文案；PC 收尾走多米诺倒牌 */
+  /** 真实等待：贴边进度先爬到 90%，画到顶点后才退场；PC 收尾走多米诺倒牌 */
   crawlProgress?: boolean;
 };
+
+const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 export const BgTransitionOverlay = ({ open, crawlProgress = false }: BgTransitionOverlayProps) => {
   const isMobile = useMediaQuery(MOBILE_BG_MQ);
   const pcSettle = !isMobile && !crawlProgress;
-  const holdMs = pcSettle ? PC_BG_HOLD_MS : BG_TRANSITION_HOLD_MS;
-  const exitMs = crawlProgress
-    ? getCrawlDissolveMs(isMobile)
-    : pcSettle
-      ? PC_BG_EXIT_MS
-      : BG_TRANSITION_EXIT_MS;
+  const exitMs = crawlProgress ? getCrawlDissolveMs(isMobile) : pcSettle ? PC_BG_EXIT_MS : BG_TRANSITION_EXIT_MS;
   const leaveDelayMs = crawlProgress ? getCrawlLeaveDelayMs(isMobile) : 0;
   const mountMs = crawlProgress ? getCrawlExitMs(isMobile) : exitMs;
-  const { mounted, visible } = useAnimatedOpen(open, mountMs);
+  const [holding, setHolding] = useState(false);
+  const [progressDone, setProgressDone] = useState(false);
+  const [trackedOpen, setTrackedOpen] = useState(open);
+  if (open !== trackedOpen) {
+    setTrackedOpen(open);
+    setProgressDone(false);
+    setHolding(!open && !prefersReducedMotion());
+  }
+  const shownOpen = open || holding;
+  const { mounted, visible } = useAnimatedOpen(shownOpen, mountMs);
+  const rootRef = useRef<HTMLDivElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dominoing, setDominoing] = useState(false);
   const [dominoDone, setDominoDone] = useState(false);
+  const present = mounted && !(dominoDone && !open);
+  const { indexes, active, onSettle } = useSplashBanners(present && isMobile, backdropRef);
 
-  // 关闭瞬间（绘制前）接管：PC 把底图切列倒牌；不可执行则沿用溶解
+  const finishEdge = () => {
+    setProgressDone(true);
+    setHolding(false);
+  };
+
+  useEffect(() => {
+    if (!holding) return;
+    const fallback = window.setTimeout(finishEdge, splashEdgeSettleMs() + 400);
+    return () => window.clearTimeout(fallback);
+  }, [holding]);
+
+  useSplashEdge(rootRef, canvasRef, {
+    enabled: present && !dominoing,
+    finishing: !open && holding,
+    onFinished: finishEdge,
+  });
+
   useLayoutEffect(() => {
-    if (open || !crawlProgress || isMobile) return;
+    if (open || !progressDone || !crawlProgress || isMobile) return;
     const backdrop = backdropRef.current;
     if (!backdrop) return;
     const cleanup = runOverlayDomino(backdrop, () => setDominoDone(true));
@@ -46,51 +75,44 @@ export const BgTransitionOverlay = ({ open, crawlProgress = false }: BgTransitio
       setDominoing(false);
       setDominoDone(false);
     };
-  }, [open, crawlProgress, isMobile]);
+  }, [open, progressDone, crawlProgress, isMobile]);
 
-  if (!mounted || (dominoDone && !open) || typeof document === "undefined") return null;
+  if (!present || typeof document === "undefined") return null;
 
   const overlayVars = {
     "--bg-transition-enter-ms": `${pcSettle ? PC_BG_ENTER_MS : 220}ms`,
-    "--bg-transition-hold-ms": `${holdMs}ms`,
     "--bg-transition-exit-ms": `${exitMs}ms`,
     "--bg-transition-leave-delay": `${leaveDelayMs}ms`,
   } as CSSProperties;
 
-  const progressClass = crawlProgress ? styles.progressBarCrawl : styles.progressBarActive;
-  /** 真实等待蒙层收尾时进度条要停在当前位置，不能随 visible 归零 */
-  const progressActive = crawlProgress || visible;
-  const rootClassName = [
-    styles.root,
-    visible ? styles.rootVisible : "",
-    crawlProgress ? styles.rootCrawl : "",
-    dominoing ? styles.rootDomino : "",
-  ]
+  const rootClassName = [styles.root, visible ? styles.rootVisible : "", crawlProgress ? styles.rootCrawl : "", dominoing ? styles.rootDomino : ""]
     .filter(Boolean)
     .join(" ");
 
   return createPortal(
-    <div
-      className={rootClassName}
-      style={overlayVars}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="bg-transition-title"
-      aria-describedby="bg-transition-desc"
-    >
-      <div ref={backdropRef} className={styles.backdrop} aria-hidden />
-      <div className={styles.veil} aria-hidden />
-      <div className={styles.panel}>
-        <p id="bg-transition-title" className={styles.title}>
-          氛围模式
-        </p>
-        <p id="bg-transition-desc" className={styles.desc}>
-          背景铺开中
-        </p>
-        <div className={styles.progressTrack} aria-hidden>
-          <span className={`${styles.progressBar}${progressActive ? ` ${progressClass}` : ""}`} />
-        </div>
+    <div ref={rootRef} className={rootClassName} style={overlayVars} role="dialog" aria-modal="true" aria-label="加载中">
+      <div ref={backdropRef} className={styles.stage} aria-hidden>
+        {isMobile ? (
+          indexes.map((index) => (
+            <div key={index} className={`${styles.banner}${index === active ? ` ${styles.bannerActive}` : ""}`}>
+              <img
+                alt=""
+                data-index={index}
+                decoding="async"
+                src={splashBannerSrc(index)}
+                onLoad={(event) => onSettle(index, event.currentTarget.naturalWidth > 0)}
+                onError={() => onSettle(index, false)}
+              />
+            </div>
+          ))
+        ) : (
+          <div className={`${styles.banner} ${styles.bannerActive}`}>
+            <img className={styles.fill} alt="" decoding="async" src={PC_PAGE_BG_URL} />
+            <img className={styles.portrait} alt="" decoding="async" src={PC_PAGE_BG_URL} />
+          </div>
+        )}
       </div>
+      {dominoing ? null : <canvas ref={canvasRef} className={styles.edge} aria-hidden />}
     </div>,
     document.body,
   );
