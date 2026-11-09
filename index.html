@@ -7,9 +7,24 @@
       content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,viewport-fit=cover"
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.png" />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/Geist-Variable.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/GeistMono-Variable.woff2" crossorigin />
-    <link rel="preconnect" href="https://memento-static.oss-cn-shenzhen.aliyuncs.com" />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/Geist-Variable.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/GeistMono-Variable.woff2"
+      crossorigin
+    />
+    <link
+      rel="preconnect"
+      href="https://memento-static.oss-cn-shenzhen.aliyuncs.com"
+    />
     <link
       rel="preload"
       as="image"
@@ -20,7 +35,7 @@
     <link
       rel="preload"
       as="image"
-      href="https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes/pc-background.png"
+      href="https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes/pc-background.jpeg"
       media="(min-width: 861px)"
       fetchpriority="high"
     />
@@ -159,7 +174,13 @@
     </style>
   </head>
   <body>
-    <div id="app-splash" role="status" aria-live="polite" aria-busy="true" aria-label="加载中">
+    <div
+      id="app-splash"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+      aria-label="加载中"
+    >
       <div id="splash-stage"></div>
       <canvas id="splash-edge" aria-hidden="true"></canvas>
     </div>
@@ -168,7 +189,8 @@
         var TICK_MS = 48;
         var LOAD_CAP = 90;
         var isPcSplash = window.matchMedia("(min-width: 861px)").matches;
-        var PC_BG = "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes/pc-background.png";
+        var PC_BG =
+          "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes/pc-background.jpeg";
         var BANNER_COUNT = isPcSplash ? 1 : 15;
         var BANNER_INTERVAL_MS = 2000;
         var BANNER_RETRY_MS = 300;
@@ -187,7 +209,9 @@
           [1, "#ffe58a"],
         ];
 
-        var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var reduce = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
         var splash = document.getElementById("app-splash");
         var stage = document.getElementById("splash-stage");
         var canvas = document.getElementById("splash-edge");
@@ -221,7 +245,10 @@
           active = index;
           var nodes = stage.children;
           for (var i = 0; i < nodes.length; i++) {
-            nodes[i].classList.toggle("is-active", Number(nodes[i].dataset.index) === index);
+            nodes[i].classList.toggle(
+              "is-active",
+              Number(nodes[i].dataset.index) === index,
+            );
           }
         };
 
@@ -245,7 +272,8 @@
 
         var mountBanner = function (index) {
           var wrap = document.createElement("div");
-          wrap.className = "splash-banner" + (index === active ? " is-active" : "");
+          wrap.className =
+            "splash-banner" + (index === active ? " is-active" : "");
           wrap.dataset.index = String(index);
           var img = document.createElement("img");
           img.alt = "";
@@ -299,10 +327,15 @@
               bannerTimer = window.setTimeout(pickRandomStart, BANNER_RETRY_MS);
               return;
             }
-            setActive(candidates[Math.floor(Math.random() * candidates.length)]);
+            setActive(
+              candidates[Math.floor(Math.random() * candidates.length)],
+            );
             bannerTimer = window.setTimeout(advance, BANNER_INTERVAL_MS);
           };
-          revealTimer = window.setTimeout(revealRestBanners, BANNER_REVEAL_FALLBACK_MS);
+          revealTimer = window.setTimeout(
+            revealRestBanners,
+            BANNER_REVEAL_FALLBACK_MS,
+          );
           bannerTimer = window.setTimeout(pickRandomStart, BANNER_INTERVAL_MS);
         };
 
@@ -374,7 +407,15 @@
             strokeHalf(w, h, side, gradient, BAND_WIDTH, dash, 0);
             if (sheenTo > sheenFrom) {
               ctx.globalAlpha = sheenAlpha;
-              strokeHalf(w, h, side, "#ffffff", BAND_WIDTH * 0.7, [sheenTo - sheenFrom, total * 2], -sheenFrom);
+              strokeHalf(
+                w,
+                h,
+                side,
+                "#ffffff",
+                BAND_WIDTH * 0.7,
+                [sheenTo - sheenFrom, total * 2],
+                -sheenFrom,
+              );
               ctx.globalAlpha = 1;
             }
           });
@@ -408,7 +449,8 @@
             splash.remove();
           };
           splash.addEventListener("transitionend", function (event) {
-            if (event.target !== splash || event.propertyName !== "opacity") return;
+            if (event.target !== splash || event.propertyName !== "opacity")
+              return;
             done();
           });
           window.setTimeout(done, LEAVE_MS + 120);
@@ -439,7 +481,9 @@
           progressStartedAt = Date.now();
           progressTimer = window.setInterval(function () {
             if (finishing) return;
-            applyProgress(Math.min(LOAD_CAP, simulated(Date.now() - progressStartedAt)));
+            applyProgress(
+              Math.min(LOAD_CAP, simulated(Date.now() - progressStartedAt)),
+            );
           }, TICK_MS);
         };
 
@@ -449,12 +493,14 @@
 
         if (ctx && !reduce) {
           resizeCanvas();
-          if (typeof ResizeObserver === "function") new ResizeObserver(resizeCanvas).observe(splash);
+          if (typeof ResizeObserver === "function")
+            new ResizeObserver(resizeCanvas).observe(splash);
           else window.addEventListener("resize", resizeCanvas);
           var render = function (time) {
             if (!splash.isConnected) return;
             shown += (progress - shown) * 0.18;
-            if (size.w > 0 && size.h > 0) drawEdgeRing(size.w, size.h, shown / 100, time);
+            if (size.w > 0 && size.h > 0)
+              drawEdgeRing(size.w, size.h, shown / 100, time);
             window.requestAnimationFrame(render);
           };
           window.requestAnimationFrame(render);

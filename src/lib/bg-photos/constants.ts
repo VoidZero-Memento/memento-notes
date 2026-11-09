@@ -11,7 +11,7 @@ export const MOBILE_BG_INTERVAL_MS = 10_000;
 
 /** PC 加载页、过渡蒙层、正文底：同一张图，铺满居中 */
 export const PC_PAGE_BG_URL =
-  "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes/pc-background.png";
+  "https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes/pc-background.jpeg";
 
 /** PC 图墙：单格倒牌（旧图 rotateX 倒下）时长 */
 export const PC_WALL_FLIP_MS = 650;

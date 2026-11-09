@@ -187,8 +187,8 @@
       rgba(4, 7, 14, 0.08) 42%,
       rgba(4, 7, 14, 0.16) 100%
     ),
-    url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes/pc-background.png");
-  background-position: center, center;
+    url("https://memento-static.oss-cn-shenzhen.aliyuncs.com/notes/pc-background.jpeg");
+  background-position: center, center bottom;
   background-repeat: no-repeat;
   background-size: cover, cover;
   filter: saturate(1) brightness(0.96);
