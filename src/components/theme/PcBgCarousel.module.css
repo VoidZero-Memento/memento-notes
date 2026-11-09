@@ -128,8 +128,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* 4:3 图在宽屏 cover 时裁上下；贴底，鞋和地板留在画面里 */
-  object-position: center bottom;
+  /* 4:3 图在宽屏 cover 时裁上下；略低于居中，鞋进画面，头顶仍留出门 */
+  object-position: center 75%;
   user-select: none;
 }
 
