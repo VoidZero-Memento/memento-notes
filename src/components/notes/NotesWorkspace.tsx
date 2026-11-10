@@ -4,6 +4,7 @@ import { MOBILE_BG_MQ } from "@/lib/bg-photos/constants";
 import { useMediaQuery } from "@/lib/dom/use-media-query";
 import { useGalleryBgGate } from "@/lib/gallery/use-gallery-gate";
 import { describeGithubError } from "@/lib/github/describe-github-error";
+import { findBlobSize, formatByteSize } from "@/lib/github/file-size";
 import { useRepos } from "@/lib/github/ReposContext";
 import { useKeepAliveActive } from "@/lib/keep-alive/keep-alive";
 import { parseOutline } from "@/lib/markdown/parse-outline";
@@ -151,6 +152,8 @@ export const NotesWorkspace = ({
     setMobileNavOpen(true);
   };
 
+  const noteBytes = selectedPath ? findBlobSize(tree, selectedPath) : null;
+  const noteSizeLabel = noteBytes == null ? "" : formatByteSize(noteBytes);
   const outlineItems = content ? parseOutline(content) : [];
   const outlineEmptyLabel = selectedPath ? "暂无大纲" : "请先选择文件";
   const outlineEmptyAction = selectedPath
@@ -458,6 +461,12 @@ export const NotesWorkspace = ({
           {selectedPath ? (
             <div className={styles.viewerMeta}>
               <p className={styles.viewerPath}>{selectedPath}</p>
+              {noteBytes != null && noteSizeLabel ? (
+                <span className={styles.viewerSize} title={`${noteBytes.toLocaleString("zh-CN")} 字节`}>
+                  <span className={styles.viewerSizeMark} aria-hidden />
+                  {noteSizeLabel}
+                </span>
+              ) : null}
             </div>
           ) : null}
           <div className={`${styles.viewerBodyWrap}${rulerMode ? ` ${styles.rulerOn}` : ""}`}>

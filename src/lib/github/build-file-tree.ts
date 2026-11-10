@@ -58,6 +58,7 @@ export const buildFileTree = (items: GithubTreeItem[]): GithubFileTreeNode[] => 
       path: item.path,
       type: "blob",
       sha: item.sha,
+      ...(typeof item.size === "number" ? { size: item.size } : {}),
     };
 
     if (!parentPath) {

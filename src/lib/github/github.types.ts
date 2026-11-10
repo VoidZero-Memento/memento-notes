@@ -11,6 +11,7 @@ export type GithubFileTreeNode = {
   path: string;
   type: "tree" | "blob";
   sha: string;
+  size?: number;
   children?: GithubFileTreeNode[];
 };
 
