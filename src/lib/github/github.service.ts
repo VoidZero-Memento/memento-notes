@@ -1,3 +1,4 @@
+import { repoAvatarUrls } from "@/config/github.config";
 import { buildFileTree } from "./build-file-tree";
 import { getGithubToken } from "./github-token";
 import { isExcludedFromNoteTree } from "./repo-path";
@@ -129,14 +130,18 @@ export const listOrgRepos = async (owner: string): Promise<GithubRepoConfig[]> =
 
   return body
     .filter((repo): repo is GithubApiRepo & { name: string } => Boolean(repo.name) && !repo.archived && !repo.disabled)
-    .map((repo) => ({
-      id: repo.name.toLowerCase(),
-      label: repo.name,
-      owner: repo.owner?.login || owner,
-      ...(repo.owner?.avatar_url ? { ownerAvatarUrl: repo.owner.avatar_url } : {}),
-      repo: repo.name,
-      branch: repo.default_branch || "main",
-    }));
+    .map((repo) => {
+      const repoId = repo.name.toLowerCase();
+      const ownerAvatarUrl = repoAvatarUrls[repoId] ?? repo.owner?.avatar_url;
+      return {
+        id: repoId,
+        label: repo.name,
+        owner: repo.owner?.login || owner,
+        ...(ownerAvatarUrl ? { ownerAvatarUrl } : {}),
+        repo: repo.name,
+        branch: repo.default_branch || "main",
+      };
+    });
 };
 
 export const getNoteRawContent = async (config: GithubRepoConfig, path: string): Promise<string> => {
